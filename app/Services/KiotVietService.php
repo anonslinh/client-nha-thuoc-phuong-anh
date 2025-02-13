@@ -1,0 +1,81 @@
+<?php
+
+
+namespace App\Services;
+
+use App\Models\PersonalAccessTokens;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\Http;
+
+class KiotVietService
+{
+    protected $clientId;
+    protected $clientSecret;
+    protected $tokenUrl;
+
+    public function __construct()
+    {
+        $this->clientId = env('KIOTVIET_CLIENT_ID');
+        $this->clientSecret = env('KIOTVIET_CLIENT_SECRET');
+        $this->tokenUrl = 'https://id.kiotviet.vn/connect/token';
+    }
+
+    /**
+     * Token kiotviet
+    */
+    public function getAccessToken(){
+        try{
+            $token = PersonalAccessTokens::where('access_token_code', 'KIOTVIET')->first();
+            if (!$token || Carbon::now()->greaterThan($token->expires_at)) {
+                return $this->refreshToken();
+            }
+
+            return $token->access_token;
+
+        }catch (\Exception $exception){
+            return response()->json(['error' => $exception->getMessage()], 500);
+        }
+    }
+
+    /**
+     * Gọi API lấy token mới
+     */
+    public function refreshToken()
+    {
+        $response = Http::asForm()->post($this->tokenUrl, [
+            'scopes' => 'PublicApi.Access',
+            'grant_type' => 'client_credentials',
+            'client_id' => $this->clientId,
+            'client_secret' => $this->clientSecret,
+        ]);
+
+        if ($response->failed()) {
+            throw new \Exception('Lỗi khi lấy token từ KiotViet');
+        }
+
+        $data = $response->json();
+        $expiresAt = Carbon::now()->addSeconds($data['expires_in']);
+
+        PersonalAccessTokens::updateOrCreate(
+            ['id' => 1, 'access_token_code' => 'KIOTVIET'],
+            [
+                'access_token' => $data['access_token'],
+                'expires_at' => $expiresAt
+            ]
+        );
+
+        return $data['access_token'];
+    }
+    /**
+     * retailer
+    */
+    public function getRetailer(){
+        try{
+            $token = env('RETAILER_KIOTVIET');
+
+            return $token;
+        }catch (\Exception $exception){
+            return response()->json(['error' => $exception->getMessage()], 500);
+        }
+    }
+}
