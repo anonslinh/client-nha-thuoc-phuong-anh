@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Http\Request;
 use App\Models\Invoice;
 use App\Models\InvoiceDetail;
+use App\Models\InvoiceRating;
 
 class InvoicesController extends HelperApiController
 {
@@ -112,4 +113,29 @@ class InvoicesController extends HelperApiController
             return response()->json(['error' => $exception->getMessage()], 500);
         }
     }
+
+    /**
+     * Đánh giá đơn hàng
+    */
+    public function invoiceRating(Request $request)
+    {
+        try {
+            $validated = $request->validate([
+                'kiotviet_invoice_id' => 'required|integer',
+                'kiotviet_customer_id' => 'required|integer',
+                'employee_id' => 'required|integer',
+                'rating' => 'required|integer|min:1|max:5',
+                'comment' => 'nullable|string'
+            ]);
+
+            // Gọi function createRating trong InvoiceRating để xử lý logic
+            $rating = InvoiceRating::createRating($validated);
+
+            return response()->json(['status' => true, 'message' => 'Đánh giá thành công', 'data' => $rating]);
+        } catch (\Exception $e) {
+            return response()->json(['status' => false, 'error' => $e->getMessage()], 500);
+        }
+    }
+
+
 }

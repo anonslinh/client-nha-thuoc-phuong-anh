@@ -9,6 +9,7 @@ Route::get('banners', [HomeController::class, 'getBanners']);
 Route::get('gifts', [HomeController::class, 'getGifts']);
 Route::get('programs', [HomeController::class, 'getPrograms']);
 Route::get('invoices', [InvoicesController::class, 'getInvoices']);
+Route::post('invoice-rating', [InvoicesController::class, 'invoiceRating']);
 
 Route::prefix('customer')->name('customer.')->group(function (){
 
