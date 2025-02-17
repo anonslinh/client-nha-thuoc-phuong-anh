@@ -4,6 +4,7 @@
 namespace App\Http\Controllers\API;
 
 use App\Models\Customer;
+use App\Models\Promotion;
 use Illuminate\Http\Request;
 use App\Models\Banner;
 use App\Models\Gift;
@@ -99,7 +100,7 @@ class HomeController extends HelperApiController
     }
 
     /**
-     * Danh sách chương trình khuyến mại
+     * Danh sách chương trình
     */
     public function getPrograms(Request $request)
     {
@@ -143,4 +144,23 @@ class HomeController extends HelperApiController
         return response()->json(['status' => true, 'data' => $programs]);
     }
 
+    /**
+     * Danh sách khuyến mại
+    */
+    public function getPromotions(Request $request){
+        $perPage = $request->input('per_page', 10);
+
+        $promotion = Promotion::where('status', 'active')
+            ->where(function ($query) {
+                $query->whereNull('start_date')->orWhere('start_date', '<=', now());
+            })
+            ->where(function ($query) {
+                $query->whereNull('end_date')->orWhere('end_date', '>=', now());
+            })
+            ->orderByDesc('priority')
+            ->orderBy('start_date', 'asc')
+            ->paginate($perPage);
+
+        return response()->json(['status' => true, 'data' => $promotion]);
+    }
 }
