@@ -14,11 +14,13 @@ return new class extends Migration
         Schema::create('gifts', function (Blueprint $table) {
             $table->id();
             $table->string('name'); // Tên quà tặng
+            $table->string('code');
             $table->string('image')->nullable(); // Hình ảnh quà
             $table->longText('description')->nullable(); // Hình ảnh quà
             $table->unsignedBigInteger('branch_id')->nullable(); // Chi nhánh áp dụng, null = toàn hệ thống
             $table->boolean('is_display')->default(false); // Quà trưng bày (hiển thị khi chưa có branch_id)
             $table->integer('points_required'); // Điểm yêu cầu để đổi quà
+            $table->integer('rank_id')->nullable();
             $table->timestamps();
 
         });

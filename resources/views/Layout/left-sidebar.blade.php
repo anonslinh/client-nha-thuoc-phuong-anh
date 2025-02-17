@@ -247,14 +247,14 @@
                 <!-- ============================= -->
                 <li class="nav-small-cap">
                     <i class="ti ti-dots nav-small-cap-icon fs-4"></i>
-                    <span class="hide-menu">PAGES</span>
+                    <span class="hide-menu">Banner</span>
                 </li>
                 <li class="sidebar-item">
                     <a class="sidebar-link has-arrow" href="javascript:void(0)" aria-expanded="false">
                   <span>
                     <iconify-icon icon="solar:notes-line-duotone" class="ti"></iconify-icon>
                   </span>
-                        <span class="hide-menu">Pages</span>
+                        <span class="hide-menu">Banner</span>
                     </a>
                     <ul aria-expanded="false" class="collapse first-level">
                         <li class="sidebar-item">

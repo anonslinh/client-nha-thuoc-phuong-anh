@@ -68,7 +68,6 @@ class SyncController extends HelperAdminController
     public function syncEmployees(){
         try{
             $accessToken = $this->kiotVietService->getAccessToken();
-
             $retailer = $this->kiotVietService->getRetailer();
 
             $response = Http::withHeaders([
@@ -81,7 +80,6 @@ class SyncController extends HelperAdminController
                 return response()->json(['error' => 'Không thể lấy dữ liệu từ KiotViet'], 500);
             }
             $employeesData = $response->json()['data'] ?? [];
-
             foreach ($employeesData as $employeeData) {
                 Employee::updateOrCreate(
                     ['kiotviet_id' => $employeeData['id']],
@@ -97,7 +95,6 @@ class SyncController extends HelperAdminController
             }
 
             return response()->json(['message' => 'Đồng bộ nhân viên thành công!']);
-
         }catch (\Exception $exception){
             return response()->json(['error' => $exception->getMessage()], 500);
         }
