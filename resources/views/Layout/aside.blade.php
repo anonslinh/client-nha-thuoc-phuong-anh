@@ -53,11 +53,11 @@
                     <!-- --------------------------------------------------------------------------------------------------------- -->
                     <!-- Charts -->
                     <!-- --------------------------------------------------------------------------------------------------------- -->
-{{--                    <li class="mini-nav-item" id="mini-6">--}}
-{{--                        <a href="javascript:void(0)" data-bs-toggle="tooltip" data-bs-custom-class="custom-tooltip" data-bs-placement="right" data-bs-title="Charts">--}}
-{{--                            <iconify-icon icon="solar:chart-line-duotone" class="fs-7"></iconify-icon>--}}
-{{--                        </a>--}}
-{{--                    </li>--}}
+                    <li class="mini-nav-item" id="mini-6">
+                        <a href="javascript:void(0)" data-bs-toggle="tooltip" data-bs-custom-class="custom-tooltip" data-bs-placement="right" data-bs-title="Khuyến mại">
+                            <iconify-icon icon="solar:chart-line-duotone" class="fs-7"></iconify-icon>
+                        </a>
+                    </li>
                     <!-- --------------------------------------------------------------------------------------------------------- -->
                     <!-- Ui -->
                     <!-- --------------------------------------------------------------------------------------------------------- -->
@@ -491,6 +491,35 @@
                         </li>
                         <li class="sidebar-item">
                             <a href="{{route('program.create')}}" class="sidebar-link">
+                                <iconify-icon icon="solar:tablet-line-duotone"></iconify-icon>
+                                <span class="hide-menu">Tạo mới</span>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+                <!-- ---------------------------------- -->
+                <!-- khuyen mai -->
+                <!-- ---------------------------------- -->
+                <nav class="sidebar-nav scroll-sidebar" id="menu-right-mini-6" data-simplebar>
+                    <ul class="sidebar-menu" id="sidebarnav">
+                        <!-- ---------------------------------- -->
+                        <!-- Home -->
+                        <!-- ---------------------------------- -->
+                        <li class="nav-small-cap">
+                            <span class="hide-menu">Khuyến mại</span>
+                        </li>
+                        <!-- ---------------------------------- -->
+                        <!-- Dashboard -->
+                        <!-- ---------------------------------- -->
+
+                        <li class="sidebar-item">
+                            <a href="{{route('promotion.list-data')}}" class="sidebar-link">
+                                <iconify-icon icon="solar:tablet-line-duotone"></iconify-icon>
+                                <span class="hide-menu">Danh sách</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item">
+                            <a href="{{route('promotion.create')}}" class="sidebar-link">
                                 <iconify-icon icon="solar:tablet-line-duotone"></iconify-icon>
                                 <span class="hide-menu">Tạo mới</span>
                             </a>

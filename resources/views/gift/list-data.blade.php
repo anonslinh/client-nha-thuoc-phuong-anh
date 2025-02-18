@@ -5,7 +5,7 @@
             <div class="card-header">
                 <div class="d-flex justify-content-between align-items-center">
                     <h4 class="p-0">Danh sách quà tặng</h4>
-                    <button class="btn btn-primary" data-toggle="modal" data-target="#modalCreate">+ Tạo mới</button>
+                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalCreate">+ Tạo mới</button>
                 </div>
             </div>
             @if(session('error'))
@@ -104,7 +104,7 @@
                         </div>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Hủy</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
                         <button class="btn btn-primary">Xác nhận</button>
                     </div>
                 </form>

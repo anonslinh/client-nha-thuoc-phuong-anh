@@ -31,16 +31,16 @@
     $("#sa-warning").click(function () {
       Swal.fire(
         {
-          title: "Are you sure?",
-          text: "You will not be able to recover this imaginary file!",
+          title: "Bạn có chắc chắn xóa?",
+          text: "Bạn sẽ không thể khôi phục dữ liệu này.!",
           type: "warning",
           showCancelButton: true,
           confirmButtonColor: "#DD6B55",
-          confirmButtonText: "Yes, delete it!",
+          confirmButtonText: "Xác nhận!",
           closeOnConfirm: false,
         },
         function () {
-          swal("Deleted!", "Your imaginary file has been deleted.", "success");
+            console.log('123')
         }
       );
     });
@@ -111,18 +111,20 @@
       });
     });
 
-    $("#sa-confirm").click(function () {
+    $(".btn-sa-confirm").click(function (ev) {
+      ev.preventDefault();
+      let url = $(this).attr('href');
       Swal.fire({
-        title: "Are you sure?",
-        text: "You won't be able to revert this!",
+        title: "Bạn có chắc chắn xóa?",
+        text: "Bạn sẽ không thể khôi phục dữ liệu này.!",
         type: "warning",
         showCancelButton: true,
         confirmButtonColor: "#3085d6",
         cancelButtonColor: "#d33",
-        confirmButtonText: "Yes, delete it!",
+        confirmButtonText: "Xác nhận!",
       }).then((result) => {
         if (result.value) {
-          Swal.fire("Deleted!", "Your file has been deleted.", "success");
+          location.replace(url);
         }
       });
     });

@@ -1,3 +1,4 @@
+
 var at = document.documentElement.getAttribute("data-layout");
 if ((at = "vertical")) {
   // ==============================================================
@@ -19,15 +20,32 @@ if ((at = "vertical")) {
       //****************************
 
       function findMatchingElement() {
-        var currentUrl = window.location.href;
+        var currentUrl = window.location.pathname;
         var anchors = document.querySelectorAll("#sidebarnav a");
-
+        let check = false;
         for (var i = 0; i < anchors.length; i++) {
-          if (anchors[i].href === currentUrl) {
-            return anchors[i];
+           var fullUrl = anchors[i].href;
+           var match = fullUrl.match(/^(https?:\/\/[^\/]+)(\/.*)/);
+          if (match != null) {
+              if (match[2] === currentUrl){
+                  return anchors[i];
+                  check = true;
+              }
           }
         }
-
+        if (!check){
+            for (var i = 0; i < anchors.length; i++) {
+                var fullUrl2 = anchors[i].href;
+                var match2 = fullUrl2.match(/^(https?:\/\/[^\/]+)(\/.*)/);
+                var arrayParam = currentUrl.split('/');
+                if (match2 != null) {
+                    var arrayUrl = match2[2].split('/');
+                    if (arrayParam[1] === arrayUrl[1]) {
+                        return anchors[i];
+                    }
+                }
+            }
+        }
         return null; // Return null if no matching element is found
       }
 
@@ -155,7 +173,7 @@ if ((at = "horizontal")) {
 }
 
 // ----------------------------------------
-// Active 2 file at same time 
+// Active 2 file at same time
 // ----------------------------------------
 
 var currentURL =

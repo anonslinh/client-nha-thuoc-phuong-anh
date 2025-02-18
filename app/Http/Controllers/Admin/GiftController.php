@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Models\Banner;
 use App\Models\Gift;
 use App\Models\Program;
+use App\Models\Promotion;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use function Illuminate\Support\of;
@@ -114,7 +115,6 @@ class GiftController
             $program->save();
             return back()->with(['success' => 'Thêm chương trình thành công']);
         }catch (\Exception $exception){
-            dd($exception->getMessage());
             return back()->with(['error' => 'Thêm chương trình thất bại.Vui lòng điền đầy đủ thông tin']);
         }
     }
@@ -129,5 +129,169 @@ class GiftController
         }
         $program->images = json_decode($program->images);
         return view('program.detail', compact('program'));
+    }
+    /**
+     * Cập nhật sự kiện
+    **/
+    public function updateProgram (Request $request, $id)
+    {
+        try{
+            $program = Program::find($id);
+            if (empty($program)){
+                return back()->with(['error' => 'Không tìm thấy dữ liệu.Vui lòng kiểm tra lại']);
+            }
+            $dataImage = json_decode($program->images);
+            if (!empty($request->image_delete)){
+                $dataImageDelete = explode(',',$request->get('image_delete'));
+                $dataImage = array_values(array_diff($dataImage, $dataImageDelete));
+                foreach ($dataImageDelete as $imageDelete){
+                    if (file_exists(public_path($imageDelete))) {
+                        unlink(public_path($imageDelete));
+                    }
+                }
+            }
+            if ($request->hasFile('thumbnail')){
+                if (file_exists(public_path($program->thumbnail))) {
+                    unlink(public_path($program->thumbnail));
+                }
+                $filePoster = $request->file('thumbnail');
+                $nameFile = 'poster'.time().Str::random(10).'.'.$filePoster->getClientOriginalExtension();
+                $filePoster->move('upload/program/', $nameFile);
+                $program->thumbnail = 'upload/program/'.$nameFile;
+            }
+            if ($request->hasFile('images')){
+                foreach ($request->file('images') as $file){
+                    $nameImage = 'image'.time().Str::random(10).'.'.$file->getClientOriginalExtension();
+                    $file->move('upload/program/', $nameImage);
+                    array_push($dataImage, 'upload/program/'.$nameImage);
+                }
+            }
+            $program->title = $request->get('title');
+            $program->join_link = $request->get('join_link')??null;
+            $program->branch_id = $request->get('branch_id');
+            $program->start_date = $request->get('start_date');
+            $program->end_date = $request->get('end_date');
+            $program->description = $request->get('description');
+            $program->images = json_encode($dataImage);
+            $program->save();
+            return back()->with(['success' => 'Cập nhật dữ liệu thành công']);
+        }catch (\Exception $exception){
+            return back()->with(['error' => 'Cập nhật dữ liệu thất bại.Vui lòng kiểm tra lại']);
+        }
+    }
+    /**
+     * Xóa dữ liệu sự kiện
+    **/
+    public function deleteProgram ($id)
+    {
+        $program = Program::find($id);
+        if (empty($program)){
+            return back()->with(['error' => 'Không tìm thấy dữ liệu.Vui lòng kiểm tra lại']);
+        }
+        if (file_exists(public_path($program->thumbnail))) {
+            unlink(public_path($program->thumbnail));
+        }
+        $dataImage = json_decode($program->images);
+        foreach ($dataImage as $imageDelete){
+            if (file_exists(public_path($imageDelete))) {
+                unlink(public_path($imageDelete));
+            }
+        }
+        $program->delete();
+        return back()->with(['success' => 'Xóa dữ liệu thành công']);
+    }
+    /**
+     * Khuyến mại
+    **/
+    public function promotion (Request $request)
+    {
+        $listData = Promotion::query();
+        if (isset($request->key_search)){
+            $listData = $listData->where('title', 'like', '%'.$request->get('key_search').'%');
+        }
+        $listData = $listData->orderBy('created_at', 'desc')->paginate(20);
+        return view('promotion.index', compact('listData'));
+    }
+    /**
+     * Tạo khuyến mại
+    **/
+    public function createPromotion (Request $request)
+    {
+        return view('promotion.create');
+    }
+    public function storePromotion (Request $request)
+    {
+        try{
+            $filePoster = $request->file('image_path');
+            $nameFile = time().Str::random(10).'.'.$filePoster->getClientOriginalExtension();
+            $filePoster->move('upload/promotion/', $nameFile);
+            $program = new Promotion([
+                'title' => $request->get('title'),
+                'description' => $request->get('description'),
+                'sub_title' => $request->get('sub_title'),
+                'image_path' => 'upload/promotion/'.$nameFile,
+                'join_link' => $request->get('join_link'),
+                'active_join_link' => isset($request->join_link) ? 1 : 0,
+                'start_date' => $request->get('start_date'),
+                'end_date' => $request->get('end_date')
+            ]);
+            $program->save();
+            return back()->with(['success' => 'Thêm khuyến mại thành công']);
+        }catch (\Exception $exception){
+            return back()->with(['error' => 'Thêm khuyến mại thất bại.Vui lòng điền đầy đủ thông tin']);
+        }
+    }
+    /**
+     * Chi tiết khuyến mại
+    **/
+    public function detailPromotion ($id)
+    {
+        $promotion = Promotion::find($id);
+        if (empty($promotion)){
+            return back()->with(['error' => 'Không tìm thấy dữ liệu.Vui lòng kiểm tra lại']);
+        }
+        return view('promotion.detail', compact('promotion'));
+    }
+    /**
+     * Cập nhật khuyến mại
+    **/
+    public function updatePromotion (Request $request, $id)
+    {
+        $promotion = Promotion::find($id);
+        if (empty($promotion)){
+            return back()->with(['error' => 'Không tìm thấy dữ liệu.Vui lòng kiểm tra lại']);
+        }
+        if ($request->hasFile('image_path')){
+            if (file_exists(public_path($promotion->image_path))) {
+                unlink(public_path($promotion->image_path));
+            }
+            $filePoster = $request->file('image_path');
+            $nameFile = time().Str::random(10).'.'.$filePoster->getClientOriginalExtension();
+            $filePoster->move('upload/promotion/', $nameFile);
+            $promotion->image_path = 'upload/promotion/'.$nameFile;
+        }
+        $promotion->title = $request->get('title');
+        $promotion->join_link = $request->get('join_link');
+        $promotion->start_date = $request->get('start_date');
+        $promotion->end_date = $request->get('end_date');
+        $promotion->sub_title = $request->get('sub_title');
+        $promotion->description = $request->get('description');
+        $promotion->save();
+        return back()->with(['success' => 'Cập nhật dữ liệu thành công']);
+    }
+    /**
+     * Xóa khuyến mại
+    **/
+    public function deletePromotion ($id)
+    {
+        $promotion = Promotion::find($id);
+        if (empty($promotion)){
+            return back()->with(['error' => 'Không tìm thấy dữ liệu.Vui lòng kiểm tra lại']);
+        }
+        if (file_exists(public_path($promotion->image_path))) {
+            unlink(public_path($promotion->image_path));
+        }
+        $promotion->delete();
+        return back()->with(['success' => 'Xóa dữ liệu thành công']);
     }
 }

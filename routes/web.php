@@ -28,5 +28,15 @@ Route::middleware([CheckLogin::class])->group(function (){
        Route::get('create', [GiftController::class, 'createProgram'])->name('create');
        Route::post('store', [GiftController::class, 'storeProgram'])->name('store');
        Route::get('detail/{id}', [GiftController::class, 'detailProgram'])->name('detail');
+       Route::post('update/{id}', [GiftController::class, 'updateProgram'])->name('update');
+       Route::get('delete/{id}', [GiftController::class, 'deleteProgram'])->name('delete');
+    });
+    Route::prefix('promotion')->name('promotion.')->group(function (){
+        Route::get('list-data', [GiftController::class, 'promotion'])->name('list-data');
+        Route::get('create', [GiftController::class, 'createPromotion'])->name('create');
+        Route::post('store', [GiftController::class, 'storePromotion'])->name('store');
+        Route::get('detail/{id}', [GiftController::class, 'detailPromotion'])->name('detail');
+        Route::post('update/{id}', [GiftController::class, 'updatePromotion'])->name('update');
+        Route::get('delete/{id}', [GiftController::class, 'deletePromotion'])->name('delete');
     });
 });

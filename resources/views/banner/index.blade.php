@@ -5,7 +5,7 @@
             <div class="card-header">
                 <div class="d-flex justify-content-between align-items-center">
                     <h4 class="m-0">Danh sách banner</h4>
-                    <button class="btn btn-primary" data-toggle="modal" data-target="#modalCreate">+ Tạo mới</button>
+                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalCreate">+ Tạo mới</button>
                 </div>
             </div>
             @if(session('error'))
@@ -76,12 +76,15 @@
         </div>
     </div>
     <!-- Modal -->
-    <div class="modal fade" id="modalCreate" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" role="document">
-            <form action="{{route('banner.store')}}" method="post" enctype="multipart/form-data" class="modal-content">
+    <div class="modal fade" id="modalCreate" tabindex="-1" aria-labelledby="vertical-center-modal" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+            <form action="{{route('banner.store')}}" method="post" class="modal-content" enctype="multipart/form-data">
                 @csrf
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLongTitle">Tạo mới banner</h5>
+                <div class="modal-header d-flex align-items-center">
+                    <h4 class="modal-title" id="myLargeModalLabel">
+                        Tạo mới banner
+                    </h4>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <div class="form-group mb-2">
@@ -112,7 +115,9 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Hủy</button>
+                    <button type="button" class="btn bg-danger-subtle text-danger  waves-effect text-start" data-bs-dismiss="modal">
+                        Hủy
+                    </button>
                     <button class="btn btn-primary">Xác nhận</button>
                 </div>
             </form>
