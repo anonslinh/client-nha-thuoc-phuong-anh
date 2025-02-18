@@ -11,7 +11,5 @@ Route::get('programs', [HomeController::class, 'getPrograms']);
 Route::get('promotions', [HomeController::class, 'getPromotions']);
 Route::get('invoices', [InvoicesController::class, 'getInvoices']);
 Route::post('invoice-rating', [InvoicesController::class, 'invoiceRating']);
+Route::get('membership-info', [HomeController::class, 'getMembershipInfo']);
 
-Route::prefix('customer')->name('customer.')->group(function (){
-
-});

@@ -9,6 +9,9 @@ use Illuminate\Http\Request;
 use App\Models\Banner;
 use App\Models\Gift;
 use App\Models\Program;
+use App\Models\CustomerRank;
+use App\Models\CustomerSpendingSummary;
+use App\Models\MembershipLevel;
 
 class HomeController extends HelperApiController
 {
@@ -28,6 +31,7 @@ class HomeController extends HelperApiController
 
             $phone = $this->normalizePhone($validatedData['phone']);
 
+            $this->syncCustomerInvoices($phone);
             // Lấy thông tin khách hàng & điểm thưởng
             $reward_point = optional(Customer::where('contact_number', $phone)->first())->reward_point ?? 0;
 
@@ -162,5 +166,71 @@ class HomeController extends HelperApiController
             ->paginate($perPage);
 
         return response()->json(['status' => true, 'data' => $promotion]);
+    }
+
+    /**
+     * Hạng thẻ của khách hàng
+    */
+    public function getMembershipInfo(Request $request){
+        try {
+            // Validate số điện thoại
+            $validatedData = $request->validate([
+                'phone' => ['required', 'regex:/^(0[1-9][0-9]{8,9}|84[1-9][0-9]{8,9})$/'],
+            ], [
+                'phone.required' => 'Số điện thoại là bắt buộc.',
+                'phone.regex' => 'Số điện thoại không hợp lệ.',
+            ]);
+
+            $phone = $this->normalizePhone($validatedData['phone']);
+
+            $this->syncCustomerInvoices($phone);
+
+            // Tìm khách hàng theo số điện thoại
+            $customer = Customer::where('contact_number', $phone)->first();
+
+            if (!$customer) {
+                return response()->json(['message' => 'Khách hàng không tồn tại'], 404);
+            }
+
+            // Lấy tổng chi tiêu của khách hàng
+            $totalSpent = CustomerSpendingSummary::where('customer_id', $customer->kiotviet_id)->sum('total_spent');
+
+            // Lấy hạng thẻ hiện tại
+            $currentRank = CustomerRank::where('customer_id', $customer->kiotviet_id)->first();
+
+            // Nếu chưa có hạng, mặc định "Thân Thiết"
+            if (!$currentRank) {
+                $currentRank = MembershipLevel::where('rank', 'than_thiet')->first();
+            } else {
+                $currentRank = MembershipLevel::where('rank', $currentRank->current_rank)->first();
+            }
+
+            // Tìm hạng tiếp theo cần thăng
+            $nextRank = MembershipLevel::where('spending_threshold', '>', $totalSpent)
+                ->orderBy('spending_threshold', 'asc')
+                ->first();
+
+            // Nếu không còn hạng cao hơn
+            $amountNeeded = $nextRank ? max(0, $nextRank->spending_threshold - $totalSpent) : 0;
+
+            $data_return = [
+                'customer_name'   => $customer->name,
+                'phone'           => $customer->contact_number,
+                'current_rank'    => $currentRank->name ?? 'Thân Thiết',
+                'total_spent'     => $totalSpent,
+                'next_rank'       => $nextRank->name ?? null,
+                'amount_to_next'  => $amountNeeded,
+            ];
+
+            return response()->json([
+                'status' => true,
+                'data' => $data_return
+            ], 200);
+
+        } catch (\Illuminate\Validation\ValidationException $exception) {
+            return response()->json(['error' => $exception->errors()], 422);
+        } catch (\Exception $exception) {
+            return response()->json(['error' => $exception->getMessage()], 500);
+        }
     }
 }
