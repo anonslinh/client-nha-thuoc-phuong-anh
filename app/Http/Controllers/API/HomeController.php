@@ -219,6 +219,7 @@ class HomeController extends HelperApiController
                 'phone'           => $customer->contact_number,
                 'current_rank'    => $currentRank->name ?? 'Thân Thiết',
                 'current_rank_code'    => $currentRank->rank ?? 'than_thiet',
+                'image' => $currentRank->image,
                 'total_spent'     => $totalSpent,
                 'next_rank'       => $nextRank->name ?? null,
                 'amount_to_next'  => $amountNeeded,
