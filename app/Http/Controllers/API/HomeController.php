@@ -12,6 +12,7 @@ use App\Models\Program;
 use App\Models\CustomerRank;
 use App\Models\CustomerSpendingSummary;
 use App\Models\MembershipLevel;
+use App\Models\Voucher;
 
 class HomeController extends HelperApiController
 {
@@ -234,4 +235,22 @@ class HomeController extends HelperApiController
             return response()->json(['error' => $exception->getMessage()], 500);
         }
     }
+
+    /**
+     * Danh sách voucher
+    */
+    public function getVouchers(Request $request)
+    {
+        $perPage = $request->input('per_page', 10);
+
+        $vouchers = Voucher::where('expiry_date', '>=', now())
+            ->orderBy('expiry_date', 'asc')
+            ->paginate($perPage);
+
+        return response()->json([
+            'status' => true,
+            'data' => $vouchers
+        ]);
+    }
+
 }

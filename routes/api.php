@@ -12,4 +12,5 @@ Route::get('promotions', [HomeController::class, 'getPromotions']);
 Route::get('invoices', [InvoicesController::class, 'getInvoices']);
 Route::post('invoice-rating', [InvoicesController::class, 'invoiceRating']);
 Route::get('membership-info', [HomeController::class, 'getMembershipInfo']);
+Route::get('vouchers', [HomeController::class, 'getVouchers']);
 
