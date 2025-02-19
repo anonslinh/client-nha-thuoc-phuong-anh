@@ -53,6 +53,9 @@ Route::middleware([CheckLogin::class])->group(function (){
     Route::prefix('voucher')->name('voucher.')->group(function (){
        Route::get('list-data', [HomeController::class, 'voucher'])->name('list-data');
        Route::get('customer', [HomeController::class, 'voucher'])->name('customer');
+       Route::post('store', [HomeController::class, 'storeVoucher'])->name('store');
+       Route::post('update/{id}', [HomeController::class, 'updateVoucher'])->name('update');
+       Route::get('delete/{id}', [HomeController::class, 'deleteVoucher'])->name('delete');
     });
     Route::prefix('rank')->name('rank.')->group(function (){
        Route::get('index', [HomeController::class, 'listRank'])->name('index');

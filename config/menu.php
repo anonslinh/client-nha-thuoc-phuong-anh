@@ -3,7 +3,7 @@
 return [
   [
       'name' => 'Quà tặng',
-      'icon' => 'solar:layers-line-duotone',
+      'icon' => 'solar:gift-broken',
       'submenu' => [
           [
               'name' => 'Danh sách',

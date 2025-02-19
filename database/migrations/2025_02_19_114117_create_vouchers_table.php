@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('vouchers', function (Blueprint $table) {
             $table->id();
             $table->string('title');
+            $table->unsignedBigInteger('membership_levels_id')->nullable();
             $table->string('image')->nullable(); // Hình ảnh quà
             $table->longText('description')->nullable();
             $table->integer('discount_amount');
