@@ -32,7 +32,43 @@ class GiftController
             return back()->with(['error' => 'Thêm quà tặng thất bại.Vui lòng điền đầy đủ thông tin']);
         }
     }
-
+    /**
+     * Cập nhật quà tặng
+    **/
+    public function update (Request $request, $id)
+    {
+        $gift = Gift::find($id);
+        if (empty($gift)){
+            return back()->with(['error' => 'Không tìm thấy dữ liệu.Vui lòng kiểm tra lại']);
+        }
+        if ($request->hasFile('image')){
+            $file = $request->file('image');
+            $nameFile = time().Str::random(10).'.'.$file->getClientOriginalExtension();
+            $file->move('upload/gift/', $nameFile);
+            if (file_exists(public_path($gift->image))) {
+                unlink(public_path($gift->image));
+            }
+            $gift->image = 'upload/gift/'.$nameFile;
+        }
+        $gift->name = $request->get('name');
+        $gift->code = $request->get('code');
+        $gift->points_required = $request->get('point');
+        $gift->rank_id = $request->get('rank_id');
+        $gift->save();
+        return back()->with(['success' => 'Cập nhật dữ liệu thành công']);
+    }
+    /**
+     * Xóa quà tặng
+    **/
+    public function delete ($id)
+    {
+        $gift = Gift::find($id);
+        if (empty($gift)){
+            return back()->with(['error' => 'Không tìm thấy dữ liệu.Vui lòng kiểm tra lại']);
+        }
+        $gift->delete();
+        return back()->with(['success' => 'Xóa dữ liệu thành công']);
+    }
     /**
      * Danh sách banner
     **/
@@ -65,7 +101,47 @@ class GiftController
             return back()->with(['error' => 'Thêm banner thất bại.Vui lòng điền đầy đủ thông tin']);
         }
     }
-
+    /**
+     * Cập nhật banner
+    **/
+    public function updateBanner (Request $request , $id)
+    {
+        $banner = Banner::find($id);
+        if (empty($banner)){
+            return back()->with(['error' => 'Không tìm thấy dữ liệu']);
+        }
+        if ($request->hasFile('image')){
+            $file = $request->file('image');
+            $nameFile = time().Str::random(10).'.'.$file->getClientOriginalExtension();
+            $file->move('upload/banner/', $nameFile);
+            if (file_exists(public_path($banner->image_url))) {
+                unlink(public_path($banner->image_url));
+            }
+            $banner->image_url = 'upload/banner/'.$nameFile;
+        }
+        $banner->title = $request->get('name');
+        $banner->branch_id = $request->get('branch_id');
+        $banner->redirect_url = $request->get('link');
+        $banner->start_date = $request->get('time_start');
+        $banner->end_date = $request->get('time_end');
+        $banner->save();
+        return back()->with(['success' => 'Cập nhật dữ liệu thành công']);
+    }
+    /**
+     * Xóa banner
+    **/
+    public function deleteBanner ($id)
+    {
+        $banner = Banner::find($id);
+        if (empty($banner)){
+            return back()->with(['error' => 'Không tìm thấy dữ liệu']);
+        }
+        if (file_exists(public_path($banner->image_url))) {
+            unlink(public_path($banner->image_url));
+        }
+        $banner->delete();
+        return back()->with(['success' => 'Xóa banner thành công']);
+    }
     /**
      * Danh sách chương trình
     **/
