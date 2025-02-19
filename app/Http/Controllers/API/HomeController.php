@@ -138,7 +138,7 @@ class HomeController extends HelperApiController
                 'branch_id' => $program->branch_id,
                 'branch_name' => optional($program->branch)->branch_name ?? 'Toàn hệ thống',
                 'thumbnail' => $program->thumbnail,
-                'images' => $program->images,
+                'images' => json_decode($program->images),
                 'start_time' => $program->start_time,
                 'end_time' => $program->end_time,
                 'can_join' => !empty($program->join_link) && $program->active_join_link,
