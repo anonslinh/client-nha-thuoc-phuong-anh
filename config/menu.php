@@ -38,7 +38,7 @@ return [
                 'route' => 'voucher.list-data'
             ],
             [
-                'name' => 'KH sử dụng voucher',
+                'name' => 'KH đổi voucher',
                 'icon' => 'solar:repeat-one-minimalistic-bold-duotone',
                 'route' => 'voucher.customer'
             ]

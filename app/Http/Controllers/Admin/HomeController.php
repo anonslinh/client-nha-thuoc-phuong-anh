@@ -28,11 +28,12 @@ class HomeController
         $listData = $listData->orderBy('updated_at', 'desc')->paginate(20);
         foreach ($listData as $value){
             if (!empty($value->rank_id)){
-                $rank = RankModel::find($value->rank_id);
+                $rank = MembershipLevel::find($value->rank_id);
                 $value['name_rank'] = $rank->name??'Hạng thẻ đã bị khóa';
             }
         }
-        return view('gift.list-data', compact('listData'));
+        $rank = MembershipLevel::orderBy('spending_threshold', 'asc')->get();
+        return view('gift.list-data', compact('listData', 'rank'));
     }
 
     public function logout ()

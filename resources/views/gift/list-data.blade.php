@@ -33,7 +33,6 @@
                         <th>Tên</th>
                         <th>Điểm quy đổi</th>
                         <th>Hạng thẻ</th>
-{{--                        <th>Trạng thái</th>--}}
                         <th>Khách hàng đổi</th>
                         <th>Thao tác</th>
                     </tr>
@@ -51,12 +50,6 @@
                                 </td>
                                 <td class="align-middle">{{$value->points_required}}</td>
                                 <td class="align-middle text-danger">{{$value->name_rank??'Không áp dụng'}}</td>
-{{--                                <td class="align-middle">--}}
-{{--                                    <label class="switch">--}}
-{{--                                        <input type="checkbox" checked>--}}
-{{--                                        <span class="slider round"></span>--}}
-{{--                                    </label>--}}
-{{--                                </td>--}}
                                 <td class="align-middle">0</td>
                                 <td class="align-middle">
 
@@ -81,7 +74,7 @@
                                                         <img src="{{$value->image}}" style="width: 200px;margin: 10px 0">
                                                         <input class="form-control" type="file" accept="image/png" name="image">
                                                     </div>
-                                                    <div class="form-group">
+                                                    <div class="form-group mb-2">
                                                         <label>Điểm quy đổi</label>
                                                         <input class="form-control" value="{{$value->points_required}}" name="point" type="number" min="0" required>
                                                     </div>
@@ -89,6 +82,9 @@
                                                         <label>Hạng thẻ</label>
                                                         <select name="rank_id" class="form-control">
                                                             <option value="">Không áp dụng</option>
+                                                            @foreach($rank as $rankItem)
+                                                                <option value="{{$rankItem->id}}" @if($rankItem->id == $value->rank_id) selected @endif>{{$rankItem->name}}</option>
+                                                            @endforeach
                                                         </select>
                                                     </div>
                                                 </div>
@@ -148,7 +144,7 @@
                             <label>Hình ảnh</label>
                             <input class="form-control" type="file" accept="image/png" name="image" required>
                         </div>
-                        <div class="form-group">
+                        <div class="form-group mb-2">
                             <label>Điểm quy đổi</label>
                             <input class="form-control" name="point" type="number" min="0" required>
                         </div>
@@ -156,6 +152,9 @@
                             <label>Hạng thẻ</label>
                             <select name="rank_id" class="form-control">
                                 <option value="">Không áp dụng</option>
+                                @foreach($rank as $rankItem)
+                                    <option value="{{$rankItem->id}}">{{$rankItem->name}}</option>
+                                @endforeach
                             </select>
                         </div>
                     </div>
