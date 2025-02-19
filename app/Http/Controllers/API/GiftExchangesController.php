@@ -73,7 +73,7 @@ class GiftExchangesController extends HelperApiController
 
             // Lưu giao dịch đổi quà
             GiftExchanges::create([
-                'customer_id' => $customer->kiotvet_id,
+                'customer_id' => $customer->kiotviet_id,
                 'contact_phone' => $customer->contact_number,
                 'gift_id' => $gift->id,
                 'branch_id' => $gift->branch_id ?? null,
@@ -165,7 +165,7 @@ class GiftExchangesController extends HelperApiController
 
         try {
             // Hoàn lại điểm cho khách hàng
-            $customer = Customer::find($exchange->customer_id);
+            $customer = Customer::where('kiotviet_id', $exchange->customer_id)->first();
             if ($customer) {
                 $customer->increment('reward_point', $exchange->points_used);
                 $customer->decrement('used_points', $exchange->points_used);
