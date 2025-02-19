@@ -24,4 +24,9 @@ class Voucher extends Model
     protected $casts = [
         'applicable_products' => 'array', // Chuyển đổi JSON thành mảng PHP
     ];
+
+    public function exchanges()
+    {
+        return $this->hasMany(VoucherExchanges::class, 'voucher_id');
+    }
 }

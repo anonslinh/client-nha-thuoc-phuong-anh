@@ -16,11 +16,10 @@ use Illuminate\Support\Str;
 class GiftExchangesController extends HelperApiController
 {
     /**
-     *
+     * Đổi điểm thành quà tặng
     */
     public function exchangeGift(Request $request)
     {
-//        dd($request->all());
         DB::beginTransaction();
         try {
 
@@ -119,7 +118,7 @@ class GiftExchangesController extends HelperApiController
             ->with('gift')
             ->paginate($perPage);;
 
-        return response()->json(['status' => true, 'data' => $giftExchanges]);
+        return response()->json(['status' => true, 'data' => $giftExchanges], 200);
     }
 
     /**
