@@ -32,6 +32,9 @@ return new class extends Migration
             $table->decimal('total_revenue', 15, 4)->default(0);
             $table->integer('total_point')->default(0);
             $table->integer('reward_point')->default(0);
+            $table->integer('kiotviet_reward_point')->default(0);
+            $table->integer('used_points')->default(0);
+            $table->integer('review_count')->default(0);
             $table->timestamps();
         });
     }

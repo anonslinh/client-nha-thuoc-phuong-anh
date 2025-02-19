@@ -130,6 +130,16 @@ class SyncController extends HelperAdminController
 
                 // Lưu danh sách khách hàng vào database
                 foreach ($data['data'] as $customer) {
+
+                    $existingCustomer = Customer::where('kiotviet_id', $customer['id'])->first();
+
+                    // Tính toán điểm thực tế
+                    $kiotvietRewardPoint = $customer['rewardPoint'] ?? 0;
+                    $usedPoints = $existingCustomer->used_points ?? 0;
+
+                    // Điểm thực tế = điểm từ KiotViet - điểm đã dùng + điểm thưởng từ đánh giá
+                    $actualRewardPoint = max($kiotvietRewardPoint - $usedPoints , 0);
+
                     Customer::updateOrCreate(
                         ['kiotviet_id' => $customer['id']], // Khóa chính để kiểm tra trùng
                         [
@@ -150,7 +160,9 @@ class SyncController extends HelperAdminController
                             'total_invoiced' => $customer['totalInvoiced'] ?? 0,
                             'total_revenue' => $customer['totalRevenue'] ?? 0,
                             'total_point' => $customer['totalPoint'] ?? 0,
-                            'reward_point' => $customer['rewardPoint'] ?? 0,
+                            'kiotviet_reward_point' => $kiotvietRewardPoint,
+                            'used_points'    => $usedPoints,
+                            'reward_point'   => $actualRewardPoint, // Cập nhật điểm thực tế
                         ]
                     );
                 }
