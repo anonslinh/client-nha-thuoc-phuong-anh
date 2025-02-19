@@ -4,10 +4,14 @@
 namespace App\Http\Controllers\Admin;
 
 
+use App\Models\CustomerRank;
 use App\Models\Gift;
+use App\Models\MembershipLevel;
 use App\Models\RankModel;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 
 class HomeController
 {
@@ -34,5 +38,38 @@ class HomeController
     {
         Auth::guard('users')->logout();
         return redirect()->route('login');
+    }
+
+    /**
+     * Danh sách hạng thẻ
+    **/
+    public function listRank (Request $request)
+    {
+        $listData = MembershipLevel::orderBy('spending_threshold', 'asc')->get();
+        foreach ($listData as $value){
+            $value->total_customer = CustomerRank::where('current_rank', $value->rank)
+                ->whereDate('rank_start_date', '<=', Carbon::now())->whereDate('rank_end_date', '>=', Carbon::now())->count();
+        }
+        return view('rank.list-data', compact('listData'));
+    }
+    /**
+     * Cập nhật hạng thẻ
+    **/
+    public function updateRank (Request $request, $id)
+    {
+        $rank = MembershipLevel::find($id);
+        if (empty($rank)){
+            return back()->with(['error' => 'Không tìm thấy dữ liệu']);
+        }
+        if ($request->hasFile('image')){
+            $file = $request->file('image');
+            $nameFile = time().Str::random(10).'.'.$file->getClientOriginalExtension();
+            $file->move('upload/rank/', $nameFile);
+            $rank->image = 'upload/rank/'.$nameFile;
+        }
+        $rank->name = $request->get('name');
+        $rank->spending_threshold = $request->get('spending_threshold');
+        $rank->save();
+        return back()->with(['success' => 'Cập nhật dữ liệu thành công']);
     }
 }

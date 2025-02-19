@@ -39,7 +39,7 @@
     <div class="page-wrapper">
         @include('Layout.header-start')
 
-        @include('Layout.left-sidebar')
+{{--        @include('Layout.left-sidebar')--}}
 
         <div class="body-wrapper">
             @yield('content')

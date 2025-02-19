@@ -16,6 +16,7 @@ Route::post('doLogin', [LoginController::class, 'doLogin'])->name('doLogin');
 Route::middleware([CheckLogin::class])->group(function (){
 //   Route::get('', [SyncController::class, 'syncEmployees'])->name('index');
     Route::get('', [HomeController::class, 'home'])->name('index');
+    Route::get('customer', [HomeController::class, 'home'])->name('customer');
     Route::get('logout', [HomeController::class, 'logout'])->name('logout');
     Route::prefix('gift')->name('gift.')->group(function (){
         Route::post('store', [GiftController::class, 'store'])->name('store');
@@ -47,5 +48,14 @@ Route::middleware([CheckLogin::class])->group(function (){
     Route::prefix('events')->name('events.')->group(function (){
        Route::get('list-data', [EventsController::class, 'listData'])->name('list-data');
        Route::get('create', [EventsController::class, 'create'])->name('create');
+    });
+
+    Route::prefix('voucher')->name('voucher.')->group(function (){
+       Route::get('list-data', [HomeController::class, 'voucher'])->name('list-data');
+       Route::get('customer', [HomeController::class, 'voucher'])->name('customer');
+    });
+    Route::prefix('rank')->name('rank.')->group(function (){
+       Route::get('index', [HomeController::class, 'listRank'])->name('index');
+       Route::post('update/{id}', [HomeController::class, 'updateRank'])->name('update');
     });
 });

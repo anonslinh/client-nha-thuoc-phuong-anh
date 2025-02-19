@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('name')->unique(); // 'than_thiet', 'bac', 'vang', 'kim_cuong'
             $table->string('rank')->unique(); // 'than_thiet', 'bac', 'vang', 'kim_cuong'
             $table->decimal('spending_threshold', 15, 2)->default(0); // Số tiền tối thiểu để đạt hạng này
+            $table->string('image')->nullable();
             $table->timestamps();
         });
 

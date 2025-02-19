@@ -16,5 +16,6 @@ class MembershipLevel extends Model
         'name',
         'rank',
         'spending_threshold',
+        'image'
     ];
 }
