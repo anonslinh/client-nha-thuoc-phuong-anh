@@ -61,11 +61,11 @@
                     <!-- --------------------------------------------------------------------------------------------------------- -->
                     <!-- Ui -->
                     <!-- --------------------------------------------------------------------------------------------------------- -->
-{{--                    <li class="mini-nav-item" id="mini-7">--}}
-{{--                        <a href="javascript:void(0)" data-bs-toggle="tooltip" data-bs-custom-class="custom-tooltip" data-bs-placement="right" data-bs-title="Ui Components">--}}
-{{--                            <iconify-icon icon="solar:widget-6-line-duotone" class="fs-7"></iconify-icon>--}}
-{{--                        </a>--}}
-{{--                    </li>--}}
+                    <li class="mini-nav-item" id="mini-7">
+                        <a href="javascript:void(0)" data-bs-toggle="tooltip" data-bs-custom-class="custom-tooltip" data-bs-placement="right" data-bs-title="Sự kiện">
+                            <iconify-icon icon="solar:widget-6-line-duotone" class="fs-7"></iconify-icon>
+                        </a>
+                    </li>
                     <!-- --------------------------------------------------------------------------------------------------------- -->
                     <!-- Components -->
                     <!-- --------------------------------------------------------------------------------------------------------- -->
@@ -524,6 +524,143 @@
                                 <span class="hide-menu">Tạo mới</span>
                             </a>
                         </li>
+                    </ul>
+                </nav>
+                <!-- ---------------------------------- -->
+                <!-- Sự kiện -->
+                <!-- ---------------------------------- -->
+                <nav class="sidebar-nav scroll-sidebar" id="menu-right-mini-7" data-simplebar>
+                    <ul class="sidebar-menu" id="sidebarnav">
+                        <!-- ---------------------------------- -->
+                        <!-- Home -->
+                        <!-- ---------------------------------- -->
+                        <li class="nav-small-cap">
+                            <span class="hide-menu">Sự kiện</span>
+                        </li>
+                        <!-- ---------------------------------- -->
+                        <!-- Dashboard -->
+                        <!-- ---------------------------------- -->
+
+                        <li class="sidebar-item">
+                            <a href="{{route('events.list-data')}}" class="sidebar-link">
+                                <iconify-icon icon="solar:waterdrops-line-duotone"></iconify-icon>
+                                <span class="hide-menu">Danh sách</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item">
+                            <a href="{{route('events.create')}}" class="sidebar-link">
+                                <iconify-icon icon="solar:tag-horizontal-line-duotone"></iconify-icon>
+                                <span class="hide-menu">Tạo sự kiện</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item">
+                            <a href="../main/ui-buttons.html" class="sidebar-link">
+                                <iconify-icon icon="solar:airbuds-case-minimalistic-line-duotone"></iconify-icon>
+                                <span class="hide-menu">Sản phẩm</span>
+                            </a>
+                        </li>
+                        <li class="sidebar-item">
+                            <a href="../main/ui-dropdowns.html" class="sidebar-link">
+                                <iconify-icon icon="solar:airbuds-case-line-duotone"></iconify-icon>
+                                <span class="hide-menu">Thêm sản phẩm</span>
+                            </a>
+                        </li>
+{{--                        <li class="sidebar-item">--}}
+{{--                            <a href="../main/ui-modals.html" class="sidebar-link">--}}
+{{--                                <iconify-icon icon="solar:bolt-line-duotone"></iconify-icon>--}}
+{{--                                <span class="hide-menu">Modals</span>--}}
+{{--                            </a>--}}
+{{--                        </li>--}}
+{{--                        <li class="sidebar-item">--}}
+{{--                            <a href="../main/ui-tab.html" class="sidebar-link">--}}
+{{--                                <iconify-icon icon="solar:box-minimalistic-line-duotone"></iconify-icon>--}}
+{{--                                <span class="hide-menu">Tab</span>--}}
+{{--                            </a>--}}
+{{--                        </li>--}}
+{{--                        <li class="sidebar-item">--}}
+{{--                            <a href="../main/ui-tooltip-popover.html" class="sidebar-link">--}}
+{{--                                <iconify-icon icon="solar:feed-line-duotone"></iconify-icon>--}}
+{{--                                <span class="hide-menu">Tooltip & Popover</span>--}}
+{{--                            </a>--}}
+{{--                        </li>--}}
+{{--                        <li class="sidebar-item">--}}
+{{--                            <a href="../main/ui-notification.html" class="sidebar-link">--}}
+{{--                                <iconify-icon icon="solar:flag-line-duotone"></iconify-icon>--}}
+{{--                                <span class="hide-menu">Notification</span>--}}
+{{--                            </a>--}}
+{{--                        </li>--}}
+{{--                        <li class="sidebar-item">--}}
+{{--                            <a href="../main/ui-progressbar.html" class="sidebar-link">--}}
+{{--                                <iconify-icon icon="solar:programming-line-duotone"></iconify-icon>--}}
+{{--                                <span class="hide-menu">Progressbar</span>--}}
+{{--                            </a>--}}
+{{--                        </li>--}}
+{{--                        <li class="sidebar-item">--}}
+{{--                            <a href="../main/ui-pagination.html" class="sidebar-link">--}}
+{{--                                <iconify-icon icon="solar:waterdrops-line-duotone"></iconify-icon>--}}
+{{--                                <span class="hide-menu">Pagination</span>--}}
+{{--                            </a>--}}
+{{--                        </li>--}}
+{{--                        <li class="sidebar-item">--}}
+{{--                            <a href="../main/ui-typography.html" class="sidebar-link">--}}
+{{--                                <iconify-icon icon="solar:text-bold-duotone"></iconify-icon>--}}
+{{--                                <span class="hide-menu">Typography</span>--}}
+{{--                            </a>--}}
+{{--                        </li>--}}
+{{--                        <li class="sidebar-item">--}}
+{{--                            <a href="../main/ui-bootstrap-ui.html" class="sidebar-link">--}}
+{{--                                <iconify-icon icon="solar:balloon-line-duotone"></iconify-icon>--}}
+{{--                                <span class="hide-menu">Bootstrap UI</span>--}}
+{{--                            </a>--}}
+{{--                        </li>--}}
+{{--                        <li class="sidebar-item">--}}
+{{--                            <a href="../main/ui-breadcrumb.html" class="sidebar-link">--}}
+{{--                                <iconify-icon icon="solar:slider-minimalistic-horizontal-line-duotone"></iconify-icon>--}}
+{{--                                <span class="hide-menu">Breadcrumb</span>--}}
+{{--                            </a>--}}
+{{--                        </li>--}}
+{{--                        <li class="sidebar-item">--}}
+{{--                            <a href="../main/ui-offcanvas.html" class="sidebar-link">--}}
+{{--                                <iconify-icon icon="solar:laptop-minimalistic-line-duotone"></iconify-icon>--}}
+{{--                                <span class="hide-menu">Offcanvas</span>--}}
+{{--                            </a>--}}
+{{--                        </li>--}}
+{{--                        <li class="sidebar-item">--}}
+{{--                            <a href="../main/ui-lists.html" class="sidebar-link">--}}
+{{--                                <iconify-icon icon="solar:checklist-bold-duotone"></iconify-icon>--}}
+{{--                                <span class="hide-menu">Lists</span>--}}
+{{--                            </a>--}}
+{{--                        </li>--}}
+{{--                        <li class="sidebar-item">--}}
+{{--                            <a href="../main/ui-grid.html" class="sidebar-link">--}}
+{{--                                <iconify-icon icon="solar:layers-minimalistic-line-duotone"></iconify-icon>--}}
+{{--                                <span class="hide-menu">Grid</span>--}}
+{{--                            </a>--}}
+{{--                        </li>--}}
+{{--                        <li class="sidebar-item">--}}
+{{--                            <a href="../main/ui-carousel.html" class="sidebar-link">--}}
+{{--                                <iconify-icon icon="solar:align-horizonta-spacing-line-duotone"></iconify-icon>--}}
+{{--                                <span class="hide-menu">Carousel</span>--}}
+{{--                            </a>--}}
+{{--                        </li>--}}
+{{--                        <li class="sidebar-item">--}}
+{{--                            <a href="../main/ui-scrollspy.html" class="sidebar-link">--}}
+{{--                                <iconify-icon icon="solar:multiple-forward-right-line-duotone"></iconify-icon>--}}
+{{--                                <span class="hide-menu">Scrollspy</span>--}}
+{{--                            </a>--}}
+{{--                        </li>--}}
+{{--                        <li class="sidebar-item">--}}
+{{--                            <a href="../main/ui-spinner.html" class="sidebar-link">--}}
+{{--                                <iconify-icon icon="solar:soundwave-bold-duotone"></iconify-icon>--}}
+{{--                                <span class="hide-menu">Spinner</span>--}}
+{{--                            </a>--}}
+{{--                        </li>--}}
+{{--                        <li class="sidebar-item">--}}
+{{--                            <a href="../main/ui-link.html" class="sidebar-link">--}}
+{{--                                <iconify-icon icon="solar:link-round-angle-bold-duotone"></iconify-icon>--}}
+{{--                                <span class="hide-menu">Link</span>--}}
+{{--                            </a>--}}
+{{--                        </li>--}}
                     </ul>
                 </nav>
             </div>

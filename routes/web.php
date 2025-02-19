@@ -6,6 +6,7 @@ use App\Http\Middleware\CheckLogin;
 use App\Http\Controllers\Admin\SyncController;
 use App\Http\Controllers\Admin\HomeController;
 use App\Http\Controllers\Admin\GiftController;
+use App\Http\Controllers\Admin\EventsController;
 
 Route::get('login', [LoginController::class, 'login'])->name('login');
 Route::get('register', [LoginController::class, 'register'])->name('register');
@@ -18,10 +19,14 @@ Route::middleware([CheckLogin::class])->group(function (){
     Route::get('logout', [HomeController::class, 'logout'])->name('logout');
     Route::prefix('gift')->name('gift.')->group(function (){
         Route::post('store', [GiftController::class, 'store'])->name('store');
+        Route::post('update/{id}', [GiftController::class, 'update'])->name('update');
+        Route::get('delete/{id}', [GiftController::class, 'delete'])->name('delete');
     });
     Route::prefix('banner')->name('banner.')->group(function (){
        Route::get('list-data', [GiftController::class, 'banner'])->name('list-data');
        Route::post('store', [GiftController::class, 'storeBanner'])->name('store');
+       Route::post('update/{id}', [GiftController::class, 'updateBanner'])->name('update');
+       Route::get('delete/{id}', [GiftController::class, 'deleteBanner'])->name('delete');
     });
     Route::prefix('program')->name('program.')->group(function (){
        Route::get('list-data', [GiftController::class, 'program'])->name('list-data');
@@ -38,5 +43,9 @@ Route::middleware([CheckLogin::class])->group(function (){
         Route::get('detail/{id}', [GiftController::class, 'detailPromotion'])->name('detail');
         Route::post('update/{id}', [GiftController::class, 'updatePromotion'])->name('update');
         Route::get('delete/{id}', [GiftController::class, 'deletePromotion'])->name('delete');
+    });
+    Route::prefix('events')->name('events.')->group(function (){
+       Route::get('list-data', [EventsController::class, 'listData'])->name('list-data');
+       Route::get('create', [EventsController::class, 'create'])->name('create');
     });
 });
