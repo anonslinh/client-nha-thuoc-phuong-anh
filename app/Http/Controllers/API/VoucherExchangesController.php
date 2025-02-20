@@ -109,7 +109,7 @@ class VoucherExchangesController extends HelperApiController
             ->orderByRaw("CASE WHEN status = 'pending' THEN 1 ELSE 2 END")
             ->orderBy('exchange_date', 'desc')
             ->with('voucher')
-            ->paginate($perPage);;
+            ->paginate($perPage);
 
         return response()->json(['status' => true, 'data' => $vouchers], 200);
     }

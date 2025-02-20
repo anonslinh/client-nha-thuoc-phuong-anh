@@ -24,6 +24,8 @@ class InvoicesController extends HelperApiController
     */
     public function getInvoices(Request $request){
         try{
+            $perPage = $request->input('per_page', 10);
+
             $phone = $request->input('phone');
 
             $accessToken = $this->kiotVietService->getAccessToken();
@@ -108,7 +110,9 @@ class InvoicesController extends HelperApiController
                 }
             }
 
-            return response()->json(['status' => true, 'data' => $invoices]);
+            $data = Invoice::where('customer_id', $customerId)->with('details')
+                ->paginate($perPage);
+            return response()->json(['status' => true, 'data' => $data]);
         }catch (\Exception $exception){
             return response()->json(['error' => $exception->getMessage()], 500);
         }
