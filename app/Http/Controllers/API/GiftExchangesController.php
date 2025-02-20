@@ -71,7 +71,7 @@ class GiftExchangesController extends HelperApiController
             $exchangeCode = 'GIFT' . strtoupper(Str::random(10));
 
             // Lưu giao dịch đổi quà
-            GiftExchanges::create([
+            $exchange = GiftExchanges::create([
                 'customer_id' => $customer->kiotviet_id,
                 'contact_phone' => $customer->contact_number,
                 'gift_id' => $gift->id,
@@ -88,6 +88,7 @@ class GiftExchangesController extends HelperApiController
                 'status' => true,
                 'message' => 'Đổi quà thành công',
                 'exchange_code' => $exchangeCode,
+                'data' => $exchange
             ]);
         } catch (\Illuminate\Validation\ValidationException $exception) {
             return response()->json(['error' => $exception->errors()], 422);
