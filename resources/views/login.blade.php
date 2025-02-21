@@ -31,7 +31,7 @@
                     <div class="min-vh-100 bg-body row justify-content-center align-items-center p-5">
                         <div class="col-12 auth-card">
                             <a href="/" class="text-nowrap logo-img d-block w-100">
-                                <img src="../assets/images/logos/logo-icon.svg" class="dark-logo" alt="Logo-Dark" />
+                                <img src="../assets/images/logos/logo.svg" class="dark-logo" alt="Logo-Dark" />
                             </a>
                             <h2 class="mb-2 mt-4 fs-7 fw-bolder">Sign In</h2>
                             <p class="mb-9">Your Admin Dashboard</p>
@@ -58,11 +58,11 @@
                             <form method="post" action="{{route('doLogin')}}">
                                 @csrf
                                 <div class="mb-3">
-                                    <label for="exampleInputEmail1" class="form-label">Username</label>
+                                    <label for="exampleInputEmail1" class="form-label">Tài khoản</label>
                                     <input type="email" class="form-control" name="email" id="exampleInputEmail1" aria-describedby="emailHelp" />
                                 </div>
                                 <div class="mb-4">
-                                    <label for="exampleInputPassword1" class="form-label">Password</label>
+                                    <label for="exampleInputPassword1" class="form-label">Mật khẩu</label>
                                     <input type="password" name="password" class="form-control" id="exampleInputPassword1" />
                                 </div>
                                 <div class="d-sm-flex align-items-center justify-content-between mb-4">
@@ -72,13 +72,12 @@
                                             Remeber this Device
                                         </label>
                                     </div>
-                                    <a class="text-primary fw-medium" href="./authentication-forgot-password.html">Forgot Password ?</a>
+                                    <a class="text-primary fw-medium" href="./authentication-forgot-password.html">Quên mật khẩu ?</a>
                                 </div>
                                 <button type="submit" class="btn btn-primary w-100 py-8 mb-4 rounded-2">Sign In</button>
                                 <div class="d-flex align-items-center justify-content-center">
-                                    <p class="fs-4 mb-0 fw-medium">New to MatDash?</p>
-                                    <a class="text-primary fw-medium ms-2" href="{{route('register')}}">Create an
-                                        account</a>
+                                    <p class="fs-4 mb-0 fw-medium">Win Win Group</p>
+                                    <a class="text-primary fw-medium ms-2" >Kính chào quý khách!</a>
                                 </div>
                             </form>
                         </div>
@@ -94,16 +93,15 @@
                         <div class="row justify-content-center w-100">
                             <div class="col-lg-6">
                                 <h2 class="text-white fs-10 mb-3 lh-sm">
-                                    Welcome to
+                                    Chào mừng bạn đến với
                                     <br />
-                                    MatDash
+                                    Win Win Group
                                 </h2>
-                                <span class="opacity-75 fs-4 text-white d-block mb-3">MatDash helps developers to build organized
-                    and well
+                                <span class="opacity-75 fs-4 text-white d-block mb-3">Warm & Build là ứng dụng dành cho khách hàng trong ngành mẹ và bé,
                     <br />
-                    coded dashboards full of beautiful and rich modules.
+                    giúp bạn trải nghiệm dịch vụ tốt hơn với nhiều tiện ích hữu ích.
                   </span>
-                                <a href="/" class="btn btn-primary">Learn More</a>
+                                <a target="_blank" href="https://winwingroup.vn/contact" class="btn btn-primary">Liên hệ</a>
                             </div>
                         </div>
                     </div>
