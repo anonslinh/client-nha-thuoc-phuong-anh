@@ -7,7 +7,6 @@
 
 <!-- solar icons -->
 <script src="https://cdn.jsdelivr.net/npm/iconify-icon@1.0.8/dist/iconify-icon.min.js"></script>
-{{--<script src="assets/libs/apexcharts/dist/apexcharts.min.js"></script>--}}
 <script src="assets/js/dashboards/dashboard1.js"></script>
 <script src="assets/libs/fullcalendar/index.global.min.js"></script>
 <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>

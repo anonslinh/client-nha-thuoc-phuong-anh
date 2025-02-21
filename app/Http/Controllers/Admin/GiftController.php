@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Models\Banner;
 use App\Models\Gift;
+use App\Models\MembershipLevel;
 use App\Models\Program;
 use App\Models\Promotion;
 use Illuminate\Http\Request;
@@ -12,6 +13,26 @@ use function Illuminate\Support\of;
 
 class GiftController
 {
+    public function index (Request $request)
+    {
+        $listData = Gift::query();
+        if (isset($request->key_search)){
+            $listData = $listData->where(function ($query) use ($request){
+                $query->where('name', 'like', '%'.$request->get('key_search').'%')
+                    ->orWhere('code', 'like', '%'.$request->get('key_search').'%');
+            });
+        }
+        $listData = $listData->orderBy('updated_at', 'desc')->paginate(20);
+        foreach ($listData as $value){
+            if (!empty($value->rank_id)){
+                $rank = MembershipLevel::find($value->rank_id);
+                $value['name_rank'] = $rank->name??'Hạng thẻ đã bị khóa';
+            }
+        }
+        $rank = MembershipLevel::orderBy('spending_threshold', 'asc')->get();
+        return view('gift.list-data', compact('listData', 'rank'));
+    }
+
     public function store (Request $request)
     {
         try{
