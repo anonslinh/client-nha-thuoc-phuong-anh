@@ -13,6 +13,7 @@ use App\Models\CustomerRank;
 use App\Models\CustomerSpendingSummary;
 use App\Models\MembershipLevel;
 use App\Models\Voucher;
+use App\Models\MiniGame;
 
 class HomeController extends HelperApiController
 {
@@ -252,6 +253,42 @@ class HomeController extends HelperApiController
             'status' => true,
             'data' => $vouchers
         ]);
+    }
+
+    /**
+     * Danh sách mini game
+    */
+    public function getActiveMiniGames(Request $request)
+    {
+        $branchId = $request->input('branch_id');
+
+        $miniGames = MiniGame::where('status', 'active')
+            ->where('start_time', '<=', now())
+            ->where('end_time', '>=', now())
+            ->where(function ($query) use ($branchId) {
+                $query->whereNull('branch_id') // Game toàn hệ thống
+                ->orWhere('branch_id', $branchId); // Game áp dụng cho chi nhánh cụ thể
+            })
+            ->get();
+
+        // Duyệt qua từng mini game để tính thời gian còn lại
+        foreach ($miniGames as $game) {
+            $now = now();
+            $endTime = \Carbon\Carbon::parse($game->end_time);
+            $diffInDays = floor($now->diffInDays($endTime)); // Chỉ lấy số nguyên
+
+            // Xác định text thời gian còn lại
+            if ($now->greaterThanOrEqualTo($endTime)) {
+                $game->time_left = "Đã kết thúc";
+            } elseif ($diffInDays == 0) {
+                $diffInHours = floor($now->diffInHours($endTime));
+                $game->time_left = "Chỉ còn $diffInHours giờ";
+            } else {
+                $game->time_left = "Chỉ còn $diffInDays ngày";
+            }
+        }
+
+        return response()->json(['status' => true, 'data' => $miniGames], 200);
     }
 
 }
