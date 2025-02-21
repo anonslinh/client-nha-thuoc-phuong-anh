@@ -282,9 +282,9 @@ class HomeController extends HelperApiController
                 $game->time_left = "Đã kết thúc";
             } elseif ($diffInDays == 0) {
                 $diffInHours = floor($now->diffInHours($endTime));
-                $game->time_left = "Chỉ còn $diffInHours giờ";
+                $game->time_left = "Thời gian: Chỉ còn $diffInHours giờ";
             } else {
-                $game->time_left = "Chỉ còn $diffInDays ngày";
+                $game->time_left = "Thời gian: Chỉ còn $diffInDays ngày";
             }
         }
 
