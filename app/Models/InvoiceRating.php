@@ -48,19 +48,42 @@ class InvoiceRating extends Model
      */
     public static function createRating($data)
     {
+
         // Kiểm tra xem hóa đơn đã được đánh giá chưa
         if (self::where('kiotviet_invoice_id', $data['kiotviet_invoice_id'])->exists()) {
             throw new \Exception('Hóa đơn này đã được đánh giá trước đó');
         }
 
-        $invoiceRating = self::create($data);
+        \DB::beginTransaction();
 
-        // Cập nhật điểm KPI cho nhân viên
-        EmployeeKpi::updateKpiScore($invoiceRating->employee_id, $invoiceRating->rating);
+        try {
+            $invoiceRating = self::create($data);
 
-        // Cập nhật tổng số chấm điểm sao cho nhân viên từ 1 -> 5 sao
-        EmployeeRatingSummary::updateRatingSummary($invoiceRating->employee_id, $invoiceRating->rating);
+            // Cập nhật điểm KPI cho nhân viên
+            EmployeeKpi::updateKpiScore($invoiceRating->employee_id, $invoiceRating->rating);
 
-        return $invoiceRating;
+            // Cập nhật tổng số chấm điểm sao cho nhân viên từ 1 -> 5 sao
+            EmployeeRatingSummary::updateRatingSummary($invoiceRating->employee_id, $invoiceRating->rating);
+
+            // Lấy thông tin khách hàng
+            $customer = Customer::where('kiotviet_id', $data['kiotviet_customer_id'])->first();
+
+            if ($customer) {
+                // Tăng review_count lên 1
+                $customer->increment('review_count');
+
+                // Nếu review_count là bội số của 10, trừ used_points đi 1
+                if ($customer->review_count % 10 === 0) {
+                    $customer->decrement('used_points', 1);
+                }
+            }
+
+            \DB::commit();
+
+            return $invoiceRating;
+        } catch (\Exception $e) {
+            \DB::rollBack();
+            throw new \Exception($e->getMessage());
+        }
     }
 }

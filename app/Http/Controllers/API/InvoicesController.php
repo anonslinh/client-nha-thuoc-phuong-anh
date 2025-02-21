@@ -21,9 +21,11 @@ class InvoicesController extends HelperApiController
 
     /**
      * Danh sách đơn hàng
+     * $cutoffDate ngày hoá đơn được tính đánh giá
     */
     public function getInvoices(Request $request){
         try{
+            $cutoffDate = '2024-02-20';
             $perPage = $request->input('per_page', 10);
 
             $phone = $request->input('phone');
@@ -112,13 +114,16 @@ class InvoicesController extends HelperApiController
 
             $data = Invoice::leftJoin('invoice_ratings', 'invoices.kiotviet_id', '=', 'invoice_ratings.kiotviet_invoice_id')
                 ->where('invoices.customer_id', $customerId)
-                ->select('invoices.*', \DB::raw('IF(invoice_ratings.kiotviet_invoice_id IS NULL, false, true) as is_rated'))
+                ->select(
+                    'invoices.*',
+                    \DB::raw("IF(invoices.created_date < '$cutoffDate' OR invoice_ratings.kiotviet_invoice_id IS NOT NULL, true, false) as is_rated")
+                )
                 ->with('details')
                 ->paginate($perPage);
 
             return response()->json(['status' => true, 'data' => $data]);
         }catch (\Exception $exception){
-            return response()->json(['error' => $exception->getMessage()], 500);
+            return response()->json(['error' => $exception->getMessage()], 200);
         }
     }
 
