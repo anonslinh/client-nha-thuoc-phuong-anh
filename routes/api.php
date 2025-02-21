@@ -17,6 +17,7 @@ Route::get('membership-info', [HomeController::class, 'getMembershipInfo']);
 Route::get('vouchers', [HomeController::class, 'getVouchers']);
 Route::get('mini-games', [HomeController::class, 'getActiveMiniGames']);
 Route::get('contacts', [HomeController::class, 'getContacts']);
+Route::get('slogan', [HomeController::class, 'getSlogans']);
 
 //Đổi quà
 Route::post('exchange-gift', [GiftExchangesController::class, 'exchangeGift']);

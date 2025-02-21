@@ -6,6 +6,7 @@ namespace App\Http\Controllers\API;
 use App\Models\Contacts;
 use App\Models\Customer;
 use App\Models\Promotion;
+use App\Models\Slogan;
 use Illuminate\Http\Request;
 use App\Models\Banner;
 use App\Models\Gift;
@@ -298,6 +299,16 @@ class HomeController extends HelperApiController
     public function getContacts(){
 
         $data = Contacts::all();
+
+        return response()->json(['status' => true, 'data' => $data], 200);
+    }
+
+    /**
+     * Slogan
+    */
+    public function getSlogans(){
+
+        $data = Slogan::find(1);
 
         return response()->json(['status' => true, 'data' => $data], 200);
     }
