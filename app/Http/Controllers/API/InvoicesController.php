@@ -46,7 +46,7 @@ class InvoicesController extends HelperApiController
 
             $customers = $response->json()['data'] ?? [];
             if (!$phone || empty($customers)) {
-                return response()->json(['status' => false, 'data' => []], 400);
+                return response()->json(['status' => false, 'data' => []], 200);
             }
 
             $customerId = $customers[0]['id'];
@@ -63,7 +63,7 @@ class InvoicesController extends HelperApiController
 
             $invoices = $invoiceResponse->json()['data'] ?? [];
             if (!$phone || empty($invoices)) {
-                return response()->json(['status' => false, 'data' => []], 400);
+                return response()->json(['status' => false, 'data' => []], 200);
             }
 
             foreach ($invoices as $invoiceData) {

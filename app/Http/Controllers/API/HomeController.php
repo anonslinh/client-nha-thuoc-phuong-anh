@@ -193,7 +193,29 @@ class HomeController extends HelperApiController
             $customer = Customer::where('contact_number', $phone)->first();
 
             if (!$customer) {
-                return response()->json(['message' => 'Khách hàng không tồn tại'], 404);
+                $currentRank = MembershipLevel::where('rank', 'than_thiet')->first();
+                // Tìm hạng tiếp theo cần thăng
+                $nextRank = MembershipLevel::where('spending_threshold', '>', 0)
+                    ->orderBy('spending_threshold', 'asc')
+                    ->first();
+                // Nếu không còn hạng cao hơn
+                $amountNeeded = $nextRank ? max(0, $nextRank->spending_threshold - 0) : 0;
+
+                $data_return = [
+                    'customer_name'   => $customer->name ?? null,
+                    'phone'           => $phone,
+                    'current_rank'    => $currentRank->name ?? 'Thân Thiết',
+                    'current_rank_code'    => $currentRank->rank ?? 'than_thiet',
+                    'image' => $currentRank->image??null,
+                    'total_spent'     => 0,
+                    'next_rank'       => $nextRank->name ?? null,
+                    'amount_to_next'  => $amountNeeded,
+                ];
+
+                return response()->json([
+                    'status' => true,
+                    'data' => $data_return
+                ], 200);
             }
 
             // Lấy tổng chi tiêu của khách hàng
