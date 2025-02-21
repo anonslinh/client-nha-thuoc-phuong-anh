@@ -3,6 +3,7 @@
 
 namespace App\Http\Controllers\API;
 
+use App\Models\Contacts;
 use App\Models\Customer;
 use App\Models\Promotion;
 use Illuminate\Http\Request;
@@ -291,4 +292,13 @@ class HomeController extends HelperApiController
         return response()->json(['status' => true, 'data' => $miniGames], 200);
     }
 
+    /**
+     * Liên hệ
+    */
+    public function getContacts(){
+
+        $data = Contacts::all();
+
+        return response()->json(['status' => true, 'data' => $data], 200);
+    }
 }
