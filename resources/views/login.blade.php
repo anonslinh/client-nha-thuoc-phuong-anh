@@ -14,7 +14,7 @@
     <!-- Core Css -->
     <link rel="stylesheet" href="assets/css/styles.css" />
 
-    <title>MatDash Bootstrap Admin</title>
+    <title>Win Win Group</title>
 </head>
 
 <body>

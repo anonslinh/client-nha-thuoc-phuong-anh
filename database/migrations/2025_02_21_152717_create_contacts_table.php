@@ -15,6 +15,7 @@ return new class extends Migration
         Schema::create('contacts', function (Blueprint $table) {
             $table->id();
             $table->string('name'); // 'Tên'
+            $table->string('icon')->nullable(); // 'Tên'
             $table->string('type'); // 'zalo', 'phone', 'email'
             $table->string('value'); // Số điện thoại, email hoặc link Zalo
             $table->timestamps();
@@ -22,9 +23,9 @@ return new class extends Migration
 
         // Chèn dữ liệu mẫu sau khi tạo bảng
         DB::table('contacts')->insert([
-            ['name' => 'Zalo OA', 'type' => 'zalo', 'value' => '4579606723122854828'],
-            ['name' => 'Số điện thoại', 'type' => 'phone', 'value' => '0387287333'],
-            ['name' => 'Email', 'type' => 'email', 'value' => 'winsinternational.co.ltd@gmail.com'],
+            ['name' => 'Zalo OA', 'type' => 'zalo', 'value' => '4579606723122854828', 'icon' => "assets/images/config/icon_zalo.svg"],
+            ['name' => 'Số điện thoại', 'type' => 'phone', 'value' => '0387287333', 'icon' => 'assets/images/config/icon_phone.svg'],
+            ['name' => 'Email', 'type' => 'email', 'value' => 'winsinternational.co.ltd@gmail.com', 'icon' => 'assets/images/config/icon_mail.svg'],
         ]);
     }
 
