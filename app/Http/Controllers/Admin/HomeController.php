@@ -4,11 +4,14 @@
 namespace App\Http\Controllers\Admin;
 
 
+use App\Models\Customer;
 use App\Models\CustomerRank;
 use App\Models\Gift;
+use App\Models\GiftExchanges;
 use App\Models\MembershipLevel;
 use App\Models\RankModel;
 use App\Models\Voucher;
+use App\Models\VoucherExchanges;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -16,24 +19,9 @@ use Illuminate\Support\Str;
 
 class HomeController
 {
-    public function home (Request $request)
+    public function home ()
     {
-        $listData = Gift::query();
-        if (isset($request->key_search)){
-            $listData = $listData->where(function ($query) use ($request){
-                $query->where('name', 'like', '%'.$request->get('key_search').'%')
-                    ->orWhere('code', 'like', '%'.$request->get('key_search').'%');
-            });
-        }
-        $listData = $listData->orderBy('updated_at', 'desc')->paginate(20);
-        foreach ($listData as $value){
-            if (!empty($value->rank_id)){
-                $rank = MembershipLevel::find($value->rank_id);
-                $value['name_rank'] = $rank->name??'Hạng thẻ đã bị khóa';
-            }
-        }
-        $rank = MembershipLevel::orderBy('spending_threshold', 'asc')->get();
-        return view('gift.list-data', compact('listData', 'rank'));
+        return view('dashboard');
     }
 
     public function logout ()
@@ -160,5 +148,78 @@ class HomeController
         }
         $voucher->delete();
         return back()->with(['success' => 'Xóa dữ liệu thành công']);
+    }
+
+    /**
+     * Danh sách khách hàng đổi voucher
+    **/
+    public function customerVoucher (Request $request)
+    {
+        $listData = VoucherExchanges::join('customers', 'customers.kiotviet_id', '=', 'voucher_exchanges.customer_id')
+            ->join('vouchers', 'vouchers.id', '=', 'voucher_exchanges.voucher_id')
+                ->select('voucher_exchanges.*', 'customers.name as name_customer', 'customers.contact_number as phone_customer',
+                    'vouchers.title', 'vouchers.image');
+        if (isset($request->key_search)){
+            $listData = $listData->where(function ($query) use ($request){
+               $query->where('customers.contact_number', 'like', '%'.$request->get('key_search').'%')
+               ->orWhere('customers.name', 'like', '%'.$request->get('key_search').'%')
+               ->orWhere('vouchers.title', 'like', '%'.$request->get('key_search').'%')
+               ->orWhere('voucher_exchanges.exchange_code', 'like', '%'.$request->get('key_search').'%');
+            });
+        }
+        if (isset($request->status)){
+            $listData = $listData->where('voucher_exchanges.status', $request->get('status'));
+        }
+        $listData = $listData->orderBy('created_at', 'desc')->paginate(20);
+        return view('voucher.customer', compact('listData'));
+    }
+    /**
+     * Danh sách khách hàng đổi quà tặng
+    **/
+    public function customerExchangeGift (Request $request)
+    {
+        $listData = GiftExchanges::query();
+        $listData = $listData->join('customers', 'customers.kiotviet_id', '=', 'gift_exchanges.customer_id')
+            ->join('gifts', 'gifts.id', '=','gift_exchanges.gift_id')
+            ->select('gift_exchanges.*','customers.name as name_customer', 'gifts.name', 'gifts.code', 'gifts.image');
+        if (isset($request->key_search)){
+            $listData = $listData->where(function ($query) use ($request){
+               $query->where('customers.name', 'like', '%'.$request->get('key_search').'%')
+                   ->orWhere('gift_exchanges.contact_phone', 'like', '%'.$request->get('key_search').'%')
+                   ->orWhere('gifts.name', 'like', '%'.$request->get('key_search').'%')
+                   ->orWhere('gifts.code', 'like', '%'.$request->get('key_search').'%')
+                   ->orWhere('gift_exchanges.exchange_code', 'like', '%'.$request->get('key_search').'%');
+            });
+        }
+        if (isset($request->status)){
+            $listData = $listData->where('gift_exchanges.status', $request->get('status'));
+        }
+        $listData = $listData->orderBy('created_at', 'desc')->paginate(20);
+        return view('gift.customer', compact('listData'));
+    }
+    /**
+     * Danh sách khách hàng
+    **/
+    public function customer (Request $request)
+    {
+        $listData = Customer::query();
+        if (isset($request->key_search)){
+            $listData = $listData->where(function ($query) use ($request){
+                $query->where('kiotviet_id', 'like', '%'.$request->get('key_search').'%')
+                    ->orWhere('code', 'like', '%'.$request->get('key_search').'%')
+                    ->orWhere('contact_number', 'like', '%'.$request->get('key_search').'%')
+                    ->orWhere('address', 'like', '%'.$request->get('key_search').'%');
+            });
+        }
+        if (isset($request->sort)){
+            if ($request->get('sort') == 'total_invoiced'){
+                $listData = $listData->orderBy('total_invoiced', 'desc');
+            }elseif ($request->get('sort') == 'total_point'){
+                $listData = $listData->orderBy('total_point', 'desc');
+            }
+        }else{
+            $listData = $listData->orderBy('created_at', 'desc')->paginate(20);
+        }
+        return view('customer.index', compact('listData'));
     }
 }
