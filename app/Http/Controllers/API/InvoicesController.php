@@ -110,8 +110,12 @@ class InvoicesController extends HelperApiController
                 }
             }
 
-            $data = Invoice::where('customer_id', $customerId)->with('details')
+            $data = Invoice::leftJoin('invoice_ratings', 'invoices.kiotviet_id', '=', 'invoice_ratings.kiotviet_invoice_id')
+                ->where('invoices.customer_id', $customerId)
+                ->select('invoices.*', \DB::raw('IF(invoice_ratings.kiotviet_invoice_id IS NULL, false, true) as is_rated'))
+                ->with('details')
                 ->paginate($perPage);
+
             return response()->json(['status' => true, 'data' => $data]);
         }catch (\Exception $exception){
             return response()->json(['error' => $exception->getMessage()], 500);
@@ -137,7 +141,7 @@ class InvoicesController extends HelperApiController
 
             return response()->json(['status' => true, 'message' => 'Đánh giá thành công', 'data' => $rating]);
         } catch (\Exception $e) {
-            return response()->json(['status' => false, 'error' => $e->getMessage()], 500);
+            return response()->json(['status' => false, 'error' => $e->getMessage()], 200);
         }
     }
 
