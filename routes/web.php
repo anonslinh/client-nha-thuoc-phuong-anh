@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\SyncController;
 use App\Http\Controllers\Admin\HomeController;
 use App\Http\Controllers\Admin\GiftController;
 use App\Http\Controllers\Admin\EventsController;
+use App\Http\Controllers\Admin\SettingController;
 
 Route::get('login', [LoginController::class, 'login'])->name('login');
 Route::get('register', [LoginController::class, 'register'])->name('register');
@@ -65,5 +66,25 @@ Route::middleware([CheckLogin::class])->group(function (){
     Route::prefix('rank')->name('rank.')->group(function (){
        Route::get('index', [HomeController::class, 'listRank'])->name('index');
        Route::post('update/{id}', [HomeController::class, 'updateRank'])->name('update');
+    });
+
+    //Cài đặt
+    Route::prefix('config')->name('config.')->group(function (){
+
+        //Đồng bộ nhân viên
+        Route::get('employees', [SettingController::class, 'getEmployees'])->name('employees');
+        Route::get('employees-sync', [SyncController::class, 'syncEmployees'])->name('employees-sync');
+
+        //Đồng bộ cửa hàng
+        Route::get('branches', [SettingController::class, 'getBranches'])->name('branches');
+        Route::get('branches-sync', [SyncController::class, 'syncBranches'])->name('branches-sync');
+
+        //Liên hệ & Phản hồi
+        Route::get('contacts', [SettingController::class, 'getContacts'])->name('contacts');
+        Route::post('contact-update/{id}', [SettingController::class, 'updateContact'])->name('contact-update');
+
+        //Slogan
+        Route::get('slogan', [SettingController::class, 'getSlogan'])->name('slogan');
+        Route::post('slogan-update/{id}', [SettingController::class, 'updateSlogan'])->name('slogan-update');
     });
 });

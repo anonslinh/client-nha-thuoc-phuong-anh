@@ -42,6 +42,41 @@
 {{--        @include('Layout.left-sidebar')--}}
 
         <div class="body-wrapper">
+            <div id="toast-container" class="toast-container">
+                @if(session('success'))
+                    <div class="toast align-items-center text-white bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="3000">
+                        <div class="d-flex">
+                            <div class="toast-body">
+                                <strong>Success:</strong> {{ session('success') }}
+                            </div>
+                        </div>
+                    </div>
+                @endif
+
+                @if(session('error'))
+                    <div class="toast align-items-center text-white bg-danger border-0" role="alert" aria-live="assertive" aria-atomic="true" data-bs-delay="3000">
+                        <div class="d-flex">
+                            <div class="toast-body">
+                                <strong>Error:</strong> {{ session('error') }}
+                            </div>
+                        </div>
+                    </div>
+                @endif
+            </div>
+
+
+            {{--        @if(session('error'))--}}
+{{--                <div class="card-header alert alert-danger alert-dismissible bg-danger text-white border-0 fade show" role="alert">--}}
+{{--                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>--}}
+{{--                    <strong>Error - </strong> {{session('error')}}--}}
+{{--                </div>--}}
+{{--            @endif--}}
+{{--            @if(session('success'))--}}
+{{--            <div class="card-header alert alert-success alert-dismissible bg-success text-white border-0 fade show" role="alert">--}}
+{{--                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>--}}
+{{--                <strong>Success - </strong> {{session('success')}}--}}
+{{--            </div>--}}
+{{--            @endif--}}
             @yield('content')
         </div>
         <button class="btn btn-danger p-3 rounded-circle d-flex align-items-center justify-content-center customizer-btn" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasExample" aria-controls="offcanvasExample">

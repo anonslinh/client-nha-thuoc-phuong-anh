@@ -100,6 +100,26 @@ return [
                 'name' => 'Hạng thẻ',
                 'icon' => 'solar:gallery-bold-duotone',
                 'route' => 'rank.index'
+            ],
+            [
+                'name' => 'Đồng bộ nhân viên',
+                'icon' => 'solar:gallery-bold-duotone',
+                'route' => 'config.employees'
+            ],
+            [
+                'name' => 'Đồng bộ cửa hàng',
+                'icon' => 'solar:gallery-bold-duotone',
+                'route' => 'config.branches'
+            ],
+            [
+                'name' => 'Liên hệ & phản hồi',
+                'icon' => 'solar:gallery-bold-duotone',
+                'route' => 'config.contacts'
+            ],
+            [
+                'name' => 'Slogan',
+                'icon' => 'solar:gallery-bold-duotone',
+                'route' => 'config.slogan'
             ]
         ]
     ]

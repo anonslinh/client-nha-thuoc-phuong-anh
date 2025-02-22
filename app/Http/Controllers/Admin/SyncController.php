@@ -55,10 +55,10 @@ class SyncController extends HelperAdminController
                 );
             }
 
-            return response()->json(['message' => 'Đồng bộ chi nhánh thành công!']);
+            return back()->with(['success' => 'Đồng bộ chi nhánh thành công!']);
 
         }catch (\Exception $exception){
-            return response()->json(['error' => $exception->getMessage()], 500);
+            return back()->with(['error' => 'Lỗi! Liên hệ với bộ phân CSKH.']);
         }
     }
 
@@ -93,10 +93,9 @@ class SyncController extends HelperAdminController
                     ]
                 );
             }
-
-            return response()->json(['message' => 'Đồng bộ nhân viên thành công!']);
+            return back()->with(['success' => 'Đồng bộ nhân viên thành công!']);
         }catch (\Exception $exception){
-            return response()->json(['error' => $exception->getMessage()], 500);
+            return back()->with(['error' => 'Lỗi! Liên hệ với bộ phân CSKH.']);
         }
     }
 
