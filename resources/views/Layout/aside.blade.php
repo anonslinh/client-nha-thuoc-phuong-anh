@@ -24,7 +24,7 @@
             <div class="sidebarmenu">
                 <div class="brand-logo d-flex align-items-center nav-logo">
                     <a href="../main/index.html" class="text-nowrap logo-img">
-                        <img src="../assets/images/logos/logo.svg" alt="Logo" />
+                        <img src="../assets/images/logos/logo1.svg" alt="Logo" />
                     </a>
                 </div>
                 @foreach(config('menu') as $key => $value)

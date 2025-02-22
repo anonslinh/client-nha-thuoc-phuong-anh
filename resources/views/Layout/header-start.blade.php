@@ -6,7 +6,7 @@
         <!-- ---------------------------------- -->
         <nav class="navbar navbar-expand-lg p-0">
             <div class="d-block d-lg-none py-9 py-xl-0">
-                <img src="../assets/images/logos/logo.svg" alt="matdash-img" />
+                <img src="../assets/images/logos/logo1.svg" alt="matdash-img" />
             </div>
             <a class="navbar-toggler p-0 border-0 nav-icon-hover-bg rounded-circle" href="javascript:void(0)" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <iconify-icon icon="solar:menu-dots-bold-duotone" class="fs-6"></iconify-icon>
@@ -175,16 +175,16 @@
                         <li class="nav-item dropdown">
                             <a class="nav-link" href="javascript:void(0)" id="drop1" aria-expanded="false">
                                 <div class="d-flex align-items-center gap-2 lh-base">
-                                    <img src="../assets/images/profile/user-1.jpg" class="rounded-circle" width="35" height="35" alt="matdash-img" />
+                                    <img src="../assets/images/logos/favicon.png" class="rounded-circle" width="35" height="35" alt="matdash-img" />
                                     <iconify-icon icon="solar:alt-arrow-down-bold" class="fs-2"></iconify-icon>
                                 </div>
                             </a>
                             <div class="dropdown-menu profile-dropdown dropdown-menu-end dropdown-menu-animate-up" aria-labelledby="drop1">
                                 <div class="position-relative px-4 pt-3 pb-2">
                                     <div class="d-flex align-items-center mb-3 pb-3 border-bottom gap-6">
-                                        <img src="../assets/images/profile/user-1.jpg" class="rounded-circle" width="56" height="56" alt="matdash-img" />
+                                        <img src="../assets/images/logos/favicon.png" class="rounded-circle" width="56" height="56" alt="matdash-img" />
                                         <div>
-                                            <h5 class="mb-0 fs-12">David McMichael <span class="text-success fs-11">Pro</span>
+                                            <h5 class="mb-0 fs-12">{{\Illuminate\Support\Facades\Auth::guard('users')->user()->name}} <span class="text-success fs-11">Pro</span>
                                             </h5>
                                             <p class="mb-0 text-dark">
                                                 {{\Illuminate\Support\Facades\Auth::guard('users')->user()->email}}
@@ -205,7 +205,7 @@
 {{--                                            Account Settings--}}
 {{--                                        </a>--}}
                                         <a href="{{route('logout')}}" class="p-2 dropdown-item h6 rounded-1">
-                                            Sign Out
+                                            Đăng xuất
                                         </a>
                                     </div>
                                 </div>
@@ -349,7 +349,7 @@
                 </li>
                 <li class="nav-item d-none d-xl-flex align-items-center">
                     <a href="../main/index.html" class="text-nowrap nav-link">
-                        <img src="../assets/images/logos/logo.svg" alt="matdash-img" />
+                        <img src="../assets/images/logos/logo1.svg" alt="matdash-img" />
                     </a>
                 </li>
                 <li class="nav-item d-none d-xl-flex align-items-center nav-icon-hover-bg rounded-circle">
@@ -463,7 +463,7 @@
             </ul>
             <div class="d-block d-xl-none">
                 <a href="../main/index.html" class="text-nowrap nav-link">
-                    <img src="../assets/images/logos/logo.svg" alt="matdash-img" />
+                    <img src="../assets/images/logos/logo1.svg" alt="matdash-img" />
                 </a>
             </div>
             <a class="navbar-toggler nav-icon-hover p-0 border-0 nav-icon-hover-bg rounded-circle" href="javascript:void(0)" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
