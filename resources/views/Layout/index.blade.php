@@ -15,6 +15,7 @@
     <link rel="stylesheet" href="assets/css/styles.css" />
     <link rel="stylesheet" href="assets/libs/sweetalert2/dist/sweetalert2.min.css">
     <title>Win Win Group</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
     @yield('style')
 </head>
 

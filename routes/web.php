@@ -9,6 +9,7 @@ use App\Http\Controllers\Admin\GiftController;
 use App\Http\Controllers\Admin\EventsController;
 use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\LoyaltyController;
+use App\Http\Controllers\Admin\EmployeeController;
 
 Route::get('login', [LoginController::class, 'login'])->name('login');
 Route::get('register', [LoginController::class, 'register'])->name('register');
@@ -98,5 +99,11 @@ Route::middleware([CheckLogin::class])->group(function (){
         Route::get('delete-mini-games/{id}', [LoyaltyController::class, 'deleteMiniGame'])->name('delete-mini-games');
         Route::post('store-mini-games', [LoyaltyController::class, 'storeMiniGame'])->name('store-mini-games');
 
+    });
+
+    //Đánh giá nhân viên
+    Route::prefix('employees')->name('employees.')->group(function (){
+        Route::get('employees', [EmployeeController::class, 'getEmployees'])->name('employees');
+        Route::get('employee-detail/{id}', [EmployeeController::class, 'getEmployeeDetails'])->name('employee-detail');
     });
 });

@@ -38,19 +38,19 @@ class EmployeeKpi extends Model
         $pointsChange = 0;
         switch ($rating) {
             case 5:
-                $pointsChange = 5;
+                $pointsChange = 3;
                 break;
             case 4:
-                $pointsChange = 0;
+                $pointsChange = 1;
                 break;
             case 3:
-                $pointsChange = -5;
+                $pointsChange = -3;
                 break;
             case 2:
-                $pointsChange = -10;
+                $pointsChange = -7;
                 break;
             case 1:
-                $pointsChange = -15;
+                $pointsChange = -12;
                 break;
         }
 
@@ -61,7 +61,8 @@ class EmployeeKpi extends Model
         );
 
         // Cập nhật điểm KPI
-        $employeeKpi->increment('points', $pointsChange);
+        $newPoints = max(30, min(120, $employeeKpi->points + $pointsChange));
+        $employeeKpi->update(['points' => $newPoints]);
 
         return $employeeKpi;
     }

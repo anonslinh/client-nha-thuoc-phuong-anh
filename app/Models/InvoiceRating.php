@@ -40,7 +40,7 @@ class InvoiceRating extends Model
      */
     public function invoice()
     {
-        return $this->belongsTo(Invoice::class, 'kiotviet_id');
+        return $this->belongsTo(Invoice::class, 'kiotviet_invoice_id', 'kiotviet_id');
     }
 
     /**

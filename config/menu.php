@@ -72,6 +72,17 @@ return [
         ]
     ],
     [
+        'name' => 'Đánh giá nhân viên',
+        'icon' => 'solar:star-fall-minimalistic-2-line-duotone',
+        'submenu' => [
+            [
+                'name' => 'Danh sách nhân viên',
+                'icon' => 'solar:shield-user-line-duotone',
+                'route' => 'employees.employees'
+            ],
+        ]
+    ],
+    [
         'name' => 'Loyalty',
         'icon' => 'solar:notes-line-duotone',
         'submenu' => [

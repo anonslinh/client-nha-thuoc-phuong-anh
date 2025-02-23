@@ -18,8 +18,10 @@ class SettingController extends SyncController
     */
     public function getEmployees(){
 
-        $listData = Employee::all();
-        return view('config.employees-sync', compact('listData'));
+        $listData = Employee::orderBy('created_at', 'desc')->paginate(20);
+        $totalEmployees = $listData->total(); // Lấy tổng số nhân viên
+
+        return view('config.employees-sync', compact('listData', 'totalEmployees'));
     }
 
     /**
@@ -27,8 +29,9 @@ class SettingController extends SyncController
     */
     public function getBranches(){
 
-        $listData = Branch::all();
-        return view('config.branches-sync', compact('listData'));
+        $listData = Branch::orderBy('created_at', 'desc')->paginate(20);
+        $totalBranches = $listData->total();
+        return view('config.branches-sync', compact('listData', 'totalBranches'));
     }
 
     /**

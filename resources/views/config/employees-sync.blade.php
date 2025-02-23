@@ -28,7 +28,7 @@
 
         <div class="card">
             <div class="card-header">
-                <h4>Danh sách nhân viên: {{count($listData)}}</h4>
+                <h4>Danh sách nhân viên: {{$totalEmployees}}</h4>
             </div>
             <div class="card-body">
                 <table class="table table-bordered">
@@ -45,7 +45,7 @@
                     <tbody>
                     @foreach($listData as $key => $item)
                         <tr>
-                            <td>{{$key+1}}</td>
+                            <td>{{ ($listData->currentPage() - 1) * $listData->perPage() + $key + 1 }}</td>
                             <td>{{$item->user_name}}</td>
                             <td>{{$item->given_name}}</td>
                             <td>{{$item->mobile_phone}}</td>
@@ -56,6 +56,7 @@
                     </tbody>
                 </table>
             </div>
+            <div class="d-flex justify-content-center">{{$listData->appends(request()->all())->links('pagination')}}</div>
         </div>
     </div>
 @endsection
