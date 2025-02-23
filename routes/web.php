@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\HomeController;
 use App\Http\Controllers\Admin\GiftController;
 use App\Http\Controllers\Admin\EventsController;
 use App\Http\Controllers\Admin\SettingController;
+use App\Http\Controllers\Admin\LoyaltyController;
 
 Route::get('login', [LoginController::class, 'login'])->name('login');
 Route::get('register', [LoginController::class, 'register'])->name('register');
@@ -86,5 +87,16 @@ Route::middleware([CheckLogin::class])->group(function (){
         //Slogan
         Route::get('slogan', [SettingController::class, 'getSlogan'])->name('slogan');
         Route::post('slogan-update/{id}', [SettingController::class, 'updateSlogan'])->name('slogan-update');
+    });
+
+    //Loyalty
+    Route::prefix('loyalty')->name('loyalty.')->group(function (){
+
+        //Mini Games
+        Route::get('mini-games', [LoyaltyController::class, 'getMiniGames'])->name('mini-games');
+        Route::post('update-mini-games/{id}', [LoyaltyController::class, 'updateMiniGame'])->name('update-mini-games');
+        Route::get('delete-mini-games/{id}', [LoyaltyController::class, 'deleteMiniGame'])->name('delete-mini-games');
+        Route::post('store-mini-games', [LoyaltyController::class, 'storeMiniGame'])->name('store-mini-games');
+
     });
 });

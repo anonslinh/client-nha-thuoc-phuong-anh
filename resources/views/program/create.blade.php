@@ -1,20 +1,25 @@
 @extends('Layout.index')
 @section('content')
     <div class="container-fluid">
+        <div class="card card-body py-3">
+            <div class="row align-items-center">
+                <div class="col-12">
+                    <div class="d-sm-flex align-items-center justify-space-between">
+                        <h4 class="mb-4 mb-sm-0 card-title">Thêm mới chương trình</h4>
+                        <nav aria-label="breadcrumb" class="ms-auto">
+                            <ol class="breadcrumb">
+                                <li class="breadcrumb-item d-flex align-items-center">
+                                    <a class="text-muted text-decoration-none d-flex">
+                                        <iconify-icon icon="solar:home-2-line-duotone" class="fs-6"></iconify-icon>
+                                    </a>
+                                </li>
+                            </ol>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
         <div class="card">
-            <div class="card-header"><h4>Tạo mới chương trình</h4></div>
-            @if(session('error'))
-                <div class="alert alert-danger alert-dismissible bg-danger text-white border-0 fade show" role="alert">
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
-                    {{session('error')}}
-                </div>
-            @endif
-            @if(session('success'))
-                <div class="alert alert-success alert-dismissible bg-success text-white border-0 fade show" role="alert">
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
-                    {{session('success')}}
-                </div>
-            @endif
             <div class="card-body">
                 <form action="{{route('program.store')}}" method="post" class="w-100" enctype="multipart/form-data">
                     @csrf

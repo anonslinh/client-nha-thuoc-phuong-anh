@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Models\Banner;
+use App\Models\Branch;
 use App\Models\Gift;
 use App\Models\MembershipLevel;
 use App\Models\Program;
@@ -96,7 +97,9 @@ class GiftController
     public function banner (Request $request)
     {
         $listData = Banner::orderBy('created_at', 'desc')->paginate(20);
-        return view('banner.index', compact('listData'));
+
+        $branches = Branch::all();
+        return view('banner.index', compact('listData', 'branches'));
     }
 
     /**

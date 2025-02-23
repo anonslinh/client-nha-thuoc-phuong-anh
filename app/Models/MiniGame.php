@@ -15,6 +15,12 @@ class MiniGame extends Model
 
     public function branch()
     {
-        return $this->belongsTo(Branch::class, 'branch_id');
+        return $this->belongsTo(Branch::class, 'branch_id', 'kiotviet_id');
+    }
+
+    // Accessor lấy tên chi nhánh
+    public function getBranchNameAttribute()
+    {
+        return $this->branch ? ($this->branch->branch_name ?? 'Không xác định') : 'Toàn hệ thống';
     }
 }

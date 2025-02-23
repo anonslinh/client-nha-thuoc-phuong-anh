@@ -78,17 +78,22 @@ return [
             [
                 'name' => 'Cài đặt banner',
                 'route' => 'banner.list-data',
-                'icon' => 'solar:notes-line-duotone'
+                'icon' => 'solar:gallery-bold-duotone'
             ],
             [
                 'name' => 'Cài đặt chương trình',
-                'icon' => 'solar:tablet-line-duotone',
+                'icon' => 'solar:notes-line-duotone',
                 'route' => 'program.list-data'
             ],
             [
                 'name' => 'Cài đặt khuyến mại',
-                'icon' => 'solar:tablet-line-duotone',
+                'icon' => 'solar:file-text-line-duotone',
                 'route' => 'promotion.list-data'
+            ],
+            [
+                'name' => 'Cài đặt mini games',
+                'icon' => 'solar:mask-happly-line-duotone',
+                'route' => 'loyalty.mini-games'
             ]
         ]
     ],
@@ -98,27 +103,27 @@ return [
         'submenu' => [
             [
                 'name' => 'Hạng thẻ',
-                'icon' => 'solar:gallery-bold-duotone',
+                'icon' => 'solar:calendar-mark-line-duotone',
                 'route' => 'rank.index'
             ],
             [
                 'name' => 'Đồng bộ nhân viên',
-                'icon' => 'solar:gallery-bold-duotone',
+                'icon' => 'solar:shield-user-line-duotone',
                 'route' => 'config.employees'
             ],
             [
                 'name' => 'Đồng bộ cửa hàng',
-                'icon' => 'solar:gallery-bold-duotone',
+                'icon' => 'solar:cart-3-line-duotone',
                 'route' => 'config.branches'
             ],
             [
                 'name' => 'Liên hệ & phản hồi',
-                'icon' => 'solar:gallery-bold-duotone',
+                'icon' => 'solar:phone-line-duotone',
                 'route' => 'config.contacts'
             ],
             [
                 'name' => 'Slogan',
-                'icon' => 'solar:gallery-bold-duotone',
+                'icon' => 'solar:document-text-line-duotone',
                 'route' => 'config.slogan'
             ]
         ]
