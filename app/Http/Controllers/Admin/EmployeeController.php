@@ -8,6 +8,9 @@ use App\Models\Employee;
 use App\Models\EmployeeKpi;
 use App\Models\InvoiceRating;
 use Illuminate\Http\Request;
+use App\Exports\EmployeeRatingsExport;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Models\EmployeeRatingSummary;
 
 class EmployeeController extends HelperAdminController
 {
@@ -106,6 +109,20 @@ class EmployeeController extends HelperAdminController
             $month = now()->month;
             $year = now()->year;
 
+            // Tạo danh sách 6 tháng tiếp theo
+            $data_months = $this->getMonths($month, $year, $employeeId);
+            $months = $data_months['months'];
+            // Tạo dữ liệu series cho biểu đồ
+            $chartSeries = [
+                [
+                    "name" => "⭐ Nguy hiểm",
+                    "data" => $data_months['low_ratings_data'],
+                ],
+                [
+                    "name" => "Điểm",
+                    "data" => $data_months['kpi_data'],
+                ],
+            ];
             // Lấy điểm KPI nhân viên (mặc định là 70 nếu không có)
             $points = EmployeeKpi::where('kiotviet_employee_id', $employeeId)
                     ->where('month', $month)
@@ -137,10 +154,100 @@ class EmployeeController extends HelperAdminController
 
             $listData = $query->paginate(20);
 
-            return view('employee.employee-detail', compact('employee', 'listData', 'points'));
+            return view('employee.employee-detail', compact('employee', 'listData', 'points', 'months', 'chartSeries'));
         }catch (\Exception $exception){
             return back()->with(['error' => 'Lỗi! Liên hệ với bộ phận CSKH']);
         }
     }
 
+    /**
+     * Xuất excel đánh giá nhân viên
+    */
+    public function exportEmployeeRatings(Request $request, $employeeId)
+    {
+        try {
+            // Truy vấn thông tin nhân viên
+            $employee = Employee::where('kiotviet_id', $employeeId)->first();
+
+            $query = InvoiceRating::with(['invoice:id,kiotviet_id,code,created_date'])
+                ->where('employee_id', $employeeId)
+                ->orderByDesc('created_at');
+
+            // Lọc theo ngày từ và ngày đến
+            if (!empty($request->from_date) || !empty($request->to_date)) {
+                $fromDate = $request->from_date ? Carbon::parse($request->from_date)->startOfDay() : null;
+                $toDate = $request->to_date ? Carbon::parse($request->to_date)->endOfDay() : null;
+
+                if ($fromDate && $toDate) {
+                    $query->whereBetween('created_at', [$fromDate, $toDate]);
+                } elseif ($fromDate) {
+                    $query->where('created_at', '>=', $fromDate);
+                } elseif ($toDate) {
+                    $query->where('created_at', '<=', $toDate);
+                }
+            }
+
+            // Lọc theo số lượng sao (rating)
+            if ($request->has('rating') && in_array($request->rating, [1, 2, 3, 4, 5])) {
+                $query->where('rating', $request->rating);
+            }
+
+            // **Lấy dữ liệu 6 tháng trước đó**
+            $month = now()->month;
+            $year = now()->year;
+            $historyData = $this->getMonths($month, $year, $employeeId);
+
+            // **Xuất Excel với dữ liệu đầy đủ**
+            return Excel::download(new EmployeeRatingsExport($query, $employee, $historyData), "{$employee->user_name}_ratings.xlsx");
+        } catch (\Exception $exception) {
+            return back()->with(['error' => 'Lỗi xuất Excel! Liên hệ với bộ phận CSKH']);
+        }
+    }
+
+    /**
+     * Lấy danh sách 6 tháng trước đó tính từ tháng hiện tại
+    */
+    private function getMonths($month, $year, $employeeId){
+        $months = [];
+        $kpiData = [];
+        $lowRatingsData = [];
+
+        for ($i = 0; $i < 6; $i++) {
+            // Thêm vào danh sách tháng
+            $months[] = "T " . $month . "/" . $year;
+
+            // Lấy điểm KPI của nhân viên (mặc định là 70 nếu không có)
+            $kpiPoints = EmployeeKpi::where('kiotviet_employee_id', $employeeId)
+                    ->where('month', $month)
+                    ->where('year', $year)
+                    ->value('points') ?? 70;
+            $kpiData[] = $kpiPoints;
+
+            // Lấy tổng số đánh giá dưới 3 sao
+            $lowRatings = EmployeeRatingSummary::where('employee_id', $employeeId)
+                    ->where('month', $month)
+                    ->where('year', $year)
+                    ->selectRaw('COALESCE(rating_1, 0) + COALESCE(rating_2, 0) + COALESCE(rating_3, 0) as low_ratings')
+                    ->value('low_ratings') ?? 0;
+            $lowRatingsData[] = $lowRatings;
+
+            // Lùi về tháng trước
+            $month--;
+            if ($month == 0) {
+                $month = 12;
+                $year--;
+            }
+        }
+
+        // Đảo ngược mảng để hiển thị từ xa đến gần
+        $months = array_reverse($months);
+        $kpiData = array_reverse($kpiData);
+        $lowRatingsData = array_reverse($lowRatingsData);
+
+        return $data = [
+            'months' => $months,
+            'kpi_data' => $kpiData,
+            'low_ratings_data' => $lowRatingsData
+        ];
+    }
 }

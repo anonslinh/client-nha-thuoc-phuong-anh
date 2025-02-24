@@ -26,12 +26,9 @@
                 <div class="card-body pb-4">
                     <div class="d-md-flex align-items-center justify-content-between mb-4">
                         <div class="hstack align-items-center gap-3">
-                      <span class="d-flex align-items-center justify-content-center round-48 bg-primary-subtle rounded flex-shrink-0">
-                        <iconify-icon icon="solar:shield-user-line-duotoner" class="fs-7 text-primary"></iconify-icon>
-                      </span>
                             <div>
                                 <h5 class="card-title">{{$employee->given_name}}</h5>
-                                <p class="card-subtitle mb-0">{{$points}}/70 điểm trong tháng</p>
+                                <p class="card-subtitle mb-0">{{$points}}/70 điểm</p>
                             </div>
                         </div>
 
@@ -74,9 +71,10 @@
                             <option value="1" {{ request()->get('rating') == '1' ? 'selected' : '' }}>⭐ (1 sao)</option>
                         </select>
                     </div>
-                    <div class="col-md-2 d-flex" style="gap: 10px">
+                    <div class="col-md-5 d-flex" style="gap: 10px">
                         <button class="btn btn-primary align-self-end">Tìm kiếm</button>
                         <a href="{{ route('employees.employee-detail', ['id' => $employee->kiotviet_id]) }}" class="btn btn-danger align-self-end">Hủy</a>
+                        <a href="{{ route('employees.employee-export', ['id' => $employee->kiotviet_id, 'from_date' => request('from_date'), 'to_date' => request('to_date'), 'rating' => request('rating')]) }}" class="btn btn-warning align-self-end">Xuất Excel</a>
                     </div>
                 </form>
 
@@ -113,4 +111,93 @@
             <div class="d-flex justify-content-center">{{$listData->appends(request()->all())->links('pagination')}}</div>
         </div>
     </div>
+@endsection
+@section('script')
+    <script src="assets/libs/apexcharts/dist/apexcharts.min.js"></script>
+    <script>
+        var months = {!! json_encode($months) !!};
+        var chartSeries = {!! json_encode($chartSeries) !!};
+
+        var chart = {
+            series: chartSeries,
+            chart: {
+                toolbar: {
+                    show: false,
+                },
+                type: "area",
+                fontFamily: "inherit",
+                foreColor: "#adb0bb",
+                height: 300,
+                width: "100%",
+                stacked: false,
+                offsetX: -10,
+            },
+            colors: ["var(--bs-danger)", "var(--bs-secondary)", "var(--bs-primary)"],
+            plotOptions: {},
+            dataLabels: {
+                enabled: false,
+            },
+            legend: {
+                show: false,
+            },
+            stroke: {
+                width: 2,
+                curve: "monotoneCubic",
+            },
+            grid: {
+                show: true,
+                padding: {
+                    top: 0,
+                    bottom: 0,
+                },
+                borderColor: "rgba(0,0,0,0.05)",
+                xaxis: {
+                    lines: {
+                        show: true,
+                    },
+                },
+                yaxis: {
+                    lines: {
+                        show: true,
+                    },
+                },
+            },
+            fill: {
+                type: "gradient",
+                gradient: {
+                    shadeIntensity: 0,
+                    inverseColors: false,
+                    opacityFrom: 0.1,
+                    opacityTo: 0.01,
+                    stops: [0, 100],
+                },
+            },
+            xaxis: {
+                axisBorder: {
+                    show: false,
+                },
+                axisTicks: {
+                    show: false,
+                },
+                categories: months,
+            },
+            markers: {
+                strokeColor: [
+                    "var(--bs-danger)",
+                    "var(--bs-secondary)",
+                    "var(--bs-primary)",
+                ],
+                strokeWidth: 2,
+            },
+            tooltip: {
+                theme: "dark",
+            },
+        };
+
+        var chart = new ApexCharts(
+            document.querySelector("#revenue-forecast"),
+            chart
+        );
+        chart.render();
+    </script>
 @endsection
