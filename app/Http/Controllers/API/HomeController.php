@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API;
 
 use App\Models\Contacts;
 use App\Models\Customer;
+use App\Models\DailyActivitySummary;
 use App\Models\Promotion;
 use App\Models\Slogan;
 use Illuminate\Http\Request;
@@ -36,8 +37,12 @@ class HomeController extends HelperApiController
             $phone = $this->normalizePhone($validatedData['phone']);
 
             $this->syncCustomerInvoices($phone);
+            $customer = Customer::where('contact_number', $phone)->first();
             // Lấy thông tin khách hàng & điểm thưởng
-            $reward_point = optional(Customer::where('contact_number', $phone)->first())->reward_point ?? 0;
+            $reward_point = optional($customer)->reward_point ?? 0;
+
+            //Ghi log đếm số lượng truy cập xem điểm
+            DailyActivitySummary::logAction(optional($customer)->kiotviet_id ?? null, 'view_points');
 
             return response()->json([
                 'status' => true,
@@ -58,6 +63,9 @@ class HomeController extends HelperApiController
     {
         $customer = $this->getCustomerByPhone($request->phone);
         $branchId = $customer->branch_id ?? null;
+
+        //Ghi log đếm số lượng truy cập ứng dụng
+        DailyActivitySummary::logAction($customer->kiotviet_id ?? null, 'access_to');
 
         $banners = Banner::where(function ($query) use ($branchId) {
             $query->whereNull('branch_id') // Banner toàn hệ thống
@@ -321,6 +329,9 @@ class HomeController extends HelperApiController
     public function getContacts(){
 
         $data = Contacts::all();
+
+        //Ghi log đếm số lượng truy cập liên hệ & phản hồi
+        DailyActivitySummary::logAction(null, 'feedback');
 
         return response()->json(['status' => true, 'data' => $data], 200);
     }

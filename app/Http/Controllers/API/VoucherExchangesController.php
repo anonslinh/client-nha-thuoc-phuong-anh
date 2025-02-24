@@ -2,6 +2,7 @@
 
 
 namespace App\Http\Controllers\API;
+use App\Models\DailyActivitySummary;
 use Illuminate\Http\Request;
 use App\Models\VoucherExchanges;
 use App\Models\Voucher;
@@ -38,21 +39,25 @@ class VoucherExchangesController extends HelperApiController
 
             // Lấy thông tin khách hàng
             $customer = Customer::where('contact_number', $phone)->first();
+
+            //Ghi log đếm số lượng đổi quà đổi voucher
+            DailyActivitySummary::logAction($customer ? $customer->kiotviet_id : null, 'redeem_gift_voucher');
+
             if (!$customer) {
-                return response()->json(['status' => false, 'message' => 'Khách hàng không tồn tại'], 404);
+                return response()->json(['status' => false, 'message' => 'Không đủ điểm để đổi voucher'], 200);
             }
 
             // Lấy thông tin voucher
             $voucher = Voucher::find($voucherId);
             if (!$voucher) {
-                return response()->json(['status' => false, 'message' => 'Voucher không tồn tại'], 404);
+                return response()->json(['status' => false, 'message' => 'Voucher không tồn tại'], 200);
             }
 
             $pointsRequired = $voucher->points_required;
 
             // Kiểm tra khách hàng có đủ điểm không
             if ($customer->reward_point < $pointsRequired) {
-                return response()->json(['status' => false, 'message' => 'Không đủ điểm để đổi voucher'], 400);
+                return response()->json(['status' => false, 'message' => 'Không đủ điểm để đổi voucher'], 200);
             }
 
             // Trừ điểm khách hàng

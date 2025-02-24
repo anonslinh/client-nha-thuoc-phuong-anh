@@ -4,6 +4,7 @@
 namespace App\Http\Controllers\API;
 
 
+use App\Models\DailyActivitySummary;
 use App\Services\KiotVietService;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Http\Request;
@@ -143,6 +144,9 @@ class InvoicesController extends HelperApiController
 
             // Gọi function createRating trong InvoiceRating để xử lý logic
             $rating = InvoiceRating::createRating($validated);
+
+            //Ghi log đếm số lượng đánh giá đơn hàng
+            DailyActivitySummary::logAction($request->kiotviet_customer_id, 'rate');
 
             return response()->json(['status' => true, 'message' => 'Đánh giá thành công', 'data' => $rating]);
         } catch (\Exception $e) {

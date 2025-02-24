@@ -3,6 +3,7 @@
 
 namespace App\Http\Controllers\API;
 use App\Models\CustomerPointLog;
+use App\Models\DailyActivitySummary;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Models\Customer;
@@ -43,21 +44,24 @@ class GiftExchangesController extends HelperApiController
             // Lấy thông tin khách hàng
             $customer = Customer::where('contact_number', $phone)->first();
 
+            //Ghi log đếm số lượng đổi quà đổi voucher
+            DailyActivitySummary::logAction($customer ? $customer->kiotviet_id : null, 'redeem_gift_voucher');
+
             if (!$customer) {
-                return response()->json(['status' => false, 'message' => 'Khách hàng không tồn tại'], 404);
+                return response()->json(['status' => false, 'message' => 'Không đủ điểm để đổi quà'], 200);
             }
 
             // Lấy thông tin quà tặng
             $gift = Gift::find($validatedData['gift_id']);
             if (!$gift) {
-                return response()->json(['status' => false, 'message' => 'Quà tặng không tồn tại'], 404);
+                return response()->json(['status' => false, 'message' => 'Quà tặng không tồn tại'], 200);
             }
 
             $pointsRequired = $gift->points_required;
 
             // Kiểm tra khách hàng có đủ điểm để đổi không
             if ($customer->reward_point < $pointsRequired) {
-                return response()->json(['status' => false, 'message' => 'Không đủ điểm để đổi quà'], 400);
+                return response()->json(['status' => false, 'message' => 'Không đủ điểm để đổi quà'], 200);
             }
 
             // Trừ điểm khách hàng
@@ -93,6 +97,7 @@ class GiftExchangesController extends HelperApiController
         } catch (\Illuminate\Validation\ValidationException $exception) {
             return response()->json(['error' => $exception->errors()], 422);
         } catch (\Exception $e) {
+            dd($e);
             DB::rollBack();
             return response()->json(['status' => false, 'message' => 'Lỗi hệ thống', 'error' => $e->getMessage()], 500);
         }
