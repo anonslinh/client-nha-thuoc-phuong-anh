@@ -67,6 +67,9 @@ Route::middleware([CheckLogin::class])->group(function (){
        Route::get('history-point', [EventsController::class, 'historyPoint'])->name('history-point');
        Route::post('customer-update-point', [EventsController::class, 'customerUpdatePoint'])->name('customer.update-point');
        Route::get('list-gift', [EventsController::class, 'listGift'])->name('list-gift');
+       Route::post('create-gift', [EventsController::class, 'createGift'])->name('gift.store');
+       Route::post('update-gift/{id}', [EventsController::class, 'updateGift'])->name('gift.update');
+       Route::get('delete-gift/{id}', [EventsController::class, 'deleteGift'])->name('gift.delete');
     });
 
     Route::prefix('voucher')->name('voucher.')->group(function (){

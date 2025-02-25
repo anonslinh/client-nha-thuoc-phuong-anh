@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Customer;
 use App\Models\EventsModel;
+use App\Models\GiftEvent;
 use App\Models\HistoryPointEvent;
 use App\Models\ProductsEvent;
 use Carbon\Carbon;
@@ -327,5 +328,87 @@ class EventsController extends SyncController
         ]);
         $history->save();
         return back()->with(['success' => 'Cập nhật điểm khách hàng thành công']);
+    }
+
+    /**
+     * Danh sách quà tặng
+    **/
+    public function listGift (Request $request)
+    {
+        $listData = GiftEvent::query();
+        if (isset($request->key_search)){
+            $listData = $listData->where(function ($query) use ($request){
+               $query->where('name', 'like', '%'.$request->get('key_search').'%')
+               ->orWhere('code', 'like', '%'.$request->get('key_search').'%')
+               ->orWhere('barcode', 'like', '%'.$request->get('key_search').'%');
+            });
+        }
+        if (isset($request->active)){
+            $listData = $listData->where('active', $request->get('active'));
+        }
+        $listData = $listData->orderBy('created_at', 'desc')->paginate(20);
+        return view('events.list-gift', compact('listData'));
+    }
+    /**
+     * Tạo quà tặng
+    **/
+    public function createGift (Request $request)
+    {
+        try{
+            $file = $request->file('image');
+            $nameFile = time().Str::random(10).'.'.$file->getClientOriginalExtension();
+            $file->move('upload/gift-event/', $nameFile);
+            $gift = new GiftEvent([
+                'name' => $request->get('name'),
+                'code' => $request->get('code'),
+                'point' => $request->get('point'),
+                'quantity' => $request->get('quantity'),
+                'barcode' => $request->get('barcode'),
+                'active' => 1,
+                'image' => 'upload/gift-event/'.$nameFile
+            ]);
+            $gift->save();
+            return back()->with(['success' => 'Thêm quà tặng thành công']);
+        }catch (\Exception $exception){
+            return back()->with(['error' => 'Thêm quà tặng thất bại.Vui lòng điền đầy đủ thông tin']);
+        }
+    }
+    /**
+     * Cập nhât quà tặng
+    **/
+    public function updateGift (Request $request, $id)
+    {
+        $gift = GiftEvent::find($id);
+        if (empty($gift)){
+            return back()->with(['error' => 'Không tìm thấy dữ liệu.Vui lòng kiểm tra lại']);
+        }
+        if ($request->hasFile('image')){
+            $file = $request->file('image');
+            $nameFile = time().Str::random(10).'.'.$file->getClientOriginalExtension();
+            $file->move('upload/gift-event/', $nameFile);
+            if (file_exists(public_path($gift->image))) {
+                unlink(public_path($gift->image));
+            }
+            $gift->image = 'upload/gift-event/'.$nameFile;
+        }
+        $gift->name = $request->get('name');
+        $gift->code = $request->get('code');
+        $gift->point = $request->get('point');
+        $gift->quantity = $request->get('quantity');
+        $gift->barcode = $request->get('barcode');
+        $gift->save();
+        return back()->with(['success' => 'Cập nhật dữ liệu thành công']);
+    }
+    /**
+     * Xóa quà tặng
+     **/
+    public function deleteGift ($id)
+    {
+        $gift = GiftEvent::find($id);
+        if (empty($gift)){
+            return back()->with(['error' => 'Không tìm thấy dữ liệu.Vui lòng kiểm tra lại']);
+        }
+        $gift->delete();
+        return back()->with(['success' => 'Xóa dữ liệu thành công']);
     }
 }
