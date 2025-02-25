@@ -14,7 +14,7 @@
     <!-- Core Css -->
     <link rel="stylesheet" href="assets/css/styles.css" />
 
-    <title>Win Win Group</title>
+    <title>Win 🍼👶 Baby</title>
 </head>
 
 <body>
@@ -76,7 +76,7 @@
                                 </div>
                                 <button type="submit" class="btn btn-primary w-100 py-8 mb-4 rounded-2">Sign In</button>
                                 <div class="d-flex align-items-center justify-content-center">
-                                    <p class="fs-4 mb-0 fw-medium">Win Win Group</p>
+                                    <p class="fs-4 mb-0 fw-medium">Win Baby</p>
                                     <a class="text-primary fw-medium ms-2" >Kính chào quý khách!</a>
                                 </div>
                             </form>
