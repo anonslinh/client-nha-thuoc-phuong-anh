@@ -137,6 +137,11 @@ return [
                 'name' => 'Slogan',
                 'icon' => 'solar:document-text-line-duotone',
                 'route' => 'config.slogan'
+            ],
+            [
+                'name' => 'AI Tự động',
+                'icon' => 'solar:atom-line-duotone',
+                'route' => 'setting-automatic.index-setting-email'
             ]
         ]
     ]

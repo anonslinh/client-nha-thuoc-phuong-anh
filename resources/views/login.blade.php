@@ -31,7 +31,7 @@
                     <div class="min-vh-100 bg-body row justify-content-center align-items-center p-5">
                         <div class="col-12 auth-card">
                             <a href="/" class="text-nowrap logo-img d-block w-100">
-                                <img style="width: 368px; height: auto" src="../assets/images/logos/logo_win_baby_login.svg" class="dark-logo" alt="Logo-Dark" />
+                                <img style="width: 368px; height: auto;" src="../assets/images/logos/logo_win_baby_login.svg"/>
                             </a>
                             <h2 class="mb-2 mt-4 fs-7 fw-bolder">Sign In</h2>
                             <p class="mb-9">Your Admin Dashboard</p>

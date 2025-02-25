@@ -11,6 +11,7 @@ use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\LoyaltyController;
 use App\Http\Controllers\Admin\EmployeeController;
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\SettingAIAgentsController;
 
 Route::get('login', [LoginController::class, 'login'])->name('login');
 Route::get('register', [LoginController::class, 'register'])->name('register');
@@ -121,5 +122,13 @@ Route::middleware([CheckLogin::class])->group(function (){
         Route::get('employee-detail/{id}', [EmployeeController::class, 'getEmployeeDetails'])->name('employee-detail');
         Route::get('employee-export/{id}', [EmployeeController::class, 'exportEmployeeRatings'])->name('employee-export');
         Route::get('ratings-invoice', [EmployeeController::class, 'getRatingsInvoice'])->name('ratings-invoice');
+    });
+
+    //Cài đặt tự động
+    Route::prefix('setting-automatic')->name('setting-automatic.')->group(function (){
+        Route::get('index-setting-email', [SettingAIAgentsController::class, 'indexEmailSettingAutomatic'])->name('index-setting-email');
+        Route::get('destroy-setting-email/{id}', [SettingAIAgentsController::class, 'destroyEmailSettingAutomatic'])->name('destroy-setting-email');
+        Route::post('store-setting-email', [SettingAIAgentsController::class, 'storeEmailSettingAutomatic'])->name('store-setting-email');
+        Route::post('update-setting-email/{id}', [SettingAIAgentsController::class, 'updateEmailSettingAutomatic'])->name('update-setting-email');
     });
 });
