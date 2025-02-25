@@ -182,22 +182,6 @@
                     </label>
                 </div>
 
-                <h6 class="mt-5 fw-semibold fs-4 mb-2">Layout Type</h6>
-                <div class="d-flex flex-row gap-3 customizer-box" role="group">
-                    <div>
-                        <input type="radio" class="btn-check" name="page-layout" id="vertical-layout" autocomplete="off" />
-                        <label class="btn p-9 btn-outline-primary rounded-2" for="vertical-layout">
-                            <i class="icon ti ti-layout-sidebar-right fs-7 me-2"></i>Vertical
-                        </label>
-                    </div>
-                    <div>
-                        <input type="radio" class="btn-check" name="page-layout" id="horizontal-layout" autocomplete="off" />
-                        <label class="btn p-9 btn-outline-primary rounded-2" for="horizontal-layout">
-                            <i class="icon ti ti-layout-navbar fs-7 me-2"></i>Horizontal
-                        </label>
-                    </div>
-                </div>
-
                 <h6 class="mt-5 fw-semibold fs-4 mb-2">Container Option</h6>
 
                 <div class="d-flex flex-row gap-3 customizer-box" role="group">
@@ -247,7 +231,13 @@
         <script>
             function handleColorTheme(e) {
                 document.documentElement.setAttribute("data-color-theme", e);
+                localStorage.setItem("colorTheme", e); // Lưu vào localStorage
             }
+            // Khi trang tải lại, áp dụng màu đã lưu trước đó
+            document.addEventListener("DOMContentLoaded", function () {
+                const savedColorTheme = localStorage.getItem("colorTheme") || "default"; // Mặc định là "default"
+                document.documentElement.setAttribute("data-color-theme", savedColorTheme);
+            });
         </script>
     </div>
 

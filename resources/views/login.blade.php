@@ -92,16 +92,17 @@
                     <div class="d-lg-flex align-items-center z-index-5 position-relative h-n80">
                         <div class="row justify-content-center w-100">
                             <div class="col-lg-6">
-                                <h2 class="text-white fs-10 mb-3 lh-sm">
-                                    Chào mừng bạn đến với
-                                    <br />
-                                    Win Win Group
-                                </h2>
-                                <span class="opacity-75 fs-4 text-white d-block mb-3">Warm & Build là ứng dụng dành cho khách hàng trong ngành mẹ và bé,
-                    <br />
-                    giúp bạn trải nghiệm dịch vụ tốt hơn với nhiều tiện ích hữu ích.
-                  </span>
-                                <a target="_blank" href="https://winwingroup.vn/contact" class="btn btn-primary">Liên hệ</a>
+                                <h5 class="text-white">
+                                    Win Baby – Nơi kết nối công nghệ hiện đại với yêu thương chân thành.
+                                </h5></br>
+                                <span class="opacity-75 fs-4 text-white d-block mb-3">
+                                    Chúng tôi tin rằng mỗi cửa hàng mẹ và bé xứng đáng được trang bị những công cụ đột phá,
+                                    biến những giao dịch thông thường thành trải nghiệm khó quên.  </br></br>
+                                    Khi mọi cửa hàng có thể tự tạo ra không gian độc đáo để gắn kết với khách hàng,
+                                    họ sẽ có thời gian tập trung vào điều mà con người làm tốt nhất – mang đến sự quan tâm và chăm sóc tận tâm.</br></br>
+                                    Vì Win Baby được xây dựng để phục vụ con người, giúp mỗi khoảnh khắc mua sắm trở nên ý nghĩa và trọn vẹn.
+                                </span>
+{{--                                <a target="_blank" href="https://winwingroup.vn/contact" class="btn btn-primary">Liên hệ</a>--}}
                             </div>
                         </div>
                     </div>
@@ -120,6 +121,10 @@
 
 <!-- solar icons -->
 <script src="https://cdn.jsdelivr.net/npm/iconify-icon@1.0.8/dist/iconify-icon.min.js"></script>
+
+<script>
+
+</script>
 </body>
 
 </html>
