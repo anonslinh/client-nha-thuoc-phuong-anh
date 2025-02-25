@@ -17,6 +17,23 @@
     <title>Win Win Group</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
     @yield('style')
+    <style>
+        .loading{
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            background: #33333330;
+            z-index: 100;
+            top: 0;
+            left: 0;
+            display: none;
+            justify-content: center;
+            align-items: center;
+        }
+        .loading.active{
+            display: flex;
+        }
+    </style>
 </head>
 
 <body>
@@ -333,6 +350,12 @@
 
 </div>
 <div class="dark-transparent sidebartoggler"></div>
+<div class="loading">
+    <button class="btn btn-primary" type="button" disabled="">
+        <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+        Loading...
+    </button>
+</div>
 <!-- Import Js Files -->
 @include('Layout.script')
 @yield('script')

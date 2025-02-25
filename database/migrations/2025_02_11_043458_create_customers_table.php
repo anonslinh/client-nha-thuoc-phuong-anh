@@ -35,6 +35,8 @@ return new class extends Migration
             $table->integer('kiotviet_reward_point')->default(0);
             $table->integer('used_points')->default(0);
             $table->integer('review_count')->default(0);
+            $table->integer('total_point_event')->default(0);
+            $table->integer('used_point_event')->default(0);
             $table->timestamps();
         });
     }

@@ -30,6 +30,8 @@ class Customer extends Model
         'reward_point',
         'kiotviet_reward_point',
         'used_points',
-        'review_count'
+        'review_count',
+        'used_point_event',
+        'total_point_event'
     ];
 }

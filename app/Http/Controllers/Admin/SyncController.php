@@ -3,6 +3,8 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Models\HistoryPointEvent;
+use App\Models\ProductsEvent;
 use App\Services\KiotVietService;
 use Illuminate\Support\Facades\Http;
 use App\Models\Branch;
@@ -299,5 +301,106 @@ class SyncController extends HelperAdminController
                 ]
             );
         }
+    }
+
+    /**
+     * Lấy danh sách nhóm hàng
+     **/
+    public function getCategories ()
+    {
+        $token = $this->kiotVietService->getAccessToken();
+        $endpoint = 'https://public.kiotapi.com/categories';
+        $pageSize = 100;
+        $response = Http::withHeaders([
+            'Retailer' => $this->kiotVietService->getRetailer(),
+            'Authorization' => 'Bearer ' . $token,
+        ])->get($endpoint,[
+            'pageSize' => $pageSize,
+        ]);
+        $categories  = $response->json();
+        $categories = collect($categories['data']);
+        return $categories;
+    }
+    /**
+     * Chi tiết sản phẩm KiotViet
+     **/
+    public function detailProductKiotViet ($productID)
+    {
+        $token = $this->kiotVietService->getAccessToken();
+        $endpoint = 'https://public.kiotapi.com/products/'.$productID;
+        $response = Http::withHeaders([
+            'Retailer' => $this->kiotVietService->getRetailer(),
+            'Authorization' => 'Bearer ' . $token,
+        ])->get($endpoint);
+        $product = $response->json();
+        return $product;
+    }
+    /**
+     * Đồng bộ điểm theo sự kiện
+    **/
+    public function SynchronizePoint ($customerID, $events)
+    {
+        $token = $this->kiotVietService->getAccessToken();
+        $endpoint = 'https://public.kiotapi.com/invoices?fromPurchaseDate='.$events->time_start.'&toPurchaseDate='.$events->time_end.'&customerIds='.$customerID.'&pageSize=100';
+        $response = Http::withHeaders([
+            'Retailer' => $this->kiotVietService->getRetailer(),
+            'Authorization' => 'Bearer ' . $token,
+        ])->get($endpoint);
+        $listInvoice = $response->json();
+        if (!empty($listInvoice) && !empty($listInvoice['data'])){
+            $index = ceil($listInvoice['total'] / $listInvoice['pageSize']);
+            $this->updatePointCustomer($listInvoice['data'], $customerID, $events);
+            if ($index > 1){
+                for ($i = 2; $i <= $index; $i++){
+                    $currentItem = $i*100;
+                    $endpoint = 'https://public.kiotapi.com/invoices?fromPurchaseDate='.$events->time_start.'&toPurchaseDate='.$events->time_end.'&customerIds='.$customerID.'&pageSize=100&currentItem='.$currentItem;
+                    $response = Http::withHeaders([
+                        'Retailer' => $this->kiotVietService->getRetailer(),
+                        'Authorization' => 'Bearer ' . $token,
+                    ])->get($endpoint);
+                    $dataInvoice = $response->json();
+                    if (!empty($dataInvoice) && !empty($dataInvoice['data'])){
+                        $this->updatePointCustomer($dataInvoice['data'],$customerID, $events);
+                    }
+                }
+            }
+        }
+        return true;
+    }
+
+    /**
+     * Cập nhật điểm khách hàng theo data hóa đơn
+    **/
+    protected function updatePointCustomer ($listInvoice, $customerID, $events)
+    {
+        $totalPoint = 0;
+        foreach ($listInvoice as $invoice){
+            if ($invoice['statusValue'] == 'Hoàn thành'){
+                foreach ($invoice['invoiceDetails'] as $invoiceDetail){
+                    $check = HistoryPointEvent::where('customer_id', $customerID)->where('code_order', $invoice['code'])
+                        ->where('product_id', $invoiceDetail['productId'])->exists();
+                    $point = ProductsEvent::where('events_id', $events->id)->where('product_id', $invoiceDetail['productId'])->first();
+                    if (!$check && !empty($point)){
+                        $pointEvents = $point->point * $invoiceDetail['quantity'];
+                        $totalPoint += $pointEvents;
+                        $historyPoint = new HistoryPointEvent([
+                            'customer_id' => $customerID,
+                            'title' => 'Tích điểm sự kiện: '.$events->title,
+                            'code_order' => $invoice['code'],
+                            'product_id' => $invoiceDetail['productId'],
+                            'product_code' => $invoiceDetail['productCode'],
+                            'product_name' => $invoiceDetail['productName'],
+                            'point' => $pointEvents,
+                            'type' => 1
+                        ]);
+                        $historyPoint->save();
+                    }
+                }
+            }
+        }
+        $customer = Customer::where('kiotviet_id', $customerID)->first();
+        $customer->total_point_event = $customer->total_point_event + $totalPoint;
+        $customer->save();
+        return true;
     }
 }
