@@ -205,10 +205,12 @@ class HomeController
         $listData = Customer::query()
             ->leftJoin('invoices', 'customers.kiotviet_id', '=', 'invoices.customer_id')
             ->select(
-                'customers.*',
-                \DB::raw('COUNT(invoices.id) as total_orders') // Tính tổng số đơn hàng
+                'customers.id', 'customers.code', 'customers.name', 'customers.contact_number',
+                'customers.total_revenue', 'customers.kiotviet_reward_point', 'customers.used_points',
+                \DB::raw('COUNT(invoices.id) as total_orders') // Tổng số đơn hàng trong ngày
             )
-            ->groupBy('customers.id'); // Nhóm theo khách hàng để tính tổng đơn hàng chính xác
+            ->groupBy('customers.id', 'customers.code', 'customers.name', 'customers.contact_number',
+                'customers.total_revenue', 'customers.kiotviet_reward_point', 'customers.used_points'); // Nhóm theo khách hàng
 
         // Tìm kiếm theo key_search (kiotviet_id, code, contact_number, address)
         if (isset($request->key_search)) {

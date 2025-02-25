@@ -140,10 +140,10 @@ class DashboardController extends HelperAdminController
         $customers = Customer::leftJoin('invoices', 'customers.kiotviet_id', '=', 'invoices.customer_id')
             ->whereDate('customers.created_at', $today) // Chỉ lấy đơn hàng của ngày hôm nay
             ->select(
-                'customers.*',
+                'customers.id', 'customers.code', 'customers.name', 'customers.contact_number', 'customers.total_revenue', 'customers.kiotviet_reward_point', 'customers.used_points',
                 \DB::raw('COUNT(invoices.id) as total_orders') // Tổng số đơn hàng trong ngày
             )
-            ->groupBy('customers.id') // Nhóm theo khách hàng
+            ->groupBy('customers.id', 'customers.code', 'customers.name', 'customers.contact_number', 'customers.total_revenue', 'customers.kiotviet_reward_point', 'customers.used_points') // Nhóm theo khách hàng
             ->orderByDesc('total_orders') // Sắp xếp theo số đơn hàng giảm dần
             ->limit(10) // Lấy 10 bản ghi
             ->get();
