@@ -23,7 +23,7 @@
                     </a>
                     <ul aria-expanded="false" class="collapse first-level">
                         <li class="sidebar-item">
-                            <a href="../main/index.html" class="sidebar-link">
+                            <a href="{{route('index')}}" class="sidebar-link">
                                 <i class="ti ti-aperture"></i>
                                 <span class="hide-menu">Dashboard 1</span>
                             </a>

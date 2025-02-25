@@ -200,26 +200,41 @@ class HomeController
     /**
      * Danh sách khách hàng
     **/
-    public function customer (Request $request)
+    public function customer(Request $request)
     {
-        $listData = Customer::query();
-        if (isset($request->key_search)){
-            $listData = $listData->where(function ($query) use ($request){
-                $query->where('kiotviet_id', 'like', '%'.$request->get('key_search').'%')
-                    ->orWhere('code', 'like', '%'.$request->get('key_search').'%')
-                    ->orWhere('contact_number', 'like', '%'.$request->get('key_search').'%')
-                    ->orWhere('address', 'like', '%'.$request->get('key_search').'%');
+        $listData = Customer::query()
+            ->leftJoin('invoices', 'customers.kiotviet_id', '=', 'invoices.customer_id')
+            ->select(
+                'customers.*',
+                \DB::raw('COUNT(invoices.id) as total_orders') // Tính tổng số đơn hàng
+            )
+            ->groupBy('customers.id'); // Nhóm theo khách hàng để tính tổng đơn hàng chính xác
+
+        // Tìm kiếm theo key_search (kiotviet_id, code, contact_number, address)
+        if (isset($request->key_search)) {
+            $search = $request->get('key_search');
+            $listData->where(function ($query) use ($search) {
+                $query->where('customers.kiotviet_id', 'like', "%$search%")
+                    ->orWhere('customers.code', 'like', "%$search%")
+                    ->orWhere('customers.contact_number', 'like', "%$search%")
+                    ->orWhere('customers.address', 'like', "%$search%");
             });
         }
-        if (isset($request->sort)){
-            if ($request->get('sort') == 'total_invoiced'){
-                $listData = $listData->orderBy('total_invoiced', 'desc');
-            }elseif ($request->get('sort') == 'total_point'){
-                $listData = $listData->orderBy('total_point', 'desc');
+
+        // Sắp xếp theo tổng tiền hóa đơn hoặc tổng điểm
+        if (isset($request->sort)) {
+            if ($request->get('sort') == 'total_invoiced') {
+                $listData->orderBy('customers.total_invoiced', 'desc');
+            } elseif ($request->get('sort') == 'total_point') {
+                $listData->orderBy('customers.total_point', 'desc');
             }
-        }else{
-            $listData = $listData->orderBy('created_at', 'desc')->paginate(20);
+        } else {
+            $listData->orderBy('customers.created_at', 'desc');
         }
+
+        // Phân trang 20 bản ghi
+        $listData = $listData->paginate(20);
+
         return view('customer.index', compact('listData'));
     }
 }

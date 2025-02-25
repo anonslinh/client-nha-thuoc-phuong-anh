@@ -14,7 +14,7 @@
     <!-- Core Css -->
     <link rel="stylesheet" href="assets/css/styles.css" />
     <link rel="stylesheet" href="assets/libs/sweetalert2/dist/sweetalert2.min.css">
-    <title>Win Win Group</title>
+    <title>Win 🍼👶 Baby</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons/font/bootstrap-icons.css">
     @yield('style')
 </head>
@@ -33,7 +33,7 @@
 {{--</div>--}}
 <!-- Preloader -->
 <div class="preloader">
-    <img src="../assets/images/logos/logo1.svg" alt="loader" class="lds-ripple img-fluid" />
+    <img src="../assets/images/logos/logo_win_baby.svg" alt="loader" class="lds-ripple img-fluid" />
 </div>
 <div id="main-wrapper">
     @include('Layout.aside')

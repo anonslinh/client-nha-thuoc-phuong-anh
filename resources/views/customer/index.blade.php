@@ -26,11 +26,10 @@
                     <tr>
                         <th>STT</th>
                         <th>Khách hàng</th>
-                        <th>Mã </th>
-                        <th>Địa chỉ</th>
+                        <th>Tổng chi tiêu</th>
+                        <th>Tổng đơn hàng</th>
                         <th>Điểm kiotviet</th>
                         <th>Điểm hệ thống</th>
-                        <th>Điểm đã sử dụng</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -39,18 +38,17 @@
                             <tr>
                                 <td class="align-middle">{{$key + 1}}</td>
                                 <td class="align-middle">
-                                    <p class="m-0">Tên: {{$value->name}}</p>
-                                    <p class="m-0">Số điện thoại: {{$value->contact_number}}</p>
+                                    <span>{{$value->code}}</span><br>
+                                    <span>{{$value->name}} - {{$value->contact_number}}</span>
                                 </td>
                                 <td class="align-middle">
-                                    <p class="m-0">Mã: {{$value->code}}</p>
+                                    <span>{{number_format($value->total_revenue)}}đ</span>
                                 </td>
                                 <td class="align-middle">
-                                    <p class="m-0">{{$value->address}}</p>
+                                    <p class="m-0">{{$value->total_orders}}</p>
                                 </td>
                                 <td class="align-middle">{{$value->kiotviet_reward_point}}</td>
                                 <td class="align-middle">{{$value->kiotviet_reward_point - $value->used_points}}</td>
-                                <td class="align-middle">{{$value->used_points}}</td>
                             </tr>
                         @endforeach
                     @else

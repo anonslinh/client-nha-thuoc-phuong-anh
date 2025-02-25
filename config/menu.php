@@ -9,49 +9,26 @@ return [
                 'name' => 'Tổng quan',
                 'icon' => 'solar:atom-line-duotone',
                 'route' => 'index'
-            ]
-        ]
-    ],
-  [
-      'name' => 'Quà tặng',
-      'icon' => 'solar:gift-broken',
-      'submenu' => [
-          [
-              'name' => 'Danh sách',
-              'icon' => 'solar:atom-line-duotone',
-              'route' => 'gift.index'
-          ],
-          [
-              'name' => 'KH đổi quà tặng',
-              'icon' => 'solar:chart-line-duotone',
-              'route' => 'customer.exchange-gift'
-          ]
-      ]
-  ],
-    [
-      'name' => 'Khách hàng',
-      'icon' => 'solar:bill-list-linear',
-        'submenu' => [
-            [
-                'name' => 'Danh sách',
-                'icon' => 'solar:sticker-smile-circle-2-line-duotone',
-                'route' => 'customer'
-            ]
-        ]
-    ],
-    [
-        'name' => 'Voucher',
-        'icon' => 'solar:palette-round-line-duotone',
-        'submenu' => [
-            [
-                'name' => 'Danh sách',
-                'icon' => 'solar:archive-line-duotone',
-                'route' => 'voucher.list-data'
             ],
             [
-                'name' => 'KH đổi voucher',
-                'icon' => 'solar:repeat-one-minimalistic-bold-duotone',
+                'name' => 'Đánh giá nhân viên',
+                'icon' => 'solar:star-fall-minimalistic-2-line-duotone',
+                'route' => 'employees.employees'
+            ],
+            [
+                'name' => 'Đổi quà',
+                'icon' => 'solar:gift-broken',
+                'route' => 'customer.exchange-gift'
+            ],
+            [
+                'name' => 'Đổi voucher',
+                'icon' => 'solar:palette-round-line-duotone',
                 'route' => 'voucher.customer'
+            ],
+            [
+                'name' => 'Khách hàng',
+                'icon' => 'solar:bill-list-linear',
+                'route' => 'customer'
             ]
         ]
     ],
@@ -69,17 +46,6 @@ return [
                 'icon' => 'solar:tag-horizontal-line-duotone',
                 'route' => 'events.create'
             ]
-        ]
-    ],
-    [
-        'name' => 'Đánh giá nhân viên',
-        'icon' => 'solar:star-fall-minimalistic-2-line-duotone',
-        'submenu' => [
-            [
-                'name' => 'Danh sách nhân viên',
-                'icon' => 'solar:shield-user-line-duotone',
-                'route' => 'employees.employees'
-            ],
         ]
     ],
     [
@@ -105,6 +71,16 @@ return [
                 'name' => 'Cài đặt mini games',
                 'icon' => 'solar:mask-happly-line-duotone',
                 'route' => 'loyalty.mini-games'
+            ],
+            [
+                'name' => 'Cài đặt voucher',
+                'icon' => 'solar:palette-round-line-duotone',
+                'route' => 'voucher.list-data'
+            ],
+            [
+                'name' => 'Cài đặt quà tặng',
+                'icon' => 'solar:gift-broken',
+                'route' => 'gift.index'
             ]
         ]
     ],

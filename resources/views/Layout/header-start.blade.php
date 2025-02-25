@@ -6,7 +6,7 @@
         <!-- ---------------------------------- -->
         <nav class="navbar navbar-expand-lg p-0">
             <div class="d-block d-lg-none py-9 py-xl-0">
-                <img src="../assets/images/logos/logo1.svg" alt="matdash-img" />
+                <img src="../assets/images/logos/logo_win_baby.svg" alt="matdash-img" />
             </div>
             <a class="navbar-toggler p-0 border-0 nav-icon-hover-bg rounded-circle" href="javascript:void(0)" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <iconify-icon icon="solar:menu-dots-bold-duotone" class="fs-6"></iconify-icon>
@@ -348,8 +348,8 @@
                     </a>
                 </li>
                 <li class="nav-item d-none d-xl-flex align-items-center">
-                    <a href="../main/index.html" class="text-nowrap nav-link">
-                        <img src="../assets/images/logos/logo1.svg" alt="matdash-img" />
+                    <a href="{{route('index')}}" class="text-nowrap nav-link">
+                        <img src="../assets/images/logos/logo_win_baby.svg" alt="matdash-img" />
                     </a>
                 </li>
                 <li class="nav-item d-none d-xl-flex align-items-center nav-icon-hover-bg rounded-circle">
@@ -462,8 +462,8 @@
                 </li>
             </ul>
             <div class="d-block d-xl-none">
-                <a href="../main/index.html" class="text-nowrap nav-link">
-                    <img src="../assets/images/logos/logo1.svg" alt="matdash-img" />
+                <a href="{{route('index')}}" class="text-nowrap nav-link">
+                    <img src="../assets/images/logos/logo_win_baby.svg" alt="matdash-img" />
                 </a>
             </div>
             <a class="navbar-toggler nav-icon-hover p-0 border-0 nav-icon-hover-bg rounded-circle" href="javascript:void(0)" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">

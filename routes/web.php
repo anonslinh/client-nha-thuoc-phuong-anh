@@ -10,6 +10,7 @@ use App\Http\Controllers\Admin\EventsController;
 use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\LoyaltyController;
 use App\Http\Controllers\Admin\EmployeeController;
+use App\Http\Controllers\Admin\DashboardController;
 
 Route::get('login', [LoginController::class, 'login'])->name('login');
 Route::get('register', [LoginController::class, 'register'])->name('register');
@@ -17,8 +18,7 @@ Route::post('user-register', [LoginController::class, 'userRegister'])->name('re
 Route::post('doLogin', [LoginController::class, 'doLogin'])->name('doLogin');
 
 Route::middleware([CheckLogin::class])->group(function (){
-//   Route::get('', [SyncController::class, 'syncEmployees'])->name('index');
-    Route::get('', [HomeController::class, 'home'])->name('index');
+    Route::get('', [DashboardController::class, 'index'])->name('index');
     Route::get('customer-exchange-gift', [HomeController::class, 'customerExchangeGift'])->name('customer.exchange-gift');
     Route::get('customer', [HomeController::class, 'customer'])->name('customer');
     Route::get('logout', [HomeController::class, 'logout'])->name('logout');
