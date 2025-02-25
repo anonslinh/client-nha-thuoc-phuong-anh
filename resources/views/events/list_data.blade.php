@@ -8,6 +8,18 @@
                     <a href="{{route('events.create')}}" class="btn btn-primary">+ Tạo mới</a>
                 </div>
             </div>
+            @if(session('error'))
+                <div class="alert alert-danger alert-dismissible bg-danger text-white border-0 fade show" role="alert">
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+                    {{session('error')}}
+                </div>
+            @endif
+            @if(session('success'))
+                <div class="alert alert-success alert-dismissible bg-success text-white border-0 fade show" role="alert">
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
+                    {{session('success')}}
+                </div>
+            @endif
             <div class="card-body">
                 <form action="{{route('events.list-data')}}" method="get" class="row">
                     <div class="col-3">
@@ -58,18 +70,22 @@
                                     <td class="align-middle">{{date_format(date_create($value->time_start), 'd/m/Y')}}</td>
                                     <td class="align-middle">{{date_format(date_create($value->time_end), 'd/m/Y')}}</td>
                                     <td class="align-middle">
-                                        <a href="{{route('events.detail',$value->id)}}" class="btn btn-primary" style="margin-right: 15px">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
-                                                <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
-                                                <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5z"/>
-                                            </svg>
-                                        </a>
-                                        <a class="btn btn-danger btn-sa-confirm" href="{{route('events.delete', $value->id)}}">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
-                                                <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z"/>
-                                                <path d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z"/>
-                                            </svg>
-                                        </a>
+                                        <div class="btn-group">
+                                            <button class="btn btn-danger dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                                                Thao tác
+                                            </button>
+                                            <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton" style="">
+                                                <li>
+                                                    <a class="dropdown-item" href="{{route('events.detail',$value->id)}}">Chi tiết</a>
+                                                </li>
+                                                <li>
+                                                    <a class="dropdown-item" href="{{route('events.add-product',$value->id)}}">Thêm sản phẩm</a>
+                                                </li>
+                                                <li>
+                                                    <a class="dropdown-item btn-sa-confirm" href="{{route('events.delete', $value->id)}}">Xóa</a>
+                                                </li>
+                                            </ul>
+                                        </div>
                                     </td>
                                 </tr>
                             @endforeach

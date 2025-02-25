@@ -27,9 +27,9 @@ return new class extends Migration
             $table->string('product_id');
             $table->string('product_code');
             $table->string('name');
-            $table->string('images');
-            $table->string('base_price');
-            $table->string('price');
+            $table->string('images')->nullable();
+            $table->string('base_price')->nullable();
+            $table->string('price')->nullable();
             $table->integer('point');
             $table->boolean('is_active')->default(1);
             $table->timestamps();

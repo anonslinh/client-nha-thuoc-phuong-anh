@@ -41,10 +41,30 @@ return [
                 'icon' => 'solar:waterdrops-line-duotone',
                 'route' => 'events.list-data'
             ],
+//            [
+//                'name' => 'Tạo sự kiện',
+//                'icon' => 'solar:tag-horizontal-line-duotone',
+//                'route' => 'events.create'
+//            ],
             [
-                'name' => 'Tạo sự kiện',
-                'icon' => 'solar:tag-horizontal-line-duotone',
-                'route' => 'events.create'
+                'name' => 'Sản phẩm',
+                'icon' => 'solar:waterdrops-line-duotone',
+                'route' => 'events.list-product'
+            ],
+            [
+                'name' => 'DS Khách Hàng',
+                'icon' => 'solar:waterdrops-line-duotone',
+                'route' => 'events.list-customer'
+            ],
+            [
+                'name' => 'Lịch sử điểm',
+                'icon' => 'solar:waterdrops-line-duotone',
+                'route' => 'events.history-point'
+            ],
+            [
+                'name' => 'Danh sách quà tặng',
+                'icon' => 'solar:waterdrops-line-duotone',
+                'route' => 'events.list-gift'
             ]
         ]
     ],

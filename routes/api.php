@@ -5,6 +5,7 @@ use App\Http\Controllers\API\HomeController;
 use App\Http\Controllers\API\InvoicesController;
 use App\Http\Controllers\API\GiftExchangesController;
 use App\Http\Controllers\API\VoucherExchangesController;
+use App\Http\Controllers\API\EventsController;
 
 Route::post('reward-point', [HomeController::class, 'rewardPointCustomer']);
 Route::get('banners', [HomeController::class, 'getBanners']);
@@ -30,4 +31,9 @@ Route::post('exchange-voucher', [VoucherExchangesController::class, 'exchangeVou
 Route::get('voucher-exchanges-by-phone', [VoucherExchangesController::class, 'getVouchersByPhone']);
 Route::post('voucher-exchange/confirm', [VoucherExchangesController::class, 'confirmVoucherExchange']);
 Route::post('voucher-exchange/cancel', [VoucherExchangesController::class, 'cancelVoucherExchange']);
+
+// Sụ kiện
+Route::prefix('events')->group(function (){
+    Route::get('get-data', [EventsController::class, 'getDataCustomer']);
+});
 
