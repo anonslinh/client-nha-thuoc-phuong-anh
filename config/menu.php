@@ -29,6 +29,11 @@ return [
                 'name' => 'Khách hàng',
                 'icon' => 'solar:bill-list-linear',
                 'route' => 'customer'
+            ],
+            [
+                'name' => 'Đánh hoá đơn',
+                'icon' => 'solar:star-fall-minimalistic-2-line-duotone',
+                'route' => 'employees.ratings-invoice'
             ]
         ]
     ],

@@ -115,7 +115,7 @@
                                 <h5 class="card-title fw-semibold mb-0">Đánh giá hoá đơn</h5>
                                 <span class="text-dark-light">Hôm nay</span>
                             </div>
-                            <a href="javascript:void(0)" class="btn btn-white fs-2 fw-semibold text-nowrap">Xem tất cả</a>
+                            <a href="{{route('employees.ratings-invoice')}}" class="btn btn-white fs-2 fw-semibold text-nowrap">Xem tất cả</a>
                         </div>
 
                         <div class="tab-content mb-n3">

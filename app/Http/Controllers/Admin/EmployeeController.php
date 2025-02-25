@@ -250,4 +250,126 @@ class EmployeeController extends HelperAdminController
             'low_ratings_data' => $lowRatingsData
         ];
     }
+
+
+    /**
+     * Đánh giá hoá đơn
+     */
+    public function getRatingsInvoice(Request $request)
+    {
+        try{
+
+            $month = now()->month;
+            $year = now()->year;
+
+            // Tạo danh sách 6 tháng tiếp theo
+            $data_months = $this->getMonthsRatingsInvoice($month, $year);
+            $months = $data_months['months'];
+            // Tạo dữ liệu series cho biểu đồ
+            $chartSeries = [
+                [
+                    "name" => "⭐",
+                    "data" => $data_months['ratings']['rating_1'],
+                ],
+                [
+                    "name" => "⭐⭐",
+                    "data" => $data_months['ratings']['rating_2'],
+                ],
+                [
+                    "name" => "⭐⭐⭐",
+                    "data" => $data_months['ratings']['rating_3'],
+                ],
+                [
+                    "name" => "⭐⭐⭐⭐",
+                    "data" => $data_months['ratings']['rating_4'],
+                ],
+                [
+                    "name" => "⭐⭐⭐⭐⭐",
+                    "data" => $data_months['ratings']['rating_5'],
+                ],
+            ];
+
+            $query = InvoiceRating::with(['invoice' => function ($query) {
+                $query->select('id', 'kiotviet_id', 'code', 'total_payment', 'sold_by_name', 'branch_name');
+            }])
+                ->orderByDesc('created_at');
+
+            // Lọc theo ngày từ và ngày đến
+            if (!empty($request->from_date) || !empty($request->to_date)) {
+                if (!empty($request->from_date) && !empty($request->to_date)) {
+                    $query->whereBetween('created_at', [$request->from_date, $request->to_date]);
+                } elseif (!empty($request->from_date)) {
+                    $query->where('created_at', '>=', $request->from_date);
+                } elseif (!empty($request->to_date)) {
+                    $query->where('created_at', '<=', $request->to_date);
+                }
+            }
+
+            // Lọc theo số lượng sao (rating)
+            if ($request->has('rating') && in_array($request->rating, [1, 2, 3, 4, 5])) {
+                $query->where('rating', $request->rating);
+            }
+
+            $listData = $query->paginate(20);
+
+            return view('employee.ratings-invoice', compact( 'listData', 'months', 'chartSeries'));
+        }catch (\Exception $exception){
+            dd($exception);
+            return back()->with(['error' => 'Lỗi! Liên hệ với bộ phận CSKH']);
+        }
+    }
+
+    /**
+     * Lấy danh sách 6 tháng trước đó tính từ tháng hiện tại
+     */
+    private function getMonthsRatingsInvoice($month, $year) {
+        $months = [];
+        $ratings = [
+            'rating_1' => [],
+            'rating_2' => [],
+            'rating_3' => [],
+            'rating_4' => [],
+            'rating_5' => []
+        ];
+
+        for ($i = 0; $i < 6; $i++) {
+            // Thêm vào danh sách tháng
+            $months[] = "T " . $month . "/" . $year;
+
+            // Lấy tổng số đánh giá từ 1 đến 5 sao
+            $ratingData = EmployeeRatingSummary::where('month', $month)
+                ->where('year', $year)
+                ->selectRaw('
+                COALESCE(SUM(rating_1), 0) as rating_1,
+                COALESCE(SUM(rating_2), 0) as rating_2,
+                COALESCE(SUM(rating_3), 0) as rating_3,
+                COALESCE(SUM(rating_4), 0) as rating_4,
+                COALESCE(SUM(rating_5), 0) as rating_5
+            ')
+                ->first();
+
+            foreach ($ratings as $key => &$ratingArray) {
+                $ratingArray[] = $ratingData ? $ratingData->$key : 0;
+            }
+
+            // Lùi về tháng trước
+            $month--;
+            if ($month == 0) {
+                $month = 12;
+                $year--;
+            }
+        }
+
+        // Đảo ngược mảng để hiển thị từ xa đến gần
+        $months = array_reverse($months);
+        foreach ($ratings as &$ratingArray) {
+            $ratingArray = array_reverse($ratingArray);
+        }
+
+        return [
+            'months' => $months,
+            'ratings' => $ratings
+        ];
+    }
+
 }
