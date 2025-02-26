@@ -30,12 +30,12 @@ class EventsController extends SyncController
             $phone = $this->normalizePhone($validatedData['phone']);
             $this->syncCustomerInvoices($phone);
             $customer = Customer::where('contact_number', $phone)->first();
-            if (!empty($events)){
+            if (!empty($events) && !empty($customer)){
                 foreach ($events as $value){
                     $this->SynchronizePoint($customer->kiotviet_id, $value);
                 }
             }
-            $customerID = $customer->id;
+            $customerID = $customer->id??null;
         }
         foreach ($events as $value){
             $value->images = json_decode($value->images);
