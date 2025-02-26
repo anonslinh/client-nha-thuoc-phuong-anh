@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Customer;
 use App\Models\EventsModel;
+use App\Models\ExchangeGiftEvent;
 use App\Models\GiftEvent;
 use App\Models\HistoryPointEvent;
 use App\Models\ProductsEvent;
@@ -410,5 +411,28 @@ class EventsController extends SyncController
         }
         $gift->delete();
         return back()->with(['success' => 'Xóa dữ liệu thành công']);
+    }
+    /**
+     * Lịch sử đổi quà của khách hàng
+    **/
+    public function historyExchangeGift (Request $request)
+    {
+        $listData = ExchangeGiftEvent::query();
+        $listData = $listData->join('customers', 'customers.kiotviet_id', '=', 'exchange_gift_event.customer_id')->select('exchange_gift_event.*', 'customers.name', 'customers.code', 'customers.contact_number');
+        if (isset($request->key_search)){
+            $listData = $listData->where(function ($query) use ($request){
+               $query->where('customers.contact_number', 'like', '%'.$request->get('key_search').'%')
+               ->orWhere('customers.name', 'like', '%'.$request->get('key_search').'%')
+               ->orWhere('customers.code', 'like', '%'.$request->get('key_search').'%')
+               ->orWhere('exchange_gift_event.name_gift', 'like', '%'.$request->get('key_search').'%')
+               ->orWhere('exchange_gift_event.code_gift', 'like', '%'.$request->get('key_search').'%')
+               ->orWhere('exchange_gift_event.barcode_gift', 'like', '%'.$request->get('key_search').'%');
+            });
+        }
+        if (isset($request->status)){
+            $listData = $listData->where('exchange_gift_event.status', $request->get('status'));
+        }
+        $listData = $listData->orderBy('created_at', 'desc')->paginate(20);
+        return view('events.exchange-gift', compact('listData'));
     }
 }

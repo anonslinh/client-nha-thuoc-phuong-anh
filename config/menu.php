@@ -70,6 +70,11 @@ return [
                 'name' => 'Danh sách quà tặng',
                 'icon' => 'solar:waterdrops-line-duotone',
                 'route' => 'events.list-gift'
+            ],
+            [
+                'name' => 'Lịch sử đổi quà',
+                'icon' => 'solar:waterdrops-line-duotone',
+                'route' => 'events.history-exchange-gift'
             ]
         ]
     ],
