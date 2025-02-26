@@ -23,7 +23,7 @@ class EmployeeKpi extends Model
      */
     public function employee()
     {
-        return $this->belongsTo(Employee::class, 'kiotviet_employee_id');
+        return $this->belongsTo(Employee::class, 'kiotviet_employee_id', 'kiotviet_id');
     }
 
     /**

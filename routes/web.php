@@ -134,5 +134,6 @@ Route::middleware([CheckLogin::class])->group(function (){
 
         //Test form mail tự động
         Route::get('test-mail-invoice/{id}', [SettingAIAgentsController::class, 'testMailInvoice'])->name('test-mail-invoice');
+        Route::get('test-mail-employee-kpi', [SettingAIAgentsController::class, 'sendMailKpiEmployee'])->name('test-mail-employee-kpi');
     });
 });
