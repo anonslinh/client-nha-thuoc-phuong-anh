@@ -5,7 +5,11 @@ namespace App\Http\Controllers\Admin;
 
 use App\Models\Branch;
 use App\Models\EmailSettingAutomatic;
+use App\Models\Invoice;
+use App\Models\InvoiceRating;
 use Illuminate\Http\Request;
+use App\Mail\InvoiceRatingMail;
+use Illuminate\Support\Facades\Mail;
 
 class SettingAIAgentsController extends HelperAdminController
 {
@@ -46,5 +50,17 @@ class SettingAIAgentsController extends HelperAdminController
     {
         EmailSettingAutomatic::destroy($id);
         return back()->with('success', 'Email setting deleted successfully.');
+    }
+
+    /**
+     * Test mail
+    */
+    public function testMailInvoice($kiotviet_invoice_id){
+        $data = $this->mailInvoice($kiotviet_invoice_id);
+        if ($data){
+            return back()->with('success', 'Send Email successfully.');
+        }else{
+            return back()->with('error', 'Send Email error.');
+        }
     }
 }

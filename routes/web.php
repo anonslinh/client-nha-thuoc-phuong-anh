@@ -131,5 +131,8 @@ Route::middleware([CheckLogin::class])->group(function (){
         Route::get('destroy-setting-email/{id}', [SettingAIAgentsController::class, 'destroyEmailSettingAutomatic'])->name('destroy-setting-email');
         Route::post('store-setting-email', [SettingAIAgentsController::class, 'storeEmailSettingAutomatic'])->name('store-setting-email');
         Route::post('update-setting-email/{id}', [SettingAIAgentsController::class, 'updateEmailSettingAutomatic'])->name('update-setting-email');
+
+        //Test form mail tự động
+        Route::get('test-mail-invoice/{id}', [SettingAIAgentsController::class, 'testMailInvoice'])->name('test-mail-invoice');
     });
 });

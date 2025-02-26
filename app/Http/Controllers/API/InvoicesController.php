@@ -148,6 +148,11 @@ class InvoicesController extends HelperApiController
             //Ghi log đếm số lượng đánh giá đơn hàng
             DailyActivitySummary::logAction($request->kiotviet_customer_id, 'rate');
 
+            //Gửi mail đánh giá đơn hàng nguy hiểm
+            if ($rating->rating <= 2){
+                $this->mailInvoice($rating->kiotviet_invoice_id);
+            }
+
             return response()->json(['status' => true, 'message' => 'Đánh giá thành công', 'data' => $rating]);
         } catch (\Exception $e) {
             return response()->json(['status' => false, 'error' => $e->getMessage()], 200);
