@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Validator;
 
 class LoginController extends Controller
 {
@@ -133,5 +134,82 @@ class LoginController extends Controller
             return redirect()->route('index');
         }
         return redirect()->route('login')->withErrors(['Tài khoản hoặc mật khẩu không chính xác']);
+    }
+
+    public function settingAccount(){
+
+        $listData = User::all();
+
+        return view('account-admin.setting', compact('listData'));
+    }
+
+    public function changePassword(Request $request)
+    {
+        // Xác thực dữ liệu đầu vào
+        $validator = Validator::make($request->all(), [
+            'current_password' => 'required',
+            'new_password' => 'required|min:8',
+            'confirm_password' => 'required|same:new_password',
+        ]);
+
+        // Nếu có lỗi, trả về với thông báo lỗi
+        if ($validator->fails()) {
+            return back()->withErrors($validator)->withInput();
+        }
+
+        // Lấy user đang đăng nhập
+        $user = Auth::guard('users')->user();
+
+        // Kiểm tra mật khẩu hiện tại có đúng không
+        if (!Hash::check($request->current_password, $user->password)) {
+            return back()->withErrors(['current_password' => 'Mật khẩu hiện tại không đúng'])->withInput();
+        }
+
+        // Cập nhật mật khẩu mới
+        $user->update([
+            'password' => Hash::make($request->new_password),
+        ]);
+
+        return redirect()->route('login')->with('success', 'Mật khẩu đã được thay đổi thành công!');
+    }
+
+    public function storeUser(Request $request)
+    {
+        // Xác thực dữ liệu đầu vào
+        $validator = Validator::make($request->all(), [
+            'email' => 'required|email|unique:users,email',
+            'new_password' => 'required|min:8',
+            'confirm_password' => 'required|same:new_password',
+        ]);
+
+        // Nếu có lỗi, trả về với thông báo lỗi
+        if ($validator->fails()) {
+            return back()->withErrors($validator)->withInput();
+        }
+
+        // Tạo user mới
+        User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => Hash::make($request->new_password),
+        ]);
+
+        return back()->with('success', 'Tài khoản đã được tạo thành công!');
+    }
+
+    public function deleteUser($id)
+    {
+        // Tìm user theo ID
+        $user = User::find($id);
+
+        // Nếu không tìm thấy user, trả về lỗi
+        if (!$user) {
+            return back()->with('error', 'Không tìm thấy tài khoản.');
+        }
+
+        // Xóa user
+        $user->delete();
+
+        return back()->with('success', 'Tài khoản đã được xóa thành công!');
     }
 }

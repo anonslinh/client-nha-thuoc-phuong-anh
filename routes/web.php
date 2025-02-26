@@ -25,6 +25,15 @@ Route::post('doLogin', [LoginController::class, 'doLogin'])->name('doLogin');
 
 Route::middleware([CheckLogin::class])->group(function (){
     Route::get('', [DashboardController::class, 'index'])->name('index');
+
+    //Cài đặt tài khoản Admin
+    Route::prefix('account-admin')->name('account-admin.')->group(function (){
+        Route::get('new-user-and-password', [LoginController::class, 'settingAccount'])->name('new-user-and-password');
+        Route::post('change-password', [LoginController::class, 'changePassword'])->name('change-password');
+        Route::post('add-user', [LoginController::class, 'storeUser'])->name('add-user');
+        Route::get('delete-user/{id}', [LoginController::class, 'deleteUser'])->name('delete-user');
+
+    });
     Route::get('customer-exchange-gift', [HomeController::class, 'customerExchangeGift'])->name('customer.exchange-gift');
     Route::get('customer', [HomeController::class, 'customer'])->name('customer');
     Route::get('logout', [HomeController::class, 'logout'])->name('logout');

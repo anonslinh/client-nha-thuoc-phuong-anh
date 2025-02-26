@@ -56,9 +56,9 @@
 {{--                                        <a href="../main/app-invoice.html" class="p-2 dropdown-item h6 rounded-1">--}}
 {{--                                            My Invoice <span class="badge bg-danger-subtle text-danger rounded ms-8">4</span>--}}
 {{--                                        </a>--}}
-{{--                                        <a href="../main/page-account-settings.html" class="p-2 dropdown-item h6 rounded-1">--}}
-{{--                                            Account Settings--}}
-{{--                                        </a>--}}
+                                        <a href="{{route('account-admin.new-user-and-password')}}" class="p-2 dropdown-item h6 rounded-1">
+                                            Cài đặt tài khoản
+                                        </a>
                                         <a href="{{route('logout')}}" class="p-2 dropdown-item h6 rounded-1">
                                             Đăng xuất
                                         </a>
