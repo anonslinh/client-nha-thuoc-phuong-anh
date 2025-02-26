@@ -124,17 +124,17 @@
                 <form action="{{ route('setting-automatic.store-setting-email') }}" method="post" enctype="multipart/form-data" class="modal-content">
                     @csrf
                     <div class="modal-body">
-                        <div class="mb-3">
-                            <label for="branch_id" class="">Chi nhánh</label>
-                            <select name="branch_id" class="form-control">
-                                <option value="">Tất cả cửa hàng</option>
-                                @foreach($branches as $branch)
-                                    <option value="{{ $branch->kiotviet_id }}" {{ old('branch_id') == $branch->kiotviet_id ? 'selected' : '' }}>
-                                        {{ $branch->branch_name }}
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div>
+{{--                        <div class="mb-3">--}}
+{{--                            <label for="branch_id" class="">Chi nhánh</label>--}}
+{{--                            <select name="branch_id" class="form-control">--}}
+{{--                                <option value="">Tất cả cửa hàng</option>--}}
+{{--                                @foreach($branches as $branch)--}}
+{{--                                    <option value="{{ $branch->kiotviet_id }}" {{ old('branch_id') == $branch->kiotviet_id ? 'selected' : '' }}>--}}
+{{--                                        {{ $branch->branch_name }}--}}
+{{--                                    </option>--}}
+{{--                                @endforeach--}}
+{{--                            </select>--}}
+{{--                        </div>--}}
                         <div class="mb-3">
                             <label for="type" class="">Thể loại</label>
                             <select name="type" class="form-control">
