@@ -11,6 +11,7 @@ use Illuminate\Http\Request;
 use App\Exports\EmployeeRatingsExport;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Models\EmployeeRatingSummary;
+use App\Exports\EmployeeExport;
 
 class EmployeeController extends HelperAdminController
 {
@@ -42,12 +43,19 @@ class EmployeeController extends HelperAdminController
                 ->where('employee_kpis.year', $year);
         })->select('employees.*', \DB::raw('COALESCE(employee_kpis.points, 70) as kpi_points'));
 
-        // Lấy tổng số đánh giá dưới 3 sao trong tháng
+        // Lấy tổng số đánh giá dưới 3 sao và từ 1 đến 5 sao trong tháng
         $query->leftJoin('employee_rating_summaries', function ($join) use ($month, $year) {
             $join->on('employees.kiotviet_id', '=', 'employee_rating_summaries.employee_id')
                 ->where('employee_rating_summaries.month', $month)
                 ->where('employee_rating_summaries.year', $year);
-        })->selectRaw('COALESCE(employee_rating_summaries.rating_1, 0) + COALESCE(employee_rating_summaries.rating_2, 0) + COALESCE(employee_rating_summaries.rating_3, 0) as low_ratings');
+        })->selectRaw(
+            'COALESCE(employee_rating_summaries.rating_1, 0) + COALESCE(employee_rating_summaries.rating_2, 0) + COALESCE(employee_rating_summaries.rating_3, 0) as low_ratings,
+            COALESCE(employee_rating_summaries.rating_1, 0) as rating_1,
+            COALESCE(employee_rating_summaries.rating_2, 0) as rating_2,
+            COALESCE(employee_rating_summaries.rating_3, 0) as rating_3,
+            COALESCE(employee_rating_summaries.rating_4, 0) as rating_4,
+            COALESCE(employee_rating_summaries.rating_5, 0) as rating_5'
+        );
 
 
         // Lọc theo khoảng điểm KPI
@@ -70,9 +78,6 @@ class EmployeeController extends HelperAdminController
                     break;
             }
         }
-
-
-
 
         // Tách riêng sắp xếp theo KPI và sắp xếp theo đánh giá dưới 3 sao
         if ($request->has('sort_kpi')) {
@@ -97,6 +102,16 @@ class EmployeeController extends HelperAdminController
         $totalEmployees = $listData->total(); // Tổng số nhân viên
 
         return view('employee.employees', compact('listData', 'totalEmployees'));
+    }
+
+    /**
+     * Danh sách nhân viên
+    */
+    public function exportEmployees()
+    {
+        $month = now()->month;
+        $year = now()->year;
+        return Excel::download(new EmployeeExport, "report-employees-$month-$year.xlsx");
     }
 
     /**

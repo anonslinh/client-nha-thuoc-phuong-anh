@@ -60,7 +60,10 @@
                     </div>
 
                     <button class="btn btn-primary" style="margin-right: 10px">Tìm kiếm</button>
-                    <a href="{{route('employees.employees')}}" class="btn btn-danger">Hủy</a>
+                    <a href="{{route('employees.employees')}}" class="btn btn-danger" style="margin-right: 10px">Hủy</a>
+                    <a href="{{ route('employees.export-employees',
+                     ['key_search' => request('key_search'), 'sort_kpi' => request('sort_kpi'), 'sort_ratings' => request('sort_ratings'),
+                      'filter_kpi' => request('filter_kpi')]) }}" class="btn btn-warning align-self-end">Xuất Excel</a>
                 </form>
             </div>
             <div class="card-body">
@@ -71,6 +74,7 @@
                         <th>Tài khoản</th>
                         <th>Điểm số trong tháng</th>
                         <th>Đánh giá nguy hiểm</th>
+{{--                        <th>⭐⭐⭐⭐⭐</th>--}}
                         <th>Hành động</th>
                     </tr>
                     </thead>
@@ -84,6 +88,23 @@
                             </td>
                             <td>{{$item->kpi_points}}</td>
                             <td>{{$item->low_ratings}}</td>
+{{--                            <td>--}}
+{{--                                @if ($item->rating_1 > 0)--}}
+{{--                                    <span>{{ $item->rating_1 }} ⭐</span><br>--}}
+{{--                                @endif--}}
+{{--                                @if ($item->rating_2 > 0)--}}
+{{--                                    <span>{{ $item->rating_2 }} ⭐⭐</span><br>--}}
+{{--                                @endif--}}
+{{--                                @if ($item->rating_3 > 0)--}}
+{{--                                    <span>{{ $item->rating_3 }} ⭐⭐⭐</span><br>--}}
+{{--                                @endif--}}
+{{--                                @if ($item->rating_4 > 0)--}}
+{{--                                    <span>{{ $item->rating_4 }} ⭐⭐⭐⭐</span><br>--}}
+{{--                                @endif--}}
+{{--                                @if ($item->rating_5 > 0)--}}
+{{--                                    <span>{{ $item->rating_5 }} ⭐⭐⭐⭐⭐</span><br>--}}
+{{--                                @endif--}}
+{{--                            </td>--}}
                             <td>
                                 <a href="{{route('employees.employee-detail', ['id' => $item->kiotviet_id])}}" type="button" class="btn btn-info">
                                     Thông tin

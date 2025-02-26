@@ -134,6 +134,7 @@ Route::middleware([CheckLogin::class])->group(function (){
     //Đánh giá nhân viên & Đánh giá đơn hàng
     Route::prefix('employees')->name('employees.')->group(function (){
         Route::get('employees', [EmployeeController::class, 'getEmployees'])->name('employees');
+        Route::get('export-employees', [EmployeeController::class, 'exportEmployees'])->name('export-employees');
         Route::get('employee-detail/{id}', [EmployeeController::class, 'getEmployeeDetails'])->name('employee-detail');
         Route::get('employee-export/{id}', [EmployeeController::class, 'exportEmployeeRatings'])->name('employee-export');
         Route::get('ratings-invoice', [EmployeeController::class, 'getRatingsInvoice'])->name('ratings-invoice');
