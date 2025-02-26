@@ -37,6 +37,9 @@ class EventsController extends SyncController
             }
             $customerID = $customer->id;
         }
+        foreach ($events as $value){
+            $value->images = json_decode($value->images);
+        }
         $data['events'] = $events;
         $data['customer'] = Customer::find($customerID);
         $data['gifts'] = GiftEvent::where('active', 1)->get();
