@@ -33,7 +33,7 @@
                             <a href="/" class="text-nowrap logo-img d-block w-100">
                                 <img style="width: 368px; height: auto;" src="../assets/images/logos/logo_win_baby_login.svg"/>
                             </a>
-                            <h2 class="mb-2 mt-4 fs-7 fw-bolder">Sign In</h2>
+                            <h2 class="mb-2 mt-4 fs-7 fw-bolder">Quên mật khẩu</h2>
                             @if (session('success'))
                                 <div class="alert alert-success">
                                     {{ session('success') }}
@@ -55,52 +55,15 @@
                                     </ul>
                                 </div>
                             @endif
-                            <p class="mb-9">Your Admin Dashboard</p>
-                            <div class="row">
-                                <div class="col-6 mb-2 mb-sm-0">
-                                    <a class="btn btn-link border border-muted d-flex align-items-center justify-content-center rounded-2 py-8 text-decoration-none" href="javascript:void(0)" role="button">
-                                        <img src="../assets/images/svgs/google-icon.svg" alt="matdash-img" class="img-fluid me-2" width="18" height="18" />
-                                        Google
-                                    </a>
-                                </div>
-                                <div class="col-6">
-                                    <a class="btn btn-link border border-muted d-flex align-items-center justify-content-center rounded-2 py-8 text-decoration-none" href="javascript:void(0)" role="button">
-                                        <img src="../assets/images/svgs/facebook-icon.svg" alt="matdash-img" class="img-fluid me-2" width="18" height="18" />
-                                        Facebook
-                                    </a>
-                                </div>
-                            </div>
-                            <div class="position-relative text-center my-4">
-                                <p class="mb-0 fs-4 px-3 d-inline-block bg-body text-dark z-index-5 position-relative">
-                                    or sign in with
-                                </p>
-                                <span class="border-top w-100 position-absolute top-50 start-50 translate-middle"></span>
-                            </div>
-                            <form method="post" action="{{route('doLogin')}}">
+                            <p class="mb-9">Vui lòng nhập địa chỉ email liên kết với tài khoản của bạn, chúng tôi sẽ gửi cho bạn một liên kết để đặt lại mật khẩu.</p>
+                            <form method="post" action="{{route('store-forgot-password')}}">
                                 @csrf
                                 <div class="mb-3">
-                                    <label for="exampleInputEmail1" class="form-label">Tài khoản</label>
+                                    <label for="exampleInputEmail1" class="form-label">Email address</label>
                                     <input type="email" class="form-control" name="email" id="exampleInputEmail1" aria-describedby="emailHelp" />
                                 </div>
-                                <div class="mb-4">
-                                    <label for="exampleInputPassword1" class="form-label">Mật khẩu</label>
-                                    <input type="password" name="password" class="form-control" id="exampleInputPassword1" />
-                                </div>
-                                <div class="d-sm-flex align-items-center justify-content-between mb-4">
-                                    <div class="form-check">
-                                        <input class="form-check-input primary" type="checkbox" value="" id="flexCheckChecked" onchange="handleRememberMe()" />
-
-                                        <label class="form-check-label text-dark" for="flexCheckChecked">
-                                            Ghi nhớ tài khoản
-                                        </label>
-                                    </div>
-                                    <a class="text-primary fw-medium" href="{{route('authentication-forgot-password')}}">Quên mật khẩu ?</a>
-                                </div>
-                                <button type="submit" class="btn btn-primary w-100 py-8 mb-4 rounded-2">Sign In</button>
-                                <div class="d-flex align-items-center justify-content-center">
-                                    <p class="fs-4 mb-0 fw-medium">Win Baby</p>
-                                    <a class="text-primary fw-medium ms-2" >Kính chào quý khách!</a>
-                                </div>
+                                <button type="submit" class="btn btn-primary w-100 py-8 mb-4 rounded-2">Quên mật khẩu?</button>
+                                <a href="{{route('login')}}" class="btn bg-primary-subtle text-primary w-100 py-8">Quay lại đăng nhập</a>
                             </form>
                         </div>
                     </div>
@@ -143,41 +106,6 @@
 
 <!-- solar icons -->
 <script src="https://cdn.jsdelivr.net/npm/iconify-icon@1.0.8/dist/iconify-icon.min.js"></script>
-<script>
-    document.addEventListener("DOMContentLoaded", function () {
-        const emailInput = document.getElementById("exampleInputEmail1");
-        const passwordInput = document.getElementById("exampleInputPassword1");
-        const rememberMeCheckbox = document.getElementById("flexCheckChecked");
-
-        // Kiểm tra nếu đã lưu email và mật khẩu trước đó
-        if (localStorage.getItem("rememberedEmail")) {
-            emailInput.value = localStorage.getItem("rememberedEmail");
-            rememberMeCheckbox.checked = true;
-        }
-
-        if (localStorage.getItem("rememberedPassword")) {
-            passwordInput.value = atob(localStorage.getItem("rememberedPassword")); // Giải mã
-        }
-
-        // Xử lý khi người dùng chọn "Ghi nhớ tài khoản"
-        window.handleRememberMe = function () {
-            if (rememberMeCheckbox.checked) {
-                localStorage.setItem("rememberedEmail", emailInput.value);
-                localStorage.setItem("rememberedPassword", btoa(passwordInput.value)); // Mã hóa
-            } else {
-                localStorage.removeItem("rememberedEmail");
-                localStorage.removeItem("rememberedPassword");
-            }
-        };
-
-        // Lưu lại khi nhập mật khẩu
-        passwordInput.addEventListener("input", function () {
-            if (rememberMeCheckbox.checked) {
-                localStorage.setItem("rememberedPassword", btoa(passwordInput.value));
-            }
-        });
-    });
-</script>
 
 </body>
 

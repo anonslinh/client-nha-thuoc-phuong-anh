@@ -14,6 +14,11 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\SettingAIAgentsController;
 
 Route::get('login', [LoginController::class, 'login'])->name('login');
+Route::get('authentication-forgot-password', [LoginController::class, 'forgotPassword'])->name('authentication-forgot-password');
+Route::post('store-forgot-password', [LoginController::class, 'storeForgotPassword'])->name('store-forgot-password');
+Route::get('/reset-password', [LoginController::class, 'showResetForm'])->name('password.reset');
+Route::post('/reset-password', [LoginController::class, 'storeResetPassword'])->name('password.update');
+
 Route::get('register', [LoginController::class, 'register'])->name('register');
 Route::post('user-register', [LoginController::class, 'userRegister'])->name('register-user');
 Route::post('doLogin', [LoginController::class, 'doLogin'])->name('doLogin');
