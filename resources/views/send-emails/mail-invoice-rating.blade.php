@@ -17,7 +17,7 @@
 <body>
 <div class="container">
     <div class="header">
-        <img style="width: 368px; height: auto;" src="https://baseminiapp.winwingroup.vn/assets/images/logos/logo_win_baby_login.svg" alt="Win Baby Logo"/>
+        <img style="width: 368px; height: auto;" src="https://baseminiapp.winwingroup.vn/assets/images/logos/logo_win_baby_login.png" alt="Win Baby Logo"/>
         <h2>Hóa Đơn - Đánh Giá Nguy Hiểm</h2>
     </div>
 
