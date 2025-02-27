@@ -37,6 +37,7 @@ class EmployeeExport implements FromView, WithColumnWidths, ShouldAutoSize
                 \DB::raw('COALESCE(employee_rating_summaries.rating_4, 0) as rating_4'),
                 \DB::raw('COALESCE(employee_rating_summaries.rating_5, 0) as rating_5')
             )
+            ->orderBy('kpi_points', 'asc') // Sắp xếp điểm từ thấp đến cao
             ->get();
 
         return view('exports.employees', compact('listData'));
