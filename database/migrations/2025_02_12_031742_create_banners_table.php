@@ -3,6 +3,8 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 
 return new class extends Migration
 {
@@ -23,6 +25,12 @@ return new class extends Migration
             $table->timestamps();
 
         });
+
+        // Chèn dữ liệu mẫu sau khi tạo bảng
+        DB::table('banners')->insert([
+            ['title' => 'Banner mẫu', 'image_url' => 'assets/images/config/banner_example.webp', 'status' => 'active',
+                'start_date' => Carbon::now(), 'end_date' => Carbon::now()->addMonth()],
+        ]);
     }
 
     /**
