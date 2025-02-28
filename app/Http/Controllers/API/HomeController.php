@@ -104,7 +104,9 @@ class HomeController extends HelperApiController
             $rankCode = $customerRank->current_rank?? 'than_thiet';
             $rank = MembershipLevel::where('rank', $rankCode)->first();
             if (isset($rank)){
-                $gifts = $gifts->where('rank_id', $rank->id); // Lấy quà theo hạng thẻ
+                $gifts = $gifts->where(function ($query) use ($rank){
+                    $query->where('rank_id', $rank->id)->orWhere('rank_id', null);
+                }); // Lấy quà theo hạng thẻ
             }
         }
         $gifts = $gifts->where(function ($query) use ($branchId){
