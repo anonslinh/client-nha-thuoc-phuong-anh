@@ -104,7 +104,7 @@ class EventsController extends SyncController
             $gift->quantity -= 1;
             $gift->save();
 
-            return response()->json(['status' => true, 'code' => $gift->code,
+            return response()->json(['status' => true, 'gift' => $exchange,
                 'msg' => 'Đổi quà thành công. Quý khách vui lòng đến cửa hàng gần nhất để nhận quà. Xin chân thành cảm ơn'], Response::HTTP_OK);
         });
 
