@@ -98,15 +98,27 @@ class HomeController extends HelperApiController
         $perPage = $request->input('per_page', 10);
 
         // Truy vấn danh sách quà tặng
-        $gifts = Gift::where(function ($query) use ($branchId) {
-            if ($branchId) {
-                // Nếu có branch_id, lấy quà của chi nhánh đó
-                $query->where('branch_id', $branchId);
-            } else {
-                // Nếu chưa có branch_id, chỉ lấy quà trưng bày
-                $query->where('is_display', true);
+        $gifts = Gift::query();
+        if (!empty($customer)){
+            $customerRank = CustomerRank::where('customer_id', $customer->kiotviet_id)->first();
+            $rankCode = $customerRank->current_rank?? 'than_thiet';
+            $rank = MembershipLevel::where('rank', $rankCode)->first();
+            if (isset($rank)){
+                $gifts = $gifts->where('rank_id', $rank->id); // Lấy quà theo hạng thẻ
             }
-        })->paginate($perPage);
+        }
+        $gifts = $gifts->where(function ($query) use ($branchId){
+            $query->where('branch_id', $branchId)->orWhere('branch_id', null);
+        });
+        $gifts = $gifts->where('is_display', true)->paginate($perPage);
+//        $gifts = Gift::where(function ($query) use ($branchId) {
+//            if ($branchId) {
+//                // Nếu có branch_id, lấy quà của chi nhánh đó
+//                $query->where('branch_id', $branchId)->orWhere('branch_id', null);
+//            } else {
+//                $query->where('is_display', true);
+//            }
+//        })->paginate($perPage);
 
         return response()->json([
             'status' => true,
