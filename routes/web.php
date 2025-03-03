@@ -12,6 +12,7 @@ use App\Http\Controllers\Admin\LoyaltyController;
 use App\Http\Controllers\Admin\EmployeeController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\SettingAIAgentsController;
+use App\Http\Controllers\LoginZaloController;
 
 Route::get('login', [LoginController::class, 'login'])->name('login');
 Route::get('authentication-forgot-password', [LoginController::class, 'forgotPassword'])->name('authentication-forgot-password');
@@ -22,6 +23,9 @@ Route::post('/reset-password', [LoginController::class, 'storeResetPassword'])->
 Route::get('register', [LoginController::class, 'register'])->name('register');
 Route::post('user-register', [LoginController::class, 'userRegister'])->name('register-user');
 Route::post('doLogin', [LoginController::class, 'doLogin'])->name('doLogin');
+
+Route::get('login/zalo', [LoginZaloController::class, 'loginZalo']);
+Route::get('zalo', [LoginZaloController::class, 'zaloUser']);
 
 Route::middleware([CheckLogin::class])->group(function (){
     Route::get('', [DashboardController::class, 'index'])->name('index');
