@@ -34,14 +34,14 @@ class LoginZaloController extends Controller
             return back()->with(['error' => 'Đã có lỗi xảy ra.Vui lòng kiểm tra lại']);
         }
         $config = array(
-            'app_id' => '998896466486819721',
-            'app_secret' => 'X0Vqx52E18C7DLgcnVhv'
+            'app_id' => '2308972398308356836',
+            'app_secret' => 'zr540EK1ugQ42NkTBNE1'
         );
         $zalo = new Zalo($config);
         $helper = $zalo->getRedirectLoginHelper();
         $zaloToken = $helper->getZaloToken($code);
         $accessToken = $zaloToken->getAccessToken();
-        $params = ['fields' => 'id,name,picture'];
+        $params = ['fields' => 'id,name,picture,phone'];
         $response = $zalo->get(ZaloEndPoint::API_GRAPH_ME, $accessToken, $params);
         $result = $response->getDecodedBody();
         dd($result);

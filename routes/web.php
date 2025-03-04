@@ -90,6 +90,7 @@ Route::middleware([CheckLogin::class])->group(function (){
        Route::post('update-gift/{id}', [EventsController::class, 'updateGift'])->name('gift.update');
        Route::get('delete-gift/{id}', [EventsController::class, 'deleteGift'])->name('gift.delete');
        Route::get('history-exchange-gift', [EventsController::class, 'historyExchangeGift'])->name('history-exchange-gift');
+       Route::post('create-product-with-category', [EventsController::class, 'createProductWithCategory'])->name('create-product-with-category');
     });
 
     Route::prefix('voucher')->name('voucher.')->group(function (){

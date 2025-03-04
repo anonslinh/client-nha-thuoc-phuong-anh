@@ -17,12 +17,25 @@
                     {{session('success')}}
                 </div>
             @endif
+            <div class="card-header">
+                <p class="fw-bolder">Cài đặt sản phẩm theo nhóm hàng</p>
+                <form action="" id="addProduct" class="d-flex align-items-center">
+                    <select class="form-control" name="categoryID" required style="border-radius: inherit;max-width: 250px;margin-right: 15px">
+                        <option value="">Nhóm hàng</option>
+                        @foreach($categories as $item)
+                            <option value="{{$item['categoryId']}}" @if(request()->get('id_category') == $item['categoryId']) selected @endif>{{$item['categoryName']}}</option>
+                        @endforeach
+                    </select>
+                    <input name="point_category" class="form-control" required type="number" style="max-width: 200px;margin-right: 15px" placeholder="Số điểm">
+                    <button class="btn btn-primary">Cài đặt</button>
+                </form>
+            </div>
             <div class="card-body">
                 <div class="d-flex justify-content-end align-items-center">
                     <input name="events_id" value="{{$events->id}}" hidden>
                     <form action="{{route('events.add-product',$events->id)}}" class="d-flex justify-content-end align-items-center w-75">
                         <select class="form-control" name="id_category" style="border-radius: inherit;max-width: 250px;margin-right: 15px">
-                            <option value="">Danh mục</option>
+                            <option value="">Nhóm hàng</option>
                             @foreach($categories as $item)
                                 <option value="{{$item['categoryId']}}" @if(request()->get('id_category') == $item['categoryId']) selected @endif>{{$item['categoryName']}}</option>
                             @endforeach
@@ -146,6 +159,38 @@
                     }
                 })
             }
+            $("#addProduct").submit(function (ev) {
+                ev.preventDefault();
+                $(".loading").addClass("active");
+                let data = {};
+                data['events_id'] = $('input[name="events_id"]').val();
+                data['point'] = $('input[name="point_category"]').val();
+                data['category_id'] = $('select[name="categoryID"]').val();
+                $.ajax({
+                    url: "{{route('events.create-product-with-category')}}",
+                    data: data,
+                    type: "post",
+                    dataType: "json",
+                    success: function (data) {
+                        $(".loading").removeClass("active");
+                        if (data.status){
+                            Swal.fire(
+                                "Thành công",
+                                data.msg,
+                                "success"
+                            );
+                        }
+                    },
+                    error: function () {
+                        $(".loading").removeClass("active");
+                        Swal.fire(
+                            "Thêm sản phẩm thất bại",
+                            "Đã có lỗi xảy ra.Vui lòng kiểm tra lại",
+                            "error"
+                        );
+                    }
+                })
+            })
         });
     </script>
 @endsection
