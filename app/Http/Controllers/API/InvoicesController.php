@@ -26,7 +26,8 @@ class InvoicesController extends HelperApiController
     */
     public function getInvoices(Request $request){
         try{
-            $cutoffDate = '2024-02-20';
+            $cutoffDate = optional($this->getKpiSetting())->cutoff_date ?? '2025-01-01';
+
             $perPage = $request->input('per_page', 10);
 
             $phone = $request->input('phone');

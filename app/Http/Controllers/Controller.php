@@ -6,6 +6,7 @@ use App\Mail\InvoiceRatingMail;
 use App\Models\EmailSettingAutomatic;
 use App\Models\Invoice;
 use App\Models\InvoiceRating;
+use App\Models\KpiSetting;
 use Illuminate\Support\Facades\Mail;
 
 abstract class Controller
@@ -38,5 +39,14 @@ abstract class Controller
         } catch (\Exception $exception) {
             return false;
         }
+    }
+
+    /**
+     * Thông tin cài đặt đánh giá
+    */
+    public function getKpiSetting(){
+        $kpi_config = KpiSetting::first();
+
+        return$kpi_config;
     }
 }

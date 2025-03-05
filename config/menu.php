@@ -144,6 +144,11 @@ return [
                 'route' => 'config.slogan'
             ],
             [
+                'name' => 'Cài đặt đánh giá',
+                'icon' => 'solar:star-fall-minimalistic-2-line-duotone',
+                'route' => 'config.setting-point-order-review'
+            ],
+            [
                 'name' => 'AI Tự động',
                 'icon' => 'solar:atom-line-duotone',
                 'route' => 'setting-automatic.index-setting-email'

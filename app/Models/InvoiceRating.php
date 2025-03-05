@@ -57,24 +57,34 @@ class InvoiceRating extends Model
         \DB::beginTransaction();
 
         try {
+            $invoice = Invoice::where('kiotviet_id', $data['kiotviet_invoice_id'])->first();
+            if (empty($invoice)){
+                throw new \Exception('Hóa đơn không tồn tại');
+            }
             $invoiceRating = self::create($data);
-
-            // Cập nhật điểm KPI cho nhân viên
-            EmployeeKpi::updateKpiScore($invoiceRating->employee_id, $invoiceRating->rating);
 
             // Cập nhật tổng số chấm điểm sao cho nhân viên từ 1 -> 5 sao
             EmployeeRatingSummary::updateRatingSummary($invoiceRating->employee_id, $invoiceRating->rating);
 
-            // Lấy thông tin khách hàng
-            $customer = Customer::where('kiotviet_id', $data['kiotviet_customer_id'])->first();
+            // Lấy cấu hình KPI từ bảng kpi_settings
+            $kpiConfig = KpiSetting::first();
+            if (!$kpiConfig) {
+                throw new \Exception("Lỗi: Cấu hình KPI chưa được thiết lập!");
+            }else{
+                // Cập nhật điểm KPI cho nhân viên
+                EmployeeKpi::updateKpiScore($invoiceRating->employee_id, $invoiceRating->rating, $kpiConfig);
 
-            if ($customer) {
-                // Tăng review_count lên 1
-                $customer->increment('review_count');
+                // Lấy thông tin khách hàng
+                $customer = Customer::where('kiotviet_id', $data['kiotviet_customer_id'])->first();
 
-                // Nếu review_count là bội số của 10, trừ used_points đi 1
-                if ($customer->review_count % 10 === 0) {
-                    $customer->decrement('used_points', 1);
+                if ($customer && ($invoice->total_payment >= $kpiConfig->min_order_value)) {
+                    // Tăng review_count lên 1
+                    $customer->increment('review_count');
+
+                    // Nếu review_count là bội số của 10, trừ used_points đi 1
+                    if ($customer->review_count % $kpiConfig->orders_required === 0) {
+                        $customer->decrement('used_points', $kpiConfig->reward_points);
+                    }
                 }
             }
 

@@ -123,6 +123,10 @@ Route::middleware([CheckLogin::class])->group(function (){
         //Slogan
         Route::get('slogan', [SettingController::class, 'getSlogan'])->name('slogan');
         Route::post('slogan-update/{id}', [SettingController::class, 'updateSlogan'])->name('slogan-update');
+
+        //Cài đặt điểm đánh giá
+        Route::get('setting-point-order-review', [SettingController::class, 'settingPointOrderReview'])->name('setting-point-order-review');
+        Route::post('update-point-order-review/{id}', [SettingController::class, 'updateSettingPointOrderReview'])->name('update-point-order-review');
     });
 
     //Loyalty

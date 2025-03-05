@@ -29,7 +29,7 @@ class EmployeeKpi extends Model
     /**
      * Cập nhật điểm KPI nhân viên theo đánh giá hóa đơn.
      */
-    public static function updateKpiScore($employeeId, $rating)
+    public static function updateKpiScore($employeeId, $rating, $kpiConfig)
     {
         $month = now()->month;
         $year = now()->year;
@@ -38,30 +38,30 @@ class EmployeeKpi extends Model
         $pointsChange = 0;
         switch ($rating) {
             case 5:
-                $pointsChange = 3;
+                $pointsChange = $kpiConfig->star_5;
                 break;
             case 4:
-                $pointsChange = 1;
+                $pointsChange = $kpiConfig->star_4;
                 break;
             case 3:
-                $pointsChange = -3;
+                $pointsChange = $kpiConfig->star_3;
                 break;
             case 2:
-                $pointsChange = -7;
+                $pointsChange = $kpiConfig->star_2;
                 break;
             case 1:
-                $pointsChange = -12;
+                $pointsChange = $kpiConfig->star_1;
                 break;
         }
 
         // Tìm hoặc tạo mới KPI nhân viên
         $employeeKpi = self::firstOrCreate(
             ['kiotviet_employee_id' => $employeeId, 'month' => $month, 'year' => $year],
-            ['points' => 70] // Điểm KPI mặc định nếu mới tạo
+            ['points' => $kpiConfig->default_kpi] // Điểm KPI mặc định nếu mới tạo
         );
 
         // Cập nhật điểm KPI
-        $newPoints = max(30, min(120, $employeeKpi->points + $pointsChange));
+        $newPoints = max($kpiConfig->min_kpi, min($kpiConfig->max_kpi, $employeeKpi->points + $pointsChange));
         $employeeKpi->update(['points' => $newPoints]);
 
         return $employeeKpi;
