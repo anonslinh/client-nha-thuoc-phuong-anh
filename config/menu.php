@@ -152,6 +152,11 @@ return [
                 'name' => 'AI Tự động',
                 'icon' => 'solar:atom-line-duotone',
                 'route' => 'setting-automatic.index-setting-email'
+            ],
+            [
+                'name' => 'Cài đặt chung',
+                'icon' => 'solar:settings-linear',
+                'route' => 'config.setting-global'
             ]
         ]
     ]

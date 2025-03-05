@@ -127,6 +127,10 @@ Route::middleware([CheckLogin::class])->group(function (){
         //Cài đặt điểm đánh giá
         Route::get('setting-point-order-review', [SettingController::class, 'settingPointOrderReview'])->name('setting-point-order-review');
         Route::post('update-point-order-review/{id}', [SettingController::class, 'updateSettingPointOrderReview'])->name('update-point-order-review');
+
+        //Cài đặt chung
+        Route::get('setting-global', [SettingController::class, 'settingGlobal'])->name('setting-global');
+        Route::post('update-setting-global/{id}', [SettingController::class, 'updateSettingGlobal'])->name('update-setting-global');
     });
 
     //Loyalty

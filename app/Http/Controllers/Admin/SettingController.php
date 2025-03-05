@@ -8,6 +8,7 @@ use App\Models\Branch;
 use App\Models\Contacts;
 use App\Models\Employee;
 use App\Models\KpiSetting;
+use App\Models\SettingGlobal;
 use App\Models\Slogan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -73,7 +74,7 @@ class SettingController extends SyncController
     }
 
     /**
-     * Cập nhật phản hồi & liên hệ
+     * Cập nhật Slogan
      */
     public function updateSlogan (Request $request, $id)
     {
@@ -129,4 +130,39 @@ class SettingController extends SyncController
         return back()->with(['success' => 'Cập nhật thành công!']);
     }
 
+
+    /**
+     * Cài đặt chung
+     * OA ID của cửa hàng
+     */
+    public function settingGlobal(){
+        $listData = SettingGlobal::all();
+        if (empty($listData)){
+            return back()->with(['error' => 'Lỗi liên hệ với bộ phận CSKH']);
+        }
+
+        return view('config.setting-global', compact('listData'));
+    }
+
+    /**
+     * Cập nhật cài đặt chung
+     */
+    public function updateSettingGlobal (Request $request, $id)
+    {
+        $data = SettingGlobal::find($id);
+        if (empty($data)){
+            return back()->with(['error' => 'Không tìm thấy dữ liệu']);
+        }
+        // Validate dữ liệu đầu vào
+        $validated = $request->validate([
+            'comment' => 'required',
+        ]);
+
+        // Cập nhật dữ liệu
+        $data->update($validated);
+        $data->comment = $request->get('comment');
+        $data->save();
+
+        return back()->with(['success' => 'Cập nhật dữ liệu thành công']);
+    }
 }

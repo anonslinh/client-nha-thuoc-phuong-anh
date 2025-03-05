@@ -6,6 +6,7 @@ use App\Http\Controllers\API\InvoicesController;
 use App\Http\Controllers\API\GiftExchangesController;
 use App\Http\Controllers\API\VoucherExchangesController;
 use App\Http\Controllers\API\EventsController;
+use App\Http\Controllers\API\SettingGlobalController;
 
 Route::post('reward-point', [HomeController::class, 'rewardPointCustomer']);
 Route::get('banners', [HomeController::class, 'getBanners']);
@@ -41,3 +42,8 @@ Route::prefix('events')->group(function (){
     Route::get('history-point', [EventsController::class, 'historyPoint']);
 });
 
+// Follow OA
+Route::prefix('follow')->group(function (){
+    Route::post('', [SettingGlobalController::class, 'storeFollow']);
+    Route::post('check-follow', [SettingGlobalController::class, 'checkFollow']);
+});
