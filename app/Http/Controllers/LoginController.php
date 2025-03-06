@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Employee;
 use App\Models\PasswordResetToken;
 use App\Models\User;
 use Carbon\Carbon;
@@ -139,8 +140,9 @@ class LoginController extends Controller
     public function settingAccount(){
 
         $listData = User::all();
+        $employees = Employee::all();
 
-        return view('account-admin.setting', compact('listData'));
+        return view('account-admin.setting', compact('listData', 'employees'));
     }
 
     public function changePassword(Request $request)
@@ -187,11 +189,16 @@ class LoginController extends Controller
             return back()->withErrors($validator)->withInput();
         }
 
+        $employee = Employee::where('kiotviet_id', $request->employee_kiotviet_id)->first();
+
         // Tạo user mới
         User::create([
-            'name' => $request->name,
+            'name' => $employee->user_name,
             'email' => $request->email,
             'password' => Hash::make($request->new_password),
+            'role' => $request->role,
+            'permissions' => json_encode(['all']),
+            'status' => 'active',
         ]);
 
         return back()->with('success', 'Tài khoản đã được tạo thành công!');

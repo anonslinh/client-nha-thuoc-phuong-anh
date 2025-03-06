@@ -5,6 +5,7 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use App\Models\Employee;
 
 return new class extends Migration
 {
@@ -19,6 +20,15 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
+
+            // Liên kết với bảng employees qua kiotviet_id
+            $table->unsignedBigInteger('employee_kiotviet_id')->nullable();
+            $table->foreign('employee_kiotviet_id')->references('kiotviet_id')->on('employees')->onDelete('cascade');
+
+            $table->enum('role', ['admin', 'manager', 'staff'])->default('staff');
+            $table->json('permissions')->nullable(); // Lưu quyền truy cập menu dưới dạng JSON
+            $table->enum('status', ['active', 'inactive'])->default('active');
+
             $table->rememberToken();
             $table->timestamps();
         });
@@ -43,6 +53,9 @@ return new class extends Migration
             'name' => 'Admin',
             'email' => 'admin.winbaby@gmail.com',
             'password' => Hash::make('Winbaby123'),
+            'role' => 'admin', // Đặt vai trò là admin
+            'permissions' => json_encode(['all']), // Cấp quyền truy cập toàn bộ hệ thống
+            'status' => 'active',
             'created_at' => now(),
             'updated_at' => now(),
         ]);
@@ -56,5 +69,9 @@ return new class extends Migration
         Schema::dropIfExists('users');
         Schema::dropIfExists('password_reset_tokens');
         Schema::dropIfExists('sessions');
+    }
+
+    public function employee() {
+        return $this->belongsTo(Employee::class, 'employee_kiotviet_id', 'kiotviet_id');
     }
 };

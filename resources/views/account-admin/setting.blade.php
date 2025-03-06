@@ -76,9 +76,23 @@
                                         <h4 class="card-title">Thêm tài khoản đăng nhập</h4>
                                         <form method="POST" action="{{ route('account-admin.add-user') }}">
                                             @csrf
-                                            <div class="mb-3">
-                                                <label class="form-label">Tên tài khoản</label>
-                                                <input type="text" class="form-control" name="name" autocomplete="new-password" required>
+                                            <div class="row">
+                                                <div class="col-md-6 mb-3">
+                                                    <label class="form-label">Nhân viên</label>
+                                                    <select class="form-control" name="employee_kiotviet_id">
+                                                        @foreach($employees as $employee)
+                                                            <option value="{{$employee->kiotviet_id}}">{{$employee->user_name}}</option>
+                                                        @endforeach
+                                                    </select>
+                                                </div>
+                                                <div class="col-md-6 mb-3">
+                                                    <label class="form-label">Cấp bậc</label>
+                                                    <select class="form-control" name="role">
+                                                        <option value="staff">Nhân viên</option>
+                                                        <option value="manager">Quản lý</option>
+                                                        <option value="manager">Quản trị viên</option>
+                                                    </select>
+                                                </div>
                                             </div>
                                             <div class="mb-3">
                                                 <label class="form-label">Email</label>
