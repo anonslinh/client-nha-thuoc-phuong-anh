@@ -22,6 +22,7 @@ Route::get('contacts', [HomeController::class, 'getContacts']);
 Route::get('slogan', [HomeController::class, 'getSlogans']);
 
 //Đổi quà
+Route::get('branches', [GiftExchangesController::class, 'getBranches']);
 Route::post('exchange-gift', [GiftExchangesController::class, 'exchangeGift']);
 Route::get('gift-exchanges-by-phone', [GiftExchangesController::class, 'getGiftExchangesByPhone']);
 Route::post('gift-exchange/confirm', [GiftExchangesController::class, 'confirmGiftExchange']);

@@ -91,7 +91,7 @@ class HomeController extends HelperApiController
     public function getGifts(Request $request)
     {
         $customer = $this->getCustomerByPhone($request->phone);
-        $branchId = $customer->branch_id ?? null;
+        $branchId = $request->branch_id ?? null;
         $rewardPoint = $customer->reward_point ?? 0; // Điểm thưởng của khách hàng (mặc định là 0 nếu không có)
 
         // Lấy số lượng item mỗi trang (mặc định 10)
@@ -109,23 +109,23 @@ class HomeController extends HelperApiController
                 }); // Lấy quà theo hạng thẻ
             }
         }
-        $gifts = $gifts->where(function ($query) use ($branchId){
-            $query->where('branch_id', $branchId)->orWhere('branch_id', null);
-        });
-        $gifts = $gifts->where('is_display', true)->paginate($perPage);
-//        $gifts = Gift::where(function ($query) use ($branchId) {
-//            if ($branchId) {
-//                // Nếu có branch_id, lấy quà của chi nhánh đó
-//                $query->where('branch_id', $branchId)->orWhere('branch_id', null);
-//            } else {
-//                $query->where('is_display', true);
-//            }
-//        })->paginate($perPage);
 
+        // Nếu có branch_id, chỉ lấy quà còn hàng tại cửa hàng đó
+        if ($branchId) {
+            $gifts = $gifts->whereHas('giftStocks', function ($query) use ($branchId) {
+                $query->where('branch_id', $branchId)->where('quantity', '>', 0);
+            });
+        }
+
+        $gifts = $gifts->where('is_display', true)->paginate($perPage);
+
+        foreach ($gifts as $item){
+            $item->branch_id = $branchId;
+        }
         return response()->json([
             'status' => true,
             'reward_point' => $rewardPoint,
-            'data' => $gifts
+            'data' => $gifts,
         ]);
     }
 

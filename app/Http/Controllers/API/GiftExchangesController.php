@@ -2,6 +2,7 @@
 
 
 namespace App\Http\Controllers\API;
+use App\Models\Branch;
 use App\Models\CustomerPointLog;
 use App\Models\DailyActivitySummary;
 use Illuminate\Http\Request;
@@ -28,12 +29,26 @@ class GiftExchangesController extends HelperApiController
             $validatedData = $request->validate([
                 'phone' => ['required', 'regex:/^(0[1-9][0-9]{8,9}|84[1-9][0-9]{8,9})$/'],
                 'gift_id' => ['required', 'exists:gifts,id'], // Đảm bảo gift_id tồn tại
+                'branch_id' => ['required', 'exists:branches,id'], // Đảm bảo branch_id tồn tại
             ], [
+                'branch_id.required' => 'Mã chi nhánh là bắt buộc.',
+                'branch_id.exists' => 'Chi nhánh không tồn tại.',
                 'gift_id.required' => 'Mã quà tặng là bắt buộc.',
                 'gift_id.exists' => 'Quà tặng không tồn tại.',
                 'phone.required' => 'Số điện thoại là bắt buộc.',
                 'phone.regex' => 'Số điện thoại không hợp lệ.',
             ]);
+
+            $quantity = 1;
+            // Kiểm tra sản phẩm còn hàng không
+            if (!GiftInventories::checkStock($validatedData['gift_id'], $validatedData['branch_id'], $quantity)) {
+                return response()->json(['status' => false, 'message' => 'Sản phẩm đã hết hàng'], 200);
+            }
+
+            // Trừ tồn kho
+            if (!GiftInventories::reduceStock($validatedData['gift_id'], $validatedData['branch_id'], $quantity)) {
+                return response()->json(['status' => false, 'message' => 'Không đủ số lượng trong kho'], 200);
+            }
 
             $phone = $this->normalizePhone($validatedData['phone']);
 
@@ -79,7 +94,7 @@ class GiftExchangesController extends HelperApiController
                 'customer_id' => $customer->kiotviet_id,
                 'contact_phone' => $customer->contact_number,
                 'gift_id' => $gift->id,
-                'branch_id' => $gift->branch_id ?? null,
+                'branch_id' => $validatedData['branch_id'] ?? null,
                 'exchange_code' => $exchangeCode,
                 'points_used' => $pointsRequired,
                 'exchange_date' => now(),
@@ -121,8 +136,8 @@ class GiftExchangesController extends HelperApiController
         $giftExchanges = GiftExchanges::where('customer_id', $customer->kiotviet_id)
             ->orderByRaw("CASE WHEN status = 'pending' THEN 1 ELSE 2 END")
             ->orderBy('exchange_date', 'desc')
-            ->with('gift')
-            ->paginate($perPage);;
+            ->with('gift', 'branch')
+            ->paginate($perPage);
 
         return response()->json(['status' => true, 'data' => $giftExchanges], 200);
     }
@@ -179,6 +194,11 @@ class GiftExchangesController extends HelperApiController
                 CustomerPointLog::updateUsedPoints($customer->kiotviet_id, $exchange->points_used, 'decrease');
             }
 
+            // Cộng thêm tồn kho khi huỷ không đổi
+            $quantity = 1;
+            if (!GiftInventories::restoreStock($exchange->gift_id, $exchange->branch_id, $quantity)) {
+                return response()->json(['status' => false, 'message' => 'Không đủ số lượng trong kho'], 200);
+            }
             // Cập nhật trạng thái quà tặng thành "cancelled"
             $exchange->update(['status' => 'cancelled']);
 
@@ -191,6 +211,18 @@ class GiftExchangesController extends HelperApiController
         }
     }
 
+    /**
+     * Danh sách chi nhánh
+    */
+    public function getBranches(Request $request){
+
+        $branches = Branch::query();
+        if (!empty($request->key_search)){
+            $branches = $branches->where('branch_name', 'like', "%$request->key_search%");
+        }
+        $branches = $branches->get();
+        return response()->json(['status' => true, 'data' => $branches], 200);
+    }
     /**
      * Function kiểm tra kho quà tại chi nhánh
     */

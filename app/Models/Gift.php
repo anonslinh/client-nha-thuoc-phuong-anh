@@ -11,4 +11,9 @@ class Gift extends Model
 
     protected $fillable = ['name', 'image', 'branch_id', 'is_display', 'points_required', 'description', 'rank_id', 'code'];
 
+    public function giftStocks()
+    {
+        return $this->hasMany(GiftInventories::class, 'gift_id');
+    }
+
 }
