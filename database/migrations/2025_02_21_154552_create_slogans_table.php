@@ -21,6 +21,7 @@ return new class extends Migration
         // Chèn dữ liệu mẫu sau khi tạo bảng
         DB::table('slogans')->insert([
             ['title' => 'Chất lượng tốt - Giá cả tốt - Phục vụ tốt'],
+            ['title' => 'Cửa hàng WinBaby'],
         ]);
     }
 

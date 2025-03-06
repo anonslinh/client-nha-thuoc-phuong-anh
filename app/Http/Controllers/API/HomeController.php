@@ -356,7 +356,8 @@ class HomeController extends HelperApiController
     public function getSlogans(){
 
         $data = Slogan::find(1);
+        $name = Slogan::find(2);
 
-        return response()->json(['status' => true, 'data' => $data], 200);
+        return response()->json(['status' => true, 'data' => $data, 'name' => $name], 200);
     }
 }
