@@ -63,7 +63,8 @@
                     <a href="{{route('employees.employees')}}" class="btn btn-danger" style="margin-right: 10px">Hủy</a>
                     <a href="{{ route('employees.export-employees',
                      ['key_search' => request('key_search'), 'sort_kpi' => request('sort_kpi'), 'sort_ratings' => request('sort_ratings'),
-                      'filter_kpi' => request('filter_kpi')]) }}" class="btn btn-warning align-self-end">Xuất Excel</a>
+                      'filter_kpi' => request('filter_kpi')]) }}" class="btn btn-danger align-self-end">
+                        <i class="ti ti-transition-right me-1 fs-4"></i>Xuất Excel</a>
                 </form>
                 <table class="table table-bordered mt-4">
                     <thead>

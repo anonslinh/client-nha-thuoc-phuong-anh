@@ -56,15 +56,15 @@
                                                 @csrf
                                                 <div class="modal-body">
                                                     <div class="mb-3">
-                                                        <label for="recipient-name" class="">Tiêu đề:</label>
+                                                        <label for="recipient-name" class="form-label">Tiêu đề:</label>
                                                         <input type="text" class="form-control" name="name" value="{{$item->name}}"/>
                                                     </div>
                                                     <div class="mb-3">
-                                                        <label for="recipient-name" class="">Nội dung:</label>
+                                                        <label for="recipient-name" class="form-label">Nội dung:</label>
                                                         <input type="text" class="form-control" name="value" value="{{$item->value}}"/>
                                                     </div>
                                                     <div class="mb-3">
-                                                        <label for="recipient-name" class="d-block">Icon:</label>
+                                                        <label for="recipient-name" class="form-label d-block">Icon:</label>
                                                         <img src="{{$item->icon}}" style="width: 50px; height: auto; margin: 10px 0">
                                                     </div>
                                                 </div>

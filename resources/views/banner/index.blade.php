@@ -31,7 +31,6 @@
                     <thead>
                     <tr>
                         <th>STT</th>
-                        <th>Hình ảnh</th>
                         <th>Tiêu đề</th>
                         <th>Đường link</th>
                         <th>Thời gian</th>
@@ -44,15 +43,19 @@
                         @foreach($listData as $key => $value)
                             <tr>
                                 <td>{{$key + 1}}</td>
-                                <td><img src="{{$value->image_url}}" style="width: 50px; margin-right: 10px"></td>
                                 <td>
-                                    <span>{{$value->title}}</span><br>
-                                    @if($value->status == 'active') <span class="mb-1 badge rounded-pill  bg-info-subtle text-info">Đang hoạt động</span> @endif
-                                    @if($value->status == 'inactive') <span class="mb-1 badge rounded-pill  bg-info-subtle text-warning">Đang khoá</span>  @endif
+                                    <div class="d-flex align-items-center">
+                                        <img src="{{$value->image_url}}" class="rounded-2" width="52" height="42">
+                                        <div class="ms-3">
+                                            <h6 class="fw-semibold mb-1">{{$value->title}}</h6>
+                                            @if($value->status == 'active') <span class="fw-normal">Đang hoạt động</span> @endif
+                                            @if($value->status == 'inactive') <span class="fw-normal">Đang khoá</span>  @endif
+                                        </div>
+                                    </div>
                                 </td>
                                 <td>{{$value->redirect_url}}</td>
                                 <td>
-                                    <span>Bắt đầu: {{date_format(date_create($value->start_date), 'h:s d/m/Y')}}</span><br>
+                                    <span class="fw-normal">Bắt đầu: {{date_format(date_create($value->start_date), 'h:s d/m/Y')}}</span><br>
                                     <span>Kết thúc: {{date_format(date_create($value->end_date), 'h:s d/m/Y')}}</span>
                                 </td>
                                 <td>{{$value->branch_name}}</td>

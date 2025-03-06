@@ -6,33 +6,32 @@
             <div class="card-body">
                 <form action="{{route('promotion.update',$promotion->id)}}" method="post" class="w-100" enctype="multipart/form-data">
                     @csrf
-                    <div class="form-group mb-4">
-                        <label>Tiêu đề</label>
+                    <div class="form-group mb-3">
+                        <label class="form-label">Tiêu đề</label>
                         <input name="title" value="{{$promotion->title}}" class="form-control" required>
                     </div>
-                    <div class="form-group mb-4">
-                        <label class="d-block">Hình ảnh</label>
-                        <img src="{{$promotion->image_path}}" style="width: 200px; margin: 10px 0">
+                    <div class="form-group mb-3">
+                        <label class="form-label d-block">Hình ảnh</label>
                         <input name="image_path" class="form-control" type="file" accept="image/*">
                     </div>
-                    <div class="form-group mb-4">
-                        <label>Link chuyển hướng (Không bắt buộc)</label>
+                    <div class="form-group mb-3">
+                        <label class="form-label">Link chuyển hướng (Không bắt buộc)</label>
                         <input name="join_link" value="{{$promotion->join_link}}" class="form-control">
                     </div>
-                    <div class="form-group mb-4">
-                        <label>Thời gian bắt đầu</label>
+                    <div class="form-group mb-3">
+                        <label class="form-label">Thời gian bắt đầu</label>
                         <input name="start_date" value="{{date_format(date_create($promotion->start_date), 'Y-m-d')}}" class="form-control" type="date" required>
                     </div>
-                    <div class="form-group mb-4">
-                        <label>Thời gian kết thúc</label>
+                    <div class="form-group mb-3">
+                        <label class="form-label">Thời gian kết thúc</label>
                         <input name="end_date" value="{{date_format(date_create($promotion->end_date), 'Y-m-d')}}" class="form-control" type="date" required>
                     </div>
-                    <div class="form-group mb-4">
-                        <label>Mô tả ngắn</label>
+                    <div class="form-group mb-3">
+                        <label class="form-label">Mô tả ngắn</label>
                         <textarea name="sub_title" class="form-control" rows="4" required>{{$promotion->sub_title}}</textarea>
                     </div>
-                    <div class="form-group mb-4">
-                        <label>Mô tả</label>
+                    <div class="form-group mb-3">
+                        <label class="form-label">Mô tả</label>
                         <textarea id="mymce" name="description">{!! $promotion->description !!}</textarea>
                     </div>
                     <div class="d-flex">

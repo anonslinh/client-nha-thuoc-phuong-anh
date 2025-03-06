@@ -21,26 +21,26 @@
         </div>
         <div class="card">
             <div class="card-body">
-                <form action="{{route('gift.store')}}" method="post" class="w-100" enctype="multipart/form-data">
+                <form action="{{route('gift.store')}}" method="post" enctype="multipart/form-data">
                     @csrf
-                    <div class="form-group mb-2">
-                        <label>Tên</label>
+                    <div class="mb-3">
+                        <label class="form-label">Tên</label>
                         <input class="form-control" name="name" required>
                     </div>
-                    <div class="form-group mb-2">
-                        <label>Mã</label>
+                    <div class="mb-3">
+                        <label class="form-label">Mã</label>
                         <input class="form-control" name="code" required>
                     </div>
-                    <div class="form-group mb-2">
-                        <label>Hình ảnh</label>
+                    <div class="mb-3">
+                        <label class="form-label">Hình ảnh</label>
                         <input class="form-control" type="file" accept="image/png" name="image" required>
                     </div>
-                    <div class="form-group mb-2">
-                        <label>Điểm quy đổi</label>
+                    <div class="mb-3">
+                        <label class="form-label">Điểm quy đổi</label>
                         <input class="form-control" name="point" type="number" min="0" required>
                     </div>
-                    <div class="form-group mb-2">
-                        <label>Hạng thẻ</label>
+                    <div class="mb-3">
+                        <label class="form-label">Hạng thẻ</label>
                         <select name="rank_id" class="form-control">
                             <option value="">Áp dụng cho tất cả hạng thẻ</option>
                             @foreach($rank as $rankItem)
@@ -48,8 +48,8 @@
                             @endforeach
                         </select>
                     </div>
-                    <div class="form-group mb-4">
-                        <label>Mô tả</label>
+                    <div class="mb-3">
+                        <label class="form-label">Mô tả</label>
                         <textarea id="mymce" name="description" class="form-control" rows="4"></textarea>
                     </div>
                     <div class="d-flex">

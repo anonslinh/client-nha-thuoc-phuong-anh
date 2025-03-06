@@ -93,6 +93,7 @@ class GiftController
         $gift->code = $request->get('code');
         $gift->points_required = $request->get('point');
         $gift->rank_id = $request->get('rank_id');
+        $gift->description = $request->get('description');
         $gift->save();
         return back()->with(['success' => 'Cập nhật dữ liệu thành công']);
     }

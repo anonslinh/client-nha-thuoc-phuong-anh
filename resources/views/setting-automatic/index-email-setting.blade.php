@@ -64,14 +64,14 @@
                                                     @csrf
                                                     <div class="modal-body">
                                                         <div class="mb-3">
-                                                            <label for="type" class="">Thể loại</label>
+                                                            <label for="type" class="form-label">Thể loại</label>
                                                             <select name="type" class="form-control">
                                                                 <option {{ $value->type == 'email_invoice' ? 'selected' : '' }} value="email_invoice">Hoá đơn dưới 3 sao</option>
                                                                 <option {{ $value->type == 'email_employee' ? 'selected' : '' }} value="email_employee">Cảnh báo nhân viên</option>
                                                             </select>
                                                         </div>
                                                         <div class="mb-3">
-                                                            <label for="email" class="">Email</label>
+                                                            <label for="email" class="form-label">Email</label>
                                                             <input type="email" class="form-control" name="email" value="{{ $value->email }}" required/>
                                                         </div>
                                                     </div>
@@ -136,14 +136,14 @@
 {{--                            </select>--}}
 {{--                        </div>--}}
                         <div class="mb-3">
-                            <label for="type" class="">Thể loại</label>
+                            <label for="type" class="form-label">Thể loại</label>
                             <select name="type" class="form-control">
                                 <option {{ old('branch_id') == 'email_invoice' ? 'selected' : '' }} value="email_invoice">Hoá đơn dưới 3 sao</option>
                                 <option {{ old('branch_id') == 'email_employee' ? 'selected' : '' }} value="email_employee">Cảnh báo nhân viên</option>
                             </select>
                         </div>
                         <div class="mb-3">
-                            <label for="email" class="">Email</label>
+                            <label for="email" class="form-label">Email</label>
                             <input type="email" class="form-control" name="email" value="{{ old('email') }}" required/>
                         </div>
                     </div>

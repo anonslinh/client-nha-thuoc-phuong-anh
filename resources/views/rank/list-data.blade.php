@@ -53,16 +53,15 @@
                                             </div>
                                             <div class="modal-body">
                                                 <div class="form-group mb-2">
-                                                    <label>Tên</label>
+                                                    <label class="form-label">Tên</label>
                                                     <input class="form-control" value="{{$value->name}}" name="name" required>
                                                 </div>
                                                 <div class="form-group mb-2">
-                                                    <label class="d-block">Ảnh nền</label>
-                                                    <img src="{{$value->image}}" style="width: 200px;margin: 10px 0">
+                                                    <label class="form-label">Ảnh nền</label>
                                                     <input class="form-control" type="file" accept="image/png" name="image">
                                                 </div>
                                                 <div class="form-group mb-2">
-                                                    <label class="d-block">Mức chi tiêu</label>
+                                                    <label class="form-label">Mức chi tiêu</label>
                                                     <input class="form-control" type="number" value="{{$value->spending_threshold}}" name="spending_threshold" required>
                                                 </div>
                                             </div>

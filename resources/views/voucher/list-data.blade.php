@@ -50,10 +50,8 @@
                     <tr>
                         <th>STT</th>
                         <th>Tên</th>
-                        <th>Số điểm</th>
+                        <th>Hoán đổi</th>
                         <th>Ngày hết hạn</th>
-                        <th>Tiền chiết khấu</th>
-                        <th>Hạng thẻ</th>
                         <th>Thao tác</th>
                     </tr>
                     </thead>
@@ -63,15 +61,20 @@
                             <tr>
                                 <td class="align-middle">{{$key + 1}}</td>
                                 <td class="align-middle">
-                                    <img src="{{$value->image}}" style="width: 50px">
-                                    <p class="mb-0 mt-3">{{$value->title}}</p>
+                                    <div class="d-flex align-items-center">
+                                        <img src="{{$value->image}}" class="rounded-2" width="52" height="42">
+                                        <div class="ms-3">
+                                            <h6 class="fw-semibold mb-1">{{$value->title}}</h6>
+                                            <span>Hạng thẻ: {{$value->rank_name}}</span>
+                                        </div>
+                                    </div>
                                 </td>
-                                <td class="align-middle">{{$value->points_required}}</td>
+                                <td>
+                                    <h6>Số điểm: {{$value->points_required}}</h6>
+                                    <span>Thành tiền: {{number_format($value->discount_amount)}} VNĐ</span>
+                                </td>
                                 <td class="align-middle">{{date_format(date_create($value->expiry_date), 'd/m/Y')}}</td>
-                                <td class="align-middle">{{number_format($value->discount_amount)}}</td>
-                                <td class="align-middle">
-                                    <p class="m-0 text-danger">{{$value->rank_name}}</p>
-                                </td>
+
                                 <td class="align-middle">
                                     <a href="{{route('voucher.detail-voucher', ['id' => $value->id])}}" class="btn btn-primary" style="margin-right: 15px">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">

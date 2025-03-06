@@ -23,24 +23,24 @@
             <div class="card-body">
                 <form action="{{route('program.store')}}" method="post" class="w-100" enctype="multipart/form-data">
                     @csrf
-                    <div class="form-group mb-4">
-                        <label>Tiêu đề</label>
+                    <div class="mb-3">
+                        <label class="form-label">Tiêu đề</label>
                         <input name="title" class="form-control" required>
                     </div>
-                    <div class="form-group mb-4">
-                        <label>Poster</label>
+                    <div class="mb-3">
+                        <label class="form-label">Poster</label>
                         <input name="thumbnail" class="form-control" type="file" accept="image/*" required>
                     </div>
-                    <div class="form-group mb-4">
-                        <label>Hình ảnh</label>
+                    <div class="mb-3">
+                        <label class="form-label">Hình ảnh</label>
                         <input name="images[]" class="form-control" type="file" accept="image/*" multiple required>
                     </div>
-                    <div class="form-group mb-4">
-                        <label>Link chuyển hướng (Không bắt buộc)</label>
+                    <div class="mb-3">
+                        <label class="form-label">Link chuyển hướng (Không bắt buộc)</label>
                         <input name="join_link" class="form-control">
                     </div>
-                    <div class="form-group mb-4">
-                        <label>Chi nhánh</label>
+                    <div class="mb-3">
+                        <label class="form-label">Chi nhánh</label>
                         <select name="branch_id" class="form-control">
                             <option value="">Áp dụng cho tất cả chi nhánh</option>
                             @foreach($branches as $branch)
@@ -50,16 +50,16 @@
                             @endforeach
                         </select>
                     </div>
-                    <div class="form-group mb-4">
-                        <label>Thời gian bắt đầu</label>
+                    <div class="mb-3">
+                        <label class="form-label">Thời gian bắt đầu</label>
                         <input name="start_date" class="form-control" type="date" required>
                     </div>
-                    <div class="form-group mb-4">
-                        <label>Thời gian kết thúc</label>
+                    <div class="mb-3">
+                        <label class="form-label">Thời gian kết thúc</label>
                         <input name="end_date" class="form-control" type="date" required>
                     </div>
-                    <div class="form-group mb-4">
-                        <label>Mô tả</label>
+                    <div class="mb-3">
+                        <label class="form-label">Mô tả</label>
                         <textarea id="mymce" name="description"></textarea>
                     </div>
                     <div class="d-flex">

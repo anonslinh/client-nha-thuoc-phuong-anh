@@ -40,10 +40,8 @@
                     <tr>
                         <th>STT</th>
                         <th>Tiêu đề</th>
-                        <th>Thời gian bắt đầu</th>
-                        <th>Thời gian kết thúc</th>
+                        <th>Thời gian</th>
                         <th>Thao tác</th>
-                        {{--                        <th>STT</th>--}}
                     </tr>
                     </thead>
                     <tbody>
@@ -53,12 +51,17 @@
                                 <td class="align-middle">{{$key + 1}}</td>
                                 <td class="align-middle">
                                     <div class="d-flex align-items-center">
-                                        <img src="{{$value->image_path}}" style="width: 50px; margin-right: 15px">
-                                        <p class="m-0">{{$value->title}}</p>
+                                        <img src="{{$value->image_path}}" class="rounded-2" width="52" height="42">
+                                        <div class="ms-3">
+                                            <h6 class="fw-semibold mb-1">{{$value->title}}</h6>
+                                            <span>{{$value->branch_name}}</span>
+                                        </div>
                                     </div>
                                 </td>
-                                <td class="align-middle">{{date_format(date_create($value->start_date), 'd/m/Y')}}</td>
-                                <td class="align-middle">{{date_format(date_create($value->end_date), 'd/m/Y')}}</td>
+                                <td>
+                                    <span>Bắt đầu: {{date_format(date_create($value->start_date), 'd/m/Y')}}</span><br>
+                                    <span>Kết thúc: {{date_format(date_create($value->end_date), 'd/m/Y')}}</span>
+                                </td>
                                 <td class="align-middle">
                                     <a href="{{route('promotion.detail',$value->id)}}" class="btn btn-primary" style="margin-right: 15px">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">

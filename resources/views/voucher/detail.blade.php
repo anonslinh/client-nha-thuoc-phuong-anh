@@ -23,29 +23,28 @@
             <div class="card-body">
                 <form action="{{route('voucher.update', $value->id)}}" method="post" class="w-100" enctype="multipart/form-data">
                     @csrf
-                    <div class="form-group mb-2">
-                        <label>Tên</label>
+                    <div class="mb-3">
+                        <label class="form-label">Tên</label>
                         <input class="form-control" name="name" value="{{$value->title}}" required>
                     </div>
-                    <div class="form-group mb-2">
-                        <label>Hình ảnh</label>
-                        <img src="{{$value->image}}" style="width: 200px; margin: 10px 0">
+                    <div class="mb-3">
+                        <label class="form-label">Hình ảnh</label>
                         <input class="form-control" type="file" accept="image/png" name="image">
                     </div>
-                    <div class="form-group mb-2">
-                        <label>Điểm quy đổi</label>
+                    <div class="mb-3">
+                        <label class="form-label">Điểm quy đổi</label>
                         <input class="form-control" name="points_required" value="{{$value->points_required}}" type="number" min="0" required>
                     </div>
-                    <div class="form-group mb-2">
-                        <label>Số tiền</label>
+                    <div class="mb-3">
+                        <label class="form-label">Số tiền</label>
                         <input class="form-control" name="discount_amount" value="{{$value->discount_amount}}" type="number" min="0" required>
                     </div>
-                    <div class="form-group mb-2">
-                        <label>Ngày hết hạn</label>
+                    <div class="mb-3">
+                        <label class="form-label">Ngày hết hạn</label>
                         <input class="form-control" name="expiry_date" value="{{$value->expiry_date}}" type="date" required>
                     </div>
-                    <div class="form-group mb-2">
-                        <label>Hạng thẻ</label>
+                    <div class="mb-3">
+                        <label class="form-label">Hạng thẻ</label>
                         <select name="rank_id" class="form-control">
                             <option value="">Áp dụng cho tất hạng</option>
                             @foreach($rank as $item)
@@ -53,8 +52,8 @@
                             @endforeach
                         </select>
                     </div>
-                    <div class="form-group mb-4">
-                        <label>Mô tả</label>
+                    <div class="mb-3">
+                        <label class="form-label">Mô tả</label>
                         <textarea id="mymce" name="description" class="form-control" rows="4">{{$value->description}}</textarea>
                     </div>
                     <div class="d-flex">

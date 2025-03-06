@@ -32,9 +32,8 @@
                     <tr>
                         <th>STT</th>
                         <th>Tiêu đề</th>
-                        <th>Link</th>
+                        <th>Chi nhánh & Link</th>
                         <th>Thời gian</th>
-                        <th>Chi nhánh</th>
                         <th>Thao tác</th>
                     </tr>
                     </thead>
@@ -44,17 +43,19 @@
                             <tr>
                                 <td>{{$key + 1}}</td>
                                 <td>
-                                    <span>{{$value->title}} </span><br>
-                                    @if($value->status == 'active') <span class="mb-1 badge rounded-pill  bg-info-subtle text-info">Đang hoạt động</span> @endif
-                                    @if($value->status == 'inactive') <span class="mb-1 badge rounded-pill  bg-info-subtle text-warning">Đang khoá</span>  @endif
+                                    <h6>{{$value->title}} </h6>
+                                    @if($value->status == 'active') <span>Đang hoạt động</span> @endif
+                                    @if($value->status == 'inactive') <span>Đang khoá</span>  @endif
 
                                 </td>
-                                <td>{{$value->link}}</td>
+                                <td>
+                                    <h6>{{$value->branch_name}}</h6>
+                                    <span>{{$value->link}}</span>
+                                </td>
                                 <td>
                                     <span>Bắt đầu: {{date_format(date_create($value->start_date), 'h:s d/m/Y')}}</span><br>
                                     <span>Kết thúc: {{date_format(date_create($value->end_date), 'h:s d/m/Y')}}</span>
                                 </td>
-                                <td>{{$value->branch_name}}</td>
                                 <td>
                                     <div class="modal fade" id="modalUpdate{{$value->id}}" tabindex="-1" aria-labelledby="exampleModalLabel1">
                                         <div class="modal-dialog" role="document">
@@ -69,15 +70,15 @@
                                                     @csrf
                                                     <div class="modal-body">
                                                         <div class="mb-3">
-                                                            <label for="recipient-name" class="">Tiêu đề:</label>
+                                                            <label for="recipient-name" class="form-label">Tiêu đề:</label>
                                                             <input type="text" class="form-control" name="title" value="{{$value->title}}"/>
                                                         </div>
                                                         <div class="mb-3">
-                                                            <label for="recipient-name" class="">Đường link:</label>
+                                                            <label for="recipient-name" class="form-label">Đường link:</label>
                                                             <input type="text" class="form-control" name="link" value="{{$value->link}}"/>
                                                         </div>
                                                         <div class="mb-3">
-                                                            <label for="recipient-name" class="">Chi nhánh</label>
+                                                            <label for="recipient-name" class="form-label">Chi nhánh</label>
                                                             <select name="branch_id" class="form-control">
                                                                 <option value="">Tất cả cửa hàng</option>
                                                                 @foreach($branches as $branch)
@@ -86,15 +87,15 @@
                                                             </select>
                                                         </div>
                                                         <div class="mb-3">
-                                                            <label for="recipient-name" class="">Thời gian bắt đầu:</label>
+                                                            <label for="recipient-name" class="form-label">Thời gian bắt đầu:</label>
                                                             <input type="datetime-local" class="form-control" name="start_time" value="{{$value->start_time}}"/>
                                                         </div>
                                                         <div class="mb-3">
-                                                            <label for="recipient-name" class="">Thời gian kết thúc:</label>
+                                                            <label for="recipient-name" class="form-label">Thời gian kết thúc:</label>
                                                             <input type="datetime-local" class="form-control" name="end_time" value="{{$value->end_time}}"/>
                                                         </div>
                                                         <div class="mb-3">
-                                                            <label for="recipient-name" class="">Trạng thái</label>
+                                                            <label for="recipient-name" class="form-label">Trạng thái</label>
                                                             <select name="status" class="form-control">
                                                                 <option value="active" {{ $value->status == 'active' ? 'selected' : '' }}>Đang hoạt động</option>
                                                                 <option value="inactive" {{ $value->status == 'inactive' ? 'selected' : '' }}>Đang khoá</option>
@@ -152,15 +153,15 @@
                     @csrf
                     <div class="modal-body">
                         <div class="mb-3">
-                            <label for="title" class="">Tiêu đề:</label>
+                            <label for="title" class="form-label">Tiêu đề:</label>
                             <input type="text" class="form-control" name="title" value="{{ old('title') }}" required/>
                         </div>
                         <div class="mb-3">
-                            <label for="link" class="">Đường link:</label>
+                            <label for="link" class="form-label">Đường link:</label>
                             <input type="text" class="form-control" name="link" value="{{ old('link') }}"/>
                         </div>
                         <div class="mb-3">
-                            <label for="branch_id" class="">Chi nhánh</label>
+                            <label for="branch_id" class="form-label">Chi nhánh</label>
                             <select name="branch_id" class="form-control">
                                 <option value="">Tất cả cửa hàng</option>
                                 @foreach($branches as $branch)
@@ -171,15 +172,15 @@
                             </select>
                         </div>
                         <div class="mb-3">
-                            <label for="start_time" class="">Thời gian bắt đầu:</label>
+                            <label for="start_time" class="form-label">Thời gian bắt đầu:</label>
                             <input type="datetime-local" class="form-control" name="start_time" value="{{ old('start_time') }}" required/>
                         </div>
                         <div class="mb-3">
-                            <label for="end_time" class="">Thời gian kết thúc:</label>
+                            <label for="end_time" class="form-label">Thời gian kết thúc:</label>
                             <input type="datetime-local" class="form-control" name="end_time" value="{{ old('end_time') }}" required/>
                         </div>
                         <div class="mb-3">
-                            <label for="status" class="">Trạng thái</label>
+                            <label for="status" class="form-label">Trạng thái</label>
                             <select name="status" class="form-control">
                                 <option value="active" {{ old('status') == 'active' ? 'selected' : '' }}>Đang hoạt động</option>
                                 <option value="inactive" {{ old('status') == 'inactive' ? 'selected' : '' }}>Đang khoá</option>

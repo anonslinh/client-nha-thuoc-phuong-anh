@@ -23,32 +23,32 @@
             <div class="card-body">
                 <form action="{{route('promotion.store')}}" method="post" class="w-100" enctype="multipart/form-data">
                     @csrf
-                    <div class="form-group mb-4">
-                        <label>Tiêu đề</label>
+                    <div class="form-group mb-3">
+                        <label class="form-label">Tiêu đề</label>
                         <input name="title" class="form-control" required>
                     </div>
-                    <div class="form-group mb-4">
-                        <label>Hình ảnh</label>
+                    <div class="form-group mb-3">
+                        <label class="form-label">Hình ảnh</label>
                         <input name="image_path" class="form-control" type="file" accept="image/*" multiple required>
                     </div>
-                    <div class="form-group mb-4">
-                        <label>Link chuyển hướng (Không bắt buộc)</label>
+                    <div class="form-group mb-3">
+                        <label class="form-label">Link chuyển hướng (Không bắt buộc)</label>
                         <input name="join_link" class="form-control">
                     </div>
-                    <div class="form-group mb-4">
-                        <label>Thời gian bắt đầu</label>
+                    <div class="form-group mb-3">
+                        <label class="form-label">Thời gian bắt đầu</label>
                         <input name="start_date" class="form-control" type="date" required>
                     </div>
-                    <div class="form-group mb-4">
-                        <label>Thời gian kết thúc</label>
+                    <div class="form-group mb-3">
+                        <label class="form-label">Thời gian kết thúc</label>
                         <input name="end_date" class="form-control" type="date" required>
                     </div>
-                    <div class="form-group mb-4">
-                        <label>Mô tả ngắn</label>
+                    <div class="form-group mb-3">
+                        <label class="form-label">Mô tả ngắn</label>
                         <textarea name="sub_title" class="form-control" rows="4" required></textarea>
                     </div>
-                    <div class="form-group mb-4">
-                        <label>Mô tả</label>
+                    <div class="form-group mb-3">
+                        <label class="form-label">Mô tả</label>
                         <textarea id="mymce" name="description"></textarea>
                     </div>
                     <div class="d-flex">

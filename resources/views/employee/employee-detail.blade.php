@@ -55,7 +55,8 @@
                     <div class="col-md-5 d-flex" style="gap: 10px">
                         <button class="btn btn-primary align-self-end">Tìm kiếm</button>
                         <a href="{{ route('employees.employee-detail', ['id' => $employee->kiotviet_id]) }}" class="btn btn-danger align-self-end">Hủy</a>
-                        <a href="{{ route('employees.employee-export', ['id' => $employee->kiotviet_id, 'from_date' => request('from_date'), 'to_date' => request('to_date'), 'rating' => request('rating')]) }}" class="btn btn-warning align-self-end">Xuất Excel</a>
+                        <a href="{{ route('employees.employee-export', ['id' => $employee->kiotviet_id, 'from_date' => request('from_date'), 'to_date' => request('to_date'), 'rating' => request('rating')]) }}" class="btn btn-danger align-self-end">
+                            <i class="ti ti-transition-right me-1 fs-4"></i>Xuất Excel</a>
                     </div>
                 </form>
 

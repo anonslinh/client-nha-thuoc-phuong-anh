@@ -6,17 +6,16 @@
             <div class="card-body">
                 <form action="{{route('program.update',$program->id)}}" method="post" class="w-100" enctype="multipart/form-data">
                     @csrf
-                    <div class="form-group mb-4">
-                        <label>Tiêu đề</label>
+                    <div class="form-group mb-3">
+                        <label class="form-label">Tiêu đề</label>
                         <input name="title" value="{{$program->title}}" class="form-control" required>
                     </div>
-                    <div class="form-group mb-4">
-                        <label class="d-block">Poster</label>
-                        <img src="{{$program->thumbnail}}" style="width: 200px; margin: 10px 0">
+                    <div class="form-group mb-3">
+                        <label class="form-label">Poster</label>
                         <input name="thumbnail" class="form-control" type="file" accept="image/*">
                     </div>
-                    <div class="form-group mb-4">
-                        <label class="d-block">Hình ảnh</label>
+                    <div class="form-group mb-3">
+                        <label class="form-label d-block">Hình ảnh</label>
                         <div class="d-flex flex-wrap" style="margin: 10px 0">
                             @foreach($program->images as $value)
                                 <div class="position-relative" style="margin-right: 15px;margin-bottom: 15px">
@@ -32,12 +31,12 @@
                         <input name="image_delete" hidden id="imageDeleteInput">
                         <input name="images[]" class="form-control" type="file" accept="image/*" multiple>
                     </div>
-                    <div class="form-group mb-4">
-                        <label>Link chuyển hướng (Không bắt buộc)</label>
+                    <div class="form-group mb-3">
+                        <label class="form-label">Link chuyển hướng (Không bắt buộc)</label>
                         <input name="join_link" value="{{$program->join_link}}" class="form-control">
                     </div>
-                    <div class="form-group mb-4">
-                        <label>Chi nhánh</label>
+                    <div class="form-group mb-3">
+                        <label class="form-label">Chi nhánh</label>
                         <select name="branch_id" class="form-control">
                             <option value="">Áp dụng cho tất cả chi nhánh</option>
                             @foreach($branches as $branch)
@@ -45,16 +44,16 @@
                             @endforeach
                         </select>
                     </div>
-                    <div class="form-group mb-4">
-                        <label>Thời gian bắt đầu</label>
+                    <div class="form-group mb-3">
+                        <label class="form-label">Thời gian bắt đầu</label>
                         <input name="start_date" value="{{date_format(date_create($program->start_date), 'Y-m-d')}}" class="form-control" type="date" required>
                     </div>
-                    <div class="form-group mb-4">
-                        <label>Thời gian kết thúc</label>
+                    <div class="form-group mb-3">
+                        <label class="form-label">Thời gian kết thúc</label>
                         <input name="end_date" class="form-control" value="{{date_format(date_create($program->end_date), 'Y-m-d')}}" type="date" required>
                     </div>
-                    <div class="form-group mb-4">
-                        <label>Mô tả</label>
+                    <div class="form-group mb-3">
+                        <label class="form-label">Mô tả</label>
                         <textarea id="mymce" name="description">{!! $program->description !!}</textarea>
                     </div>
                     <div class="d-flex">

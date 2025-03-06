@@ -37,9 +37,7 @@
                     <tr>
                         <th>STT</th>
                         <th>Tên</th>
-                        <th>Điểm quy đổi</th>
-                        <th>Hạng thẻ</th>
-                        <th>Khách hàng đổi</th>
+                        <th>Hoán đổi</th>
                         <th>Thao tác</th>
                     </tr>
                     </thead>
@@ -47,16 +45,21 @@
                     @if($listData->total() > 0)
                         @foreach($listData as $key => $value)
                             <tr>
-                                <td class="align-middle">{{$key + 1}}</td>
-                                <td>
+                                <td>{{$key+1}}</td>
+                                <td class="align-middle">
                                     <div class="d-flex align-items-center">
-                                        <img src="{{$value->image}}" style="width: 50px; margin-right: 15px">
-                                        <p class="mb-0">{{$value->name}}</p>
+                                        <img src="{{$value->image}}" class="rounded-2" width="52" height="42">
+                                        <div class="ms-3">
+                                            <h6 class="fw-semibold mb-1">{{$value->name}}</h6>
+                                            <span>Hạng thẻ: {{$value->name_rank??'Không áp dụng'}}</span>
+                                        </div>
                                     </div>
                                 </td>
-                                <td class="align-middle">{{$value->points_required}}</td>
-                                <td class="align-middle text-danger">{{$value->name_rank??'Không áp dụng'}}</td>
-                                <td class="align-middle">0</td>
+
+                                <td class="align-middle">
+                                    <h6>Số điểm: {{$value->points_required}}</h6>
+                                    <span>Sản phẩm: 01</span>
+                                </td>
                                 <td class="align-middle">
 
                                     <div class="modal fade" id="modalUpdate{{$value->id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">

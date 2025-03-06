@@ -54,7 +54,7 @@
                                                 @csrf
                                                 <div class="modal-body">
                                                     <div class="mb-3">
-                                                        <label for="recipient-name">Nội dung:</label>
+                                                        <label class="form-label" for="recipient-name">Nội dung:</label>
                                                         <input type="text" class="form-control" name="comment" value="{{$item->comment}}"/>
                                                     </div>
                                                 </div>
