@@ -1,24 +1,43 @@
 @extends('Layout.index')
 @section('content')
     <div class="container-fluid">
+        <div class="card card-body py-3">
+            <div class="row align-items-center">
+                <div class="col-12">
+                    <div class="d-sm-flex align-items-center justify-space-between">
+                        <h4 class="mb-4 mb-sm-0 card-title">Danh sách khách hàng</h4>
+                        <nav aria-label="breadcrumb" class="ms-auto">
+                            <ol class="breadcrumb">
+                                <li class="breadcrumb-item d-flex align-items-center">
+                                    <a class="text-muted text-decoration-none d-flex">
+                                        <iconify-icon icon="solar:home-2-line-duotone" class="fs-6"></iconify-icon>
+                                    </a>
+                                </li>
+                            </ol>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
         <div class="card">
             <div class="card-header">
-                <div class="d-flex justify-content-between align-items-center">
-                    <h4>Danh sách khách hàng</h4>
-                    <form action="{{route('customer')}}" method="get" class="w-75 d-flex justify-content-end align-items-center">
+                <form action="{{route('customer')}}" method="get" class="d-flex">
+                    <div class="col-md-3" style="margin-right: 15px">
                         <input name="key_search" class="form-control"
                                placeholder="Tìm theo tên, số điện thoại ..."
                                value="{{request()->get('key_search')}}"
-                               style="max-width: 200px;margin-right: 15px">
-                        <select name="status" class="form-control" style="max-width: 200px;margin-right: 15px">
+                        >
+                    </div>
+                    <div class="col-md-2" style="margin-right: 15px">
+                        <select name="status" class="form-control">
                             <option value="">Sắp xếp theo</option>
                             <option value="total_invoiced" @if(request()->get('sort') == 'total_invoiced') selected @endif>Tổng đơn hàng</option>
                             <option value="total_point" @if(request()->get('sort') == 'total_point') selected @endif>Tổng điểm</option>
                         </select>
-                        <button class="btn btn-primary" style="margin-right: 15px">Tìm kiếm</button>
-                        <a href="{{route('customer')}}" class="btn btn-danger">Hủy</a>
-                    </form>
-                </div>
+                    </div>
+                    <button class="btn btn-primary" style="margin-right: 15px">Tìm kiếm</button>
+                    <a href="{{route('customer')}}" class="btn btn-danger">Hủy</a>
+                </form>
             </div>
             <div class="card-body">
                 <table class="table table-bordered">

@@ -52,6 +52,9 @@
                         <label>Chi nhánh</label>
                         <select name="branch_id" class="form-control">
                             <option value="">Áp dụng cho tất cả chi nhánh</option>
+                            @foreach($branches as $branch)
+                                <option @if($branch->kiotviet_id == $program->branch_id) selected @endif value="{{$branch->kiotviet_id}}">{{$branch->branch_name}}</option>
+                            @endforeach
                         </select>
                     </div>
                     <div class="form-group mb-4">

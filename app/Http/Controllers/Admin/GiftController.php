@@ -172,6 +172,7 @@ class GiftController
     public function program (Request $request)
     {
         $listData = Program::query();
+        $branches = Branch::all();
         if (isset($request->key_search)){
             $listData = $listData->where('title', 'like', '%'.$request->get('key_search').'%');
         }
@@ -179,7 +180,7 @@ class GiftController
         foreach ($listData as $value){
             $value->images = json_decode($value->images);
         }
-        return view('program.index', compact('listData'));
+        return view('program.index', compact('listData', 'branches'));
     }
 
     /**
@@ -187,7 +188,8 @@ class GiftController
     **/
     public function createProgram (Request $request)
     {
-        return view('program.create');
+        $branches = Branch::all();
+        return view('program.create', compact('branches'));
     }
     public function storeProgram (Request $request)
     {
@@ -213,7 +215,7 @@ class GiftController
                 'end_date' => $request->get('end_date')
             ]);
             $program->save();
-            return back()->with(['success' => 'Thêm chương trình thành công']);
+            return redirect()->route('program.list-data')->with(['success' => 'Thêm chương trình thành công']);
         }catch (\Exception $exception){
             return back()->with(['error' => 'Thêm chương trình thất bại.Vui lòng điền đầy đủ thông tin']);
         }
@@ -224,11 +226,12 @@ class GiftController
     public function detailProgram (Request $request, $id)
     {
         $program = Program::find($id);
+        $branches = Branch::all();
         if (empty($program)){
             return back()->with(['error' => 'Không tìm thấy dữ liệu.Vui lòng kiểm tra lại']);
         }
         $program->images = json_decode($program->images);
-        return view('program.detail', compact('program'));
+        return view('program.detail', compact('program', 'branches'));
     }
     /**
      * Cập nhật sự kiện

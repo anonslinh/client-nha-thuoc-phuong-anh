@@ -42,6 +42,7 @@
                         <th>Tiêu đề</th>
                         <th>Thời gian bắt đầu</th>
                         <th>Thời gian kết thúc</th>
+                        <th>Chi nhánh</th>
                         <th>Thao tác</th>
 {{--                        <th>STT</th>--}}
                     </tr>
@@ -59,6 +60,7 @@
                                 </td>
                                 <td class="align-middle">{{date_format(date_create($value->start_date), 'd/m/Y')}}</td>
                                 <td class="align-middle">{{date_format(date_create($value->end_date), 'd/m/Y')}}</td>
+                                <td class="align-middle">{{$value->branch_name}}</td>
                                 <td class="align-middle">
                                     <a href="{{route('program.detail',$value->id)}}" class="btn btn-primary" style="margin-right: 15px">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
@@ -77,7 +79,7 @@
                         @endforeach
                         @else
                         <tr>
-                            <td colspan="5">
+                            <td colspan="6">
                                 <p class="m-0 text-danger text-center">Không có dữ liệu</p>
                             </td>
                         </tr>

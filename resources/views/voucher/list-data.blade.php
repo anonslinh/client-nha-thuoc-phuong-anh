@@ -1,39 +1,50 @@
 @extends('Layout.index')
 @section('content')
     <div class="container-fluid">
-        <div class="card">
-            <div class="card-header">
-                <div class="d-flex justify-content-between align-items-center">
-                    <h4 class="m-0">Danh sách voucher</h4>
-                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalCreate">+ Tạo mới</button>
+        <div class="card card-body py-3">
+            <div class="row align-items-center">
+                <div class="col-12">
+                    <div class="d-sm-flex align-items-center justify-space-between">
+                        <h4 class="mb-4 mb-sm-0 card-title">Cài đặt voucher</h4>
+                        <nav aria-label="breadcrumb" class="ms-auto">
+                            <ol class="breadcrumb">
+                                <li class="breadcrumb-item d-flex align-items-center">
+                                    <a class="text-muted text-decoration-none d-flex">
+                                        <iconify-icon icon="solar:home-2-line-duotone" class="fs-6"></iconify-icon>
+                                    </a>
+                                </li>
+                                <li class="breadcrumb-item" aria-current="page">
+                                    <button data-bs-toggle="modal" data-bs-target="#modalCreate" type="button" class="justify-content-center badge fw-medium fs-2 btn btn-rounded btn-info d-flex align-items-center">
+                                        <i class="ti ti-send fs-4 me-2"></i>
+                                        Thêm voucher
+                                    </button>
+                                </li>
+                            </ol>
+                        </nav>
+                    </div>
                 </div>
             </div>
-            @if(session('error'))
-                <div class="alert alert-danger alert-dismissible bg-danger text-white border-0 fade show" role="alert">
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
-                    {{session('error')}}
-                </div>
-            @endif
-            @if(session('success'))
-                <div class="alert alert-success alert-dismissible bg-success text-white border-0 fade show" role="alert">
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
-                    {{session('success')}}
-                </div>
-            @endif
+        </div>
+        <div class="card">
             <div class="card-body">
-                <form action="{{route('voucher.list-data')}}" method="get" class="d-flex align-items-center justify-content-end">
-                    <input name="key_search" value="{{request()->get('key_search')}}" class="form-control"
-                           placeholder="Tìm kiếm theo tên"
-                           style="max-width: 200px;margin-right: 15px">
-                    <select name="rank_id" class="form-control" style="max-width: 200px;margin-right: 15px">
-                        <option value="">Hạng thành viên (Không áp dụng)</option>
-                        @foreach($rank as $rankItem)
-                            <option value="{{$rankItem->id}}" @if(request()->get('rank_id') == $rankItem->id) selected @endif>{{$rankItem->name}}</option>
-                        @endforeach
-                    </select>
-                    <button class="btn btn-warning" style="margin-right: 15px">Tìm kiếm</button>
+                <form action="{{route('voucher.list-data')}}" method="get" class="d-flex">
+                    <div class="col-md-3" style="margin-right: 15px">
+                        <input name="key_search" value="{{request()->get('key_search')}}" class="form-control"
+                               placeholder="Tìm kiếm theo tên"
+                        >
+                    </div>
+                    <div class="col-md-3" style="margin-right: 15px">
+                        <select name="rank_id" class="form-control">
+                            <option value="">Hạng thành viên (Không áp dụng)</option>
+                            @foreach($rank as $rankItem)
+                                <option value="{{$rankItem->id}}" @if(request()->get('rank_id') == $rankItem->id) selected @endif>{{$rankItem->name}}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <button class="btn btn-primary" style="margin-right: 15px">Tìm kiếm</button>
                     <a href="{{route('voucher.list-data')}}" class="btn btn-danger">Hủy</a>
                 </form>
+
                 <table class="table table-bordered mt-4">
                     <thead>
                     <tr>
