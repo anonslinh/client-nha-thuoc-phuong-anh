@@ -85,6 +85,25 @@ class HomeController
         $rank = MembershipLevel::orderBy('spending_threshold', 'asc')->get();
         return view('voucher.list-data', compact('listData', 'rank'));
     }
+
+    public function createdVoucher(){
+
+        $rank = MembershipLevel::orderBy('spending_threshold', 'asc')->get();
+
+        return view('voucher.create', compact('rank'));
+    }
+
+    public function detailVoucher($id){
+
+        $rank = MembershipLevel::orderBy('spending_threshold', 'asc')->get();
+        $value = Voucher::find($id);
+        if (empty($value)){
+            return back()->with(['error' => 'Lỗi! không tìm thấy voucher']);
+        }
+
+        return view('voucher.detail', compact('rank', 'value'));
+    }
+
     /**
      * Tạo mới voucher
     **/
@@ -108,7 +127,7 @@ class HomeController
                 'description' => $request->get('description')
             ]);
             $voucher->save();
-            return back()->with(['success' => 'Tạo voucher thành công']);
+            return redirect()->route('voucher.list-data')->with(['success' => 'Tạo voucher thành công']);
         }catch (\Exception $exception){
             return back()->with(['error' => 'Vui lòng điền đầy đủ thông tin']);
         }

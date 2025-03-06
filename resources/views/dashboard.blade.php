@@ -58,7 +58,7 @@
                                 <div class="hstack gap-6 mb-4">
                                     <h5 class="mb-0 fs-7">{{$voucher_exchange}}</h5>
                                 </div>
-                                <a href="{{route('voucher.customer')}}" class="btn btn-white fs-2 fw-semibold text-nowrap">Xem chi tiết</a>
+                                <a href="{{route('customer.exchange-voucher')}}" class="btn btn-white fs-2 fw-semibold text-nowrap">Xem chi tiết</a>
                             </div>
 
                         </div>

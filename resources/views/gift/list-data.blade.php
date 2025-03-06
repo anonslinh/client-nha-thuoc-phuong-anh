@@ -14,10 +14,10 @@
                                     </a>
                                 </li>
                                 <li class="breadcrumb-item" aria-current="page">
-                                    <button data-bs-toggle="modal" data-bs-target="#modalCreate" type="button" class="justify-content-center badge fw-medium fs-2 btn btn-rounded btn-info d-flex align-items-center">
+                                    <a href="{{route('gift.created')}}" type="button" class="justify-content-center badge fw-medium fs-2 btn btn-rounded btn-info d-flex align-items-center">
                                         <i class="ti ti-send fs-4 me-2"></i>
                                         Thêm quà tặng
-                                    </button>
+                                    </a>
                                 </li>
                             </ol>
                         </nav>
@@ -50,7 +50,7 @@
                                 <td class="align-middle">{{$key + 1}}</td>
                                 <td>
                                     <div class="d-flex align-items-center">
-                                        <img src="{{$value->image}}" style="width: 50px; height: 50px; border-radius: 50px;object-fit: cover;margin-right: 15px">
+                                        <img src="{{$value->image}}" style="width: 50px; margin-right: 15px">
                                         <p class="mb-0">{{$value->name}}</p>
                                     </div>
                                 </td>
@@ -102,12 +102,12 @@
                                         </div>
                                     </div>
 
-                                    <button data-bs-toggle="modal" data-bs-target="#modalUpdate{{$value->id}}" class="btn btn-primary" style="margin-right: 15px">
+                                    <a href="{{route('gift.detail', ['id' => $value->id])}}" class="btn btn-primary" style="margin-right: 15px">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
                                             <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
                                             <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5z"/>
                                         </svg>
-                                    </button>
+                                    </a>
                                     <a class="btn btn-danger btn-sa-confirm" href="{{route('gift.delete', $value->id)}}">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash" viewBox="0 0 16 16">
                                             <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z"/>
@@ -127,48 +127,6 @@
                     </tbody>
                 </table>
                 <div class="d-flex justify-content-center">{{$listData->appends(request()->all())->links('pagination')}}</div>
-            </div>
-        </div>
-        <!-- Modal -->
-        <div class="modal fade" id="modalCreate" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-            <div class="modal-dialog modal-dialog-centered" role="document">
-                <form action="{{route('gift.store')}}" method="post" enctype="multipart/form-data" class="modal-content">
-                    @csrf
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="exampleModalLongTitle">Tạo mới quà tặng</h5>
-                    </div>
-                    <div class="modal-body">
-                        <div class="form-group mb-2">
-                            <label>Tên</label>
-                            <input class="form-control" name="name" required>
-                        </div>
-                        <div class="form-group mb-2">
-                            <label>Mã</label>
-                            <input class="form-control" name="code" required>
-                        </div>
-                        <div class="form-group mb-2">
-                            <label>Hình ảnh</label>
-                            <input class="form-control" type="file" accept="image/png" name="image" required>
-                        </div>
-                        <div class="form-group mb-2">
-                            <label>Điểm quy đổi</label>
-                            <input class="form-control" name="point" type="number" min="0" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Hạng thẻ</label>
-                            <select name="rank_id" class="form-control">
-                                <option value="">Không áp dụng</option>
-                                @foreach($rank as $rankItem)
-                                    <option value="{{$rankItem->id}}">{{$rankItem->name}}</option>
-                                @endforeach
-                            </select>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                        <button class="btn btn-primary">Xác nhận</button>
-                    </div>
-                </form>
             </div>
         </div>
     </div>

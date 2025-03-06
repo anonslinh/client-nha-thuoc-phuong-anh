@@ -23,7 +23,7 @@ return [
             [
                 'name' => 'Đổi voucher',
                 'icon' => 'solar:palette-round-line-duotone',
-                'route' => 'voucher.customer'
+                'route' => 'customer.exchange-voucher'
             ],
             [
                 'name' => 'Khách hàng',

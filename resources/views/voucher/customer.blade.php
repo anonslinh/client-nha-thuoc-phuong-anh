@@ -21,7 +21,7 @@
         </div>
         <div class="card">
             <div class="card-body">
-                <form action="{{route('voucher.customer')}}" method="get" class="d-flex">
+                <form action="{{route('customer.exchange-voucher')}}" method="get" class="d-flex">
                     <div class="col-md-3" style="margin-right: 15px">
                         <input name="key_search" class="form-control"
                                placeholder="Tìm theo tên, số điện thoại ..."
@@ -37,7 +37,7 @@
                         </select>
                     </div>
                     <button class="btn btn-primary" style="margin-right: 15px">Tìm kiếm</button>
-                    <a href="{{route('voucher.customer')}}" class="btn btn-danger">Hủy</a>
+                    <a href="{{route('customer.exchange-voucher')}}" class="btn btn-danger">Hủy</a>
                 </form>
                 <table class="table table-bordered mt-4">
                     <thead>

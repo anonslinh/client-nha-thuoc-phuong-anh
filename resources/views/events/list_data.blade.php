@@ -8,18 +8,6 @@
                     <a href="{{route('events.create')}}" class="btn btn-primary">+ Tạo mới</a>
                 </div>
             </div>
-            @if(session('error'))
-                <div class="alert alert-danger alert-dismissible bg-danger text-white border-0 fade show" role="alert">
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
-                    {{session('error')}}
-                </div>
-            @endif
-            @if(session('success'))
-                <div class="alert alert-success alert-dismissible bg-success text-white border-0 fade show" role="alert">
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close"></button>
-                    {{session('success')}}
-                </div>
-            @endif
             <div class="card-body">
                 <form action="{{route('events.list-data')}}" method="get" class="row">
                     <div class="col-3">

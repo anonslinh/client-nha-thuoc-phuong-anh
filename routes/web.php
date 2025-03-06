@@ -39,10 +39,13 @@ Route::middleware([CheckLogin::class])->group(function (){
 
     });
     Route::get('customer-exchange-gift', [HomeController::class, 'customerExchangeGift'])->name('customer.exchange-gift');
+    Route::get('customer-exchange-voucher', [HomeController::class, 'customerVoucher'])->name('customer.exchange-voucher');
     Route::get('customer', [HomeController::class, 'customer'])->name('customer');
     Route::get('logout', [HomeController::class, 'logout'])->name('logout');
     Route::prefix('gift')->name('gift.')->group(function (){
         Route::get('index', [GiftController::class, 'index'])->name('index');
+        Route::get('created', [GiftController::class, 'created'])->name('created');
+        Route::get('detail/{id}', [GiftController::class, 'detail'])->name('detail');
         Route::post('store', [GiftController::class, 'store'])->name('store');
         Route::post('update/{id}', [GiftController::class, 'update'])->name('update');
         Route::get('delete/{id}', [GiftController::class, 'delete'])->name('delete');
@@ -95,10 +98,11 @@ Route::middleware([CheckLogin::class])->group(function (){
 
     Route::prefix('voucher')->name('voucher.')->group(function (){
        Route::get('list-data', [HomeController::class, 'voucher'])->name('list-data');
-       Route::get('customer', [HomeController::class, 'customerVoucher'])->name('customer');
        Route::post('store', [HomeController::class, 'storeVoucher'])->name('store');
        Route::post('update/{id}', [HomeController::class, 'updateVoucher'])->name('update');
        Route::get('delete/{id}', [HomeController::class, 'deleteVoucher'])->name('delete');
+       Route::get('created-voucher', [HomeController::class, 'createdVoucher'])->name('created-voucher');
+       Route::get('detail-voucher/{id}', [HomeController::class, 'detailVoucher'])->name('detail-voucher');
     });
     Route::prefix('rank')->name('rank.')->group(function (){
        Route::get('index', [HomeController::class, 'listRank'])->name('index');

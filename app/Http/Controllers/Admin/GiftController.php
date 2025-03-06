@@ -34,6 +34,22 @@ class GiftController
         return view('gift.list-data', compact('listData', 'rank'));
     }
 
+    public function created(){
+
+        $rank = MembershipLevel::orderBy('spending_threshold', 'asc')->get();
+        return view('gift.create', compact( 'rank'));
+    }
+
+    public function detail($id){
+
+        $value = Gift::find($id);
+        if (empty($value)){
+            return back()->with(['error' => 'Lỗi! Không tìm thấy']);
+        }
+        $rank = MembershipLevel::orderBy('spending_threshold', 'asc')->get();
+        return view('gift.detail', compact( 'rank', 'value'));
+    }
+
     public function store (Request $request)
     {
         try{
@@ -43,13 +59,14 @@ class GiftController
             $gift = new Gift([
                 'name' => $request->get('name'),
                 'code' => $request->get('code'),
+                'description' => $request->get('description'),
                 'points_required' => $request->get('point'),
                 'rank_id' => $request->get('rank_id'),
                 'is_display' => 1,
                 'image' => 'upload/gift/'.$nameFile
             ]);
             $gift->save();
-            return back()->with(['success' => 'Thêm quà tặng thành công']);
+            return redirect()->route('gift.index')->with(['success' => 'Thêm quà tặng thành công']);
         }catch (\Exception $exception){
             return back()->with(['error' => 'Thêm quà tặng thất bại.Vui lòng điền đầy đủ thông tin']);
         }
