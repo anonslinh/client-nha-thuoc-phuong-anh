@@ -1,10 +1,25 @@
 @extends('Layout.index')
 @section('content')
     <div class="container-fluid">
-        <div class="card">
-            <div class="card-header">
-                <h4>Danh sách hạng thẻ</h4>
+        <div class="card card-body py-3">
+            <div class="row align-items-center">
+                <div class="col-12">
+                    <div class="d-sm-flex align-items-center justify-space-between">
+                        <h4 class="mb-4 mb-sm-0 card-title">Hạng thẻ</h4>
+                        <nav aria-label="breadcrumb" class="ms-auto">
+                            <ol class="breadcrumb">
+                                <li class="breadcrumb-item d-flex align-items-center">
+                                    <a class="text-muted text-decoration-none d-flex">
+                                        <iconify-icon icon="solar:home-2-line-duotone" class="fs-6"></iconify-icon>
+                                    </a>
+                                </li>
+                            </ol>
+                        </nav>
+                    </div>
+                </div>
             </div>
+        </div>
+        <div class="card">
             <div class="card-body">
                 <table class="table table-bordered">
                     <thead>

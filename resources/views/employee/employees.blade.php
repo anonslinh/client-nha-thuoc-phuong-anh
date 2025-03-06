@@ -27,7 +27,7 @@
         </div>
 
         <div class="card">
-            <div class="card-header">
+            <div class="card-body">
                 <form action="{{route('employees.employees')}}" method="get" class="d-flex">
                     <div class="col-md-2" style="margin-right: 10px">
                         <input name="key_search" class="form-control"
@@ -65,9 +65,7 @@
                      ['key_search' => request('key_search'), 'sort_kpi' => request('sort_kpi'), 'sort_ratings' => request('sort_ratings'),
                       'filter_kpi' => request('filter_kpi')]) }}" class="btn btn-warning align-self-end">Xuất Excel</a>
                 </form>
-            </div>
-            <div class="card-body">
-                <table class="table table-bordered">
+                <table class="table table-bordered mt-4">
                     <thead>
                     <tr>
                         <th>STT</th>

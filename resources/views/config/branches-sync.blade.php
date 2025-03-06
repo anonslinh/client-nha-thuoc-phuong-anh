@@ -5,7 +5,7 @@
             <div class="row align-items-center">
                 <div class="col-12">
                     <div class="d-sm-flex align-items-center justify-space-between">
-                        <h4 class="mb-4 mb-sm-0 card-title">Đồng bộ chi nhánh</h4>
+                        <h4 class="mb-4 mb-sm-0 card-title">Đồng bộ cửa hàng: {{$totalBranches}} cửa hàng</h4>
                         <nav aria-label="breadcrumb" class="ms-auto">
                             <ol class="breadcrumb">
                                 <li class="breadcrumb-item d-flex align-items-center">
@@ -27,9 +27,6 @@
         </div>
 
         <div class="card">
-            <div class="card-header">
-                <h4>Danh sách chi nhánh: {{$totalBranches}}</h4>
-            </div>
             <div class="card-body">
                 <table class="table table-bordered">
                     <thead>

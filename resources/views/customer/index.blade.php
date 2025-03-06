@@ -20,7 +20,7 @@
             </div>
         </div>
         <div class="card">
-            <div class="card-header">
+            <div class="card-body">
                 <form action="{{route('customer')}}" method="get" class="d-flex">
                     <div class="col-md-3" style="margin-right: 15px">
                         <input name="key_search" class="form-control"
@@ -38,9 +38,7 @@
                     <button class="btn btn-primary" style="margin-right: 15px">Tìm kiếm</button>
                     <a href="{{route('customer')}}" class="btn btn-danger">Hủy</a>
                 </form>
-            </div>
-            <div class="card-body">
-                <table class="table table-bordered">
+                <table class="table table-bordered mt-4">
                     <thead>
                     <tr>
                         <th>STT</th>

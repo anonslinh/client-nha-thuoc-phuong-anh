@@ -329,7 +329,6 @@ class EmployeeController extends HelperAdminController
 
             return view('employee.ratings-invoice', compact( 'listData', 'months', 'chartSeries'));
         }catch (\Exception $exception){
-            dd($exception);
             return back()->with(['error' => 'Lỗi! Liên hệ với bộ phận CSKH']);
         }
     }
