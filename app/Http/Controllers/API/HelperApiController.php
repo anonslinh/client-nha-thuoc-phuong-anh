@@ -75,7 +75,6 @@ class HelperApiController extends Controller
 
             return response()->json(['status' => true, 'message' => 'Sync successful']);
         } catch (\Exception $e) {
-            dd($e);
             return response()->json(['status' => false, 'message' => 'Internal Server Error'], 500);
         }
     }
@@ -218,7 +217,7 @@ class HelperApiController extends Controller
                 'quantity'        => $detail['quantity'],
                 'price'           => $detail['price'],
                 'discount'        => $detail['discount'],
-                'use_point'       => $detail['usePoint'],
+                'use_point'       => $detail['usePoint'] ?? 0,
                 'sub_total'       => $detail['subTotal'],
                 'serial_numbers'  => $detail['serialNumbers'] ?? null,
                 'return_quantity' => $detail['returnQuantity'],
