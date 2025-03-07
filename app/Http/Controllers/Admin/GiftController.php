@@ -5,9 +5,11 @@ namespace App\Http\Controllers\Admin;
 use App\Models\Banner;
 use App\Models\Branch;
 use App\Models\Gift;
+use App\Models\GiftInventories;
 use App\Models\MembershipLevel;
 use App\Models\Program;
 use App\Models\Promotion;
+use Dflydev\DotAccessData\Data;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use function Illuminate\Support\of;
@@ -35,9 +37,9 @@ class GiftController
     }
 
     public function created(){
-
+        $listBranch = Branch::all();
         $rank = MembershipLevel::orderBy('spending_threshold', 'asc')->get();
-        return view('gift.create', compact( 'rank'));
+        return view('gift.create', compact( 'rank', 'listBranch'));
     }
 
     public function detail($id){
@@ -46,13 +48,29 @@ class GiftController
         if (empty($value)){
             return back()->with(['error' => 'Lỗi! Không tìm thấy']);
         }
+        $listBranch = Branch::all();
+        foreach ($listBranch as $item){
+            $quantity = GiftInventories::where('gift_id', $id)->where('branch_id', $item->id)->first();
+            $item['quantity_gift'] = $quantity->quantity ?? null;
+        }
         $rank = MembershipLevel::orderBy('spending_threshold', 'asc')->get();
-        return view('gift.detail', compact( 'rank', 'value'));
+        return view('gift.detail', compact( 'rank', 'value', 'listBranch'));
     }
 
     public function store (Request $request)
     {
         try{
+            $checkQuantity = true;
+            if (!empty($request->branch)){
+                foreach ($request->branch as $value){
+                    if ( !empty($value['quantity']) && (int)$value['quantity'] > 0){
+                        $checkQuantity = false;
+                    }
+                }
+            }
+            if ($checkQuantity){
+                return back()->with(['error' => 'Vui lòng điền số lượng quà tặng ít nhất cho một chi nhánh']);
+            }
             $file = $request->file('image');
             $nameFile = time().Str::random(10).'.'.$file->getClientOriginalExtension();
             $file->move('upload/gift/', $nameFile);
@@ -66,8 +84,19 @@ class GiftController
                 'image' => 'upload/gift/'.$nameFile
             ]);
             $gift->save();
+            foreach ($request->get('branch') as $value){
+                if ( !empty($value['quantity']) && (int)$value['quantity'] > 0){
+                    $quantityGift = new GiftInventories([
+                        'gift_id' => $gift['id'],
+                        'branch_id' => $value['id'],
+                        'quantity' => $value['quantity']
+                    ]);
+                    $quantityGift->save();
+                }
+            }
             return redirect()->route('gift.index')->with(['success' => 'Thêm quà tặng thành công']);
         }catch (\Exception $exception){
+            dd($exception->getMessage());
             return back()->with(['error' => 'Thêm quà tặng thất bại.Vui lòng điền đầy đủ thông tin']);
         }
     }
@@ -79,6 +108,17 @@ class GiftController
         $gift = Gift::find($id);
         if (empty($gift)){
             return back()->with(['error' => 'Không tìm thấy dữ liệu.Vui lòng kiểm tra lại']);
+        }
+        $checkQuantity = true;
+        if (!empty($request->branch)){
+            foreach ($request->branch as $value){
+                if ( !empty($value['quantity']) && (int)$value['quantity'] > 0){
+                    $checkQuantity = false;
+                }
+            }
+        }
+        if ($checkQuantity){
+            return back()->with(['error' => 'Vui lòng điền số lượng quà tặng ít nhất cho một chi nhánh']);
         }
         if ($request->hasFile('image')){
             $file = $request->file('image');
@@ -95,6 +135,17 @@ class GiftController
         $gift->rank_id = $request->get('rank_id');
         $gift->description = $request->get('description');
         $gift->save();
+        GiftInventories::where('gift_id', $id)->delete();
+        foreach ($request->get('branch') as $value){
+            if ( !empty($value['quantity']) && (int)$value['quantity'] > 0){
+                $quantityGift = new GiftInventories([
+                    'gift_id' => $id,
+                    'branch_id' => $value['id'],
+                    'quantity' => $value['quantity']
+                ]);
+                $quantityGift->save();
+            }
+        }
         return back()->with(['success' => 'Cập nhật dữ liệu thành công']);
     }
     /**

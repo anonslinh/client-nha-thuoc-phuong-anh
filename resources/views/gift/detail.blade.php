@@ -39,6 +39,38 @@
                         <label class="form-label">Điểm quy đổi</label>
                         <input class="form-control" value="{{$value->points_required}}" name="point" type="number" min="0" required>
                     </div>
+                    <div class="mb-3">
+                        <label class="form-label">Cấu hình theo chi nhánh:</label>
+                        <div class="list-branch">
+                            <div class="d-flex align-items-center" style="margin-bottom: 15px">
+                                <input class="form-control" name="quantity_setup" placeholder="Số lương quà tặng" type="number" style="max-width: 250px;margin-right: 15px">
+                                <button class="btn btn-primary btnAddAll" type="button">Áp dụng cho tất cả</button>
+                            </div>
+                            <table class="table table-bordered">
+                                <thead>
+                                <tr>
+                                    <th>STT</th>
+                                    <th>Tên chi nhánh</th>
+                                    <th>Địa chỉ</th>
+                                    <th>Số lượng quà</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                @foreach($listBranch as $key => $item)
+                                    <tr>
+                                        <td>{{$key + 1}}</td>
+                                        <td>{{$item->branch_name}}</td>
+                                        <td>{{$item->address.'-'.$item->ward_name.'-'.$item->location_name}}</td>
+                                        <td>
+                                            <input name="branch[{{$key}}][id]" value="{{$item->id}}" hidden>
+                                            <input name="branch[{{$key}}][quantity]" type="number" value="{{$item->quantity_gift}}" class="form-control quantity">
+                                        </td>
+                                    </tr>
+                                @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                     <div class="form-group mb-3">
                         <label class="form-label">Hạng thẻ</label>
                         <select name="rank_id" class="form-control">
@@ -63,4 +95,23 @@
 @section('script')
     <script src="assets/libs/tinymce/tinymce.min.js"></script>
     <script src="assets/js/forms/tinymce-init.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('.btnAddAll').click(function () {
+                var quantity = $('input[name="quantity_setup"]').val();
+                if (quantity === '' || parseInt(quantity) < 1){
+                    Swal.fire(
+                        "Thất bại",
+                        "Vui lòng điền số lương quà tặng",
+                        "error"
+                    );
+                }else{
+                    $("tbody tr").each(function () {
+                        var input = $(this).find(".quantity");
+                        input.val(quantity);
+                    });
+                }
+            });
+        });
+    </script>
 @endsection
