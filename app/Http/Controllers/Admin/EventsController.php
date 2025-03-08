@@ -3,12 +3,14 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Branch;
 use App\Models\Customer;
 use App\Models\EventsModel;
 use App\Models\ExchangeGiftEvent;
 use App\Models\GiftEvent;
 use App\Models\HistoryPointEvent;
 use App\Models\ProductsEvent;
+use App\Models\QuantityGiftEvents;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -351,7 +353,15 @@ class EventsController extends SyncController
             $listData = $listData->where('active', $request->get('active'));
         }
         $listData = $listData->orderBy('created_at', 'desc')->paginate(20);
+        foreach ($listData as $value){
+            $value->quantity = QuantityGiftEvents::where('gift_events_id', $value->id)->sum('quantity');
+        }
         return view('events.list-gift', compact('listData'));
+    }
+    public function viewCreateGift ()
+    {
+        $listBranch = Branch::all();
+        return view('events.create-gift', compact('listBranch'));
     }
     /**
      * Tạo quà tặng
@@ -359,6 +369,17 @@ class EventsController extends SyncController
     public function createGift (Request $request)
     {
         try{
+            $checkQuantity = true;
+            if (!empty($request->branch)){
+                foreach ($request->branch as $value){
+                    if ( !empty($value['quantity']) && (int)$value['quantity'] > 0){
+                        $checkQuantity = false;
+                    }
+                }
+            }
+            if ($checkQuantity){
+                return back()->with(['error' => 'Vui lòng điền số lượng quà tặng ít nhất cho một chi nhánh']);
+            }
             $file = $request->file('image');
             $nameFile = time().Str::random(10).'.'.$file->getClientOriginalExtension();
             $file->move('upload/gift-event/', $nameFile);
@@ -366,16 +387,41 @@ class EventsController extends SyncController
                 'name' => $request->get('name'),
                 'code' => $request->get('code'),
                 'point' => $request->get('point'),
-                'quantity' => $request->get('quantity'),
                 'barcode' => $request->get('barcode'),
                 'active' => 1,
                 'image' => 'upload/gift-event/'.$nameFile
             ]);
             $gift->save();
+            foreach ($request->get('branch') as $value){
+                if ( !empty($value['quantity']) && (int)$value['quantity'] > 0){
+                    $quantityGift = new QuantityGiftEvents([
+                        'gift_events_id' => $gift['id'],
+                        'branch_id' => $value['id'],
+                        'quantity' => $value['quantity']
+                    ]);
+                    $quantityGift->save();
+                }
+            }
             return back()->with(['success' => 'Thêm quà tặng thành công']);
         }catch (\Exception $exception){
             return back()->with(['error' => 'Thêm quà tặng thất bại.Vui lòng điền đầy đủ thông tin']);
         }
+    }
+    /**
+     * Chi tiết quà tặng
+    **/
+    public function detailGift ($id)
+    {
+        $gift = GiftEvent::find($id);
+        if (empty($gift)){
+            return back()->with(['error' => 'Dữ liệu không tồn tại']);
+        }
+        $listBranch = Branch::all();
+        foreach ($listBranch as $value){
+            $quantity = QuantityGiftEvents::where('gift_events_id', $id)->where('branch_id', $value->id)->first();
+            $value['quantity'] = $quantity->quantity??null;
+        }
+        return view('events.detail-gift', compact('gift', 'listBranch'));
     }
     /**
      * Cập nhât quà tặng
@@ -385,6 +431,17 @@ class EventsController extends SyncController
         $gift = GiftEvent::find($id);
         if (empty($gift)){
             return back()->with(['error' => 'Không tìm thấy dữ liệu.Vui lòng kiểm tra lại']);
+        }
+        $checkQuantity = true;
+        if (!empty($request->branch)){
+            foreach ($request->branch as $value){
+                if ( !empty($value['quantity']) && (int)$value['quantity'] > 0){
+                    $checkQuantity = false;
+                }
+            }
+        }
+        if ($checkQuantity){
+            return back()->with(['error' => 'Vui lòng điền số lượng quà tặng ít nhất cho một chi nhánh']);
         }
         if ($request->hasFile('image')){
             $file = $request->file('image');
@@ -398,9 +455,21 @@ class EventsController extends SyncController
         $gift->name = $request->get('name');
         $gift->code = $request->get('code');
         $gift->point = $request->get('point');
-        $gift->quantity = $request->get('quantity');
+        $gift->quantity = $request->get('quantity')??0;
         $gift->barcode = $request->get('barcode');
+        $gift->description = $request->get('description');
         $gift->save();
+        QuantityGiftEvents::where('gift_events_id', $id)->delete();
+        foreach ($request->get('branch') as $value){
+            if ( !empty($value['quantity']) && (int)$value['quantity'] > 0){
+                $quantityGift = new QuantityGiftEvents([
+                    'gift_events_id' => $id,
+                    'branch_id' => $value['id'],
+                    'quantity' => $value['quantity']
+                ]);
+                $quantityGift->save();
+            }
+        }
         return back()->with(['success' => 'Cập nhật dữ liệu thành công']);
     }
     /**

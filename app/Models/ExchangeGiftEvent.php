@@ -16,6 +16,7 @@ class ExchangeGiftEvent extends Model
         'barcode_gift',
         'point',
         'quantity',
-        'status'
+        'status',
+        'branch_id'
     ];
 }

@@ -5,7 +5,7 @@
             <div class="card-header">
                 <div class="d-flex justify-content-between align-items-center">
                     <h4 class="p-0">Danh sách quà tặng</h4>
-                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modalCreate">+ Tạo mới</button>
+                    <a href="{{route('events.gift.create')}}" class="btn btn-primary">+ Tạo mới</a>
                 </div>
             </div>
             <div class="card-body">
@@ -41,54 +41,54 @@
                                 <td class="align-middle">0</td>
                                 <td class="align-middle">
 
-                                    <div class="modal fade" id="modalUpdate{{$value->id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-                                        <div class="modal-dialog modal-dialog-centered" role="document">
-                                            <form action="{{route('events.gift.update',$value->id)}}" method="post" enctype="multipart/form-data" class="modal-content">
-                                                @csrf
-                                                <div class="modal-header">
-                                                    <h5 class="modal-title" id="exampleModalLongTitle">Cập nhật quà tặng</h5>
-                                                </div>
-                                                <div class="modal-body">
-                                                    <div class="form-group mb-2">
-                                                        <label>Tên</label>
-                                                        <input class="form-control" value="{{$value->name}}" name="name" required>
-                                                    </div>
-                                                    <div class="form-group mb-2">
-                                                        <label>Mã</label>
-                                                        <input class="form-control" value="{{$value->code}}" name="code" required>
-                                                    </div>
-                                                    <div class="form-group mb-2">
-                                                        <label>Mã vạch</label>
-                                                        <input class="form-control" value="{{$value->code}}" name="barcode">
-                                                    </div>
-                                                    <div class="form-group mb-2">
-                                                        <label class="d-block">Hình ảnh</label>
-                                                        <img src="{{$value->image}}" style="width: 200px;margin: 10px 0">
-                                                        <input class="form-control" type="file" accept="image/png" name="image">
-                                                    </div>
-                                                    <div class="form-group mb-2">
-                                                        <label>Điểm quy đổi</label>
-                                                        <input class="form-control" value="{{$value->point}}" name="point" type="number" min="0" required>
-                                                    </div>
-                                                    <div class="form-group mb-2">
-                                                        <label>Số lượng</label>
-                                                        <input class="form-control" value="{{$value->quantity}}" name="quantity" type="number" min="0" required>
-                                                    </div>
-                                                </div>
-                                                <div class="modal-footer">
-                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                                                    <button class="btn btn-primary">Xác nhận</button>
-                                                </div>
-                                            </form>
-                                        </div>
-                                    </div>
+{{--                                    <div class="modal fade" id="modalUpdate{{$value->id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">--}}
+{{--                                        <div class="modal-dialog modal-dialog-centered" role="document">--}}
+{{--                                            <form action="{{route('events.gift.update',$value->id)}}" method="post" enctype="multipart/form-data" class="modal-content">--}}
+{{--                                                @csrf--}}
+{{--                                                <div class="modal-header">--}}
+{{--                                                    <h5 class="modal-title" id="exampleModalLongTitle">Cập nhật quà tặng</h5>--}}
+{{--                                                </div>--}}
+{{--                                                <div class="modal-body">--}}
+{{--                                                    <div class="form-group mb-2">--}}
+{{--                                                        <label>Tên</label>--}}
+{{--                                                        <input class="form-control" value="{{$value->name}}" name="name" required>--}}
+{{--                                                    </div>--}}
+{{--                                                    <div class="form-group mb-2">--}}
+{{--                                                        <label>Mã</label>--}}
+{{--                                                        <input class="form-control" value="{{$value->code}}" name="code" required>--}}
+{{--                                                    </div>--}}
+{{--                                                    <div class="form-group mb-2">--}}
+{{--                                                        <label>Mã vạch</label>--}}
+{{--                                                        <input class="form-control" value="{{$value->code}}" name="barcode">--}}
+{{--                                                    </div>--}}
+{{--                                                    <div class="form-group mb-2">--}}
+{{--                                                        <label class="d-block">Hình ảnh</label>--}}
+{{--                                                        <img src="{{$value->image}}" style="width: 200px;margin: 10px 0">--}}
+{{--                                                        <input class="form-control" type="file" accept="image/png" name="image">--}}
+{{--                                                    </div>--}}
+{{--                                                    <div class="form-group mb-2">--}}
+{{--                                                        <label>Điểm quy đổi</label>--}}
+{{--                                                        <input class="form-control" value="{{$value->point}}" name="point" type="number" min="0" required>--}}
+{{--                                                    </div>--}}
+{{--                                                    <div class="form-group mb-2">--}}
+{{--                                                        <label>Số lượng</label>--}}
+{{--                                                        <input class="form-control" value="{{$value->quantity}}" name="quantity" type="number" min="0" required>--}}
+{{--                                                    </div>--}}
+{{--                                                </div>--}}
+{{--                                                <div class="modal-footer">--}}
+{{--                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>--}}
+{{--                                                    <button class="btn btn-primary">Xác nhận</button>--}}
+{{--                                                </div>--}}
+{{--                                            </form>--}}
+{{--                                        </div>--}}
+{{--                                    </div>--}}
                                     <div class="btn-group">
                                         <button class="btn btn-danger dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
                                             Thao tác
                                         </button>
                                         <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton" style="">
                                             <li>
-                                                <button data-bs-toggle="modal" data-bs-target="#modalUpdate{{$value->id}}" class="dropdown-item">Sửa</button>
+                                                <a href="{{route('events.gift.detail',$value->id)}}" class="dropdown-item">Sửa</a>
                                             </li>
                                             <li>
                                                 <a class="dropdown-item btn-sa-confirm" href="{{route('events.gift.delete', $value->id)}}">Xóa</a>

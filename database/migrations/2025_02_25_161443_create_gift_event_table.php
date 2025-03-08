@@ -20,6 +20,7 @@ return new class extends Migration
             $table->integer('point')->default(1);
             $table->integer('quantity')->default(1);
             $table->boolean('active')->default(1);
+            $table->longText('description')->nullable();
             $table->timestamps();
         });
         Schema::create('exchange_gift_event', function (Blueprint $table) {
@@ -32,6 +33,7 @@ return new class extends Migration
             $table->string('barcode_gift')->nullable();
             $table->integer('point')->default(1);
             $table->integer('quantity')->default(1);
+            $table->unsignedBigInteger('branch_id')->nullable();
             $table->tinyInteger('status')->default(1)->comment('1: Wait; 2: Confirm; 3: Cancel');
             $table->timestamps();
         });

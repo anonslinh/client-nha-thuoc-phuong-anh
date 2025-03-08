@@ -14,6 +14,7 @@ class GiftEvent extends Model
         'barcode',
         'point',
         'quantity',
-        'active'
+        'active',
+        'description'
     ];
 }

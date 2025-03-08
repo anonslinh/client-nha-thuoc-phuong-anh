@@ -3,11 +3,13 @@
 namespace App\Http\Controllers\API;
 
 use App\Http\Controllers\Admin\SyncController;
+use App\Models\Branch;
 use App\Models\Customer;
 use App\Models\EventsModel;
 use App\Models\ExchangeGiftEvent;
 use App\Models\GiftEvent;
 use App\Models\HistoryPointEvent;
+use App\Models\QuantityGiftEvents;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -19,6 +21,8 @@ class EventsController extends SyncController
     {
         $events = EventsModel::whereDate('time_start', '<=', Carbon::now())->whereDate('time_end', '>=', Carbon::now())->get();
         $customerID = null;
+        $branchDefault = Branch::first();
+        $branch_id = $request->get('branch_id');
         if (isset($request->phone)){
             $validatedData = $request->validate([
                 'phone' => ['required', 'regex:/^(0[1-9][0-9]{8,9}|84[1-9][0-9]{8,9})$/'],
@@ -36,13 +40,28 @@ class EventsController extends SyncController
                 }
             }
             $customerID = $customer->id??null;
+            if (!empty($customer->branch_id) && empty($branch_id)){
+                $branchCustomer = Branch::where('kiotviet_id', $customer->branch_id)->first();
+                $branch_id = $branchCustomer->id??null;
+            }
+        }
+        if (empty($branch_id)){
+            $branch_id = $branchDefault->id;
         }
         foreach ($events as $value){
             $value->images = json_decode($value->images);
         }
+        $giftID = QuantityGiftEvents::where('branch_id', $branch_id)->pluck('gift_events_id')->toArray();
+        $listGift = GiftEvent::whereIn('id', array_unique($giftID))->where('active', 1)->get();
+        foreach ($listGift as $value){
+            $quantity = QuantityGiftEvents::where('gift_events_id', $value->id)->where('branch_id', $branch_id)->first();
+            $value['quantity'] = $quantity->quantity;
+            $branch = Branch::find($branch_id);
+            $value['branch_name'] = $branch->branch_name??'';
+        }
         $data['events'] = $events;
         $data['customer'] = Customer::find($customerID);
-        $data['gifts'] = GiftEvent::where('active', 1)->get();
+        $data['gifts'] = $listGift;
         return response()->json(['status' => true, 'data' => $data], Response::HTTP_OK);
     }
     /**
@@ -61,13 +80,18 @@ class EventsController extends SyncController
             if (empty($gift)) {
                 return response()->json(['status' => false, 'msg' => 'Quà tặng không tồn tại hoặc đã hết. Vui lòng thử lại sau']);
             }
-            if ($gift->quantity < 1) {
+            $branch_id = $request->get('branch_id');
+            if (empty($branch_id)){
+                $branch = Branch::where('kiotviet_id', $customer->branch_id)->first();
+                $branch_id = $branch->id??null;
+            }
+            $quantity = QuantityGiftEvents::where('gift_events_id', $gift->id)->where('branch_id', $branch_id)->first();
+            if (empty($quantity) || $quantity->quantity < 1){
                 return response()->json(['status' => false, 'msg' => 'Quà tặng đã hết. Vui lòng thử lại sau']);
             }
             if ($pointCustomer < $gift->point) {
                 return response()->json(['status' => false, 'msg' => 'Điểm của quý khách không đủ để đổi phần quà này. Vui lòng kiểm tra lại'], Response::HTTP_BAD_REQUEST);
             }
-
             // Thực hiện trao đổi quà
             $exchange = new ExchangeGiftEvent([
                 'customer_id' => $customer->kiotviet_id,
@@ -78,7 +102,8 @@ class EventsController extends SyncController
                 'barcode_gift' => $gift->barcode ?? null,
                 'point' => $gift->point,
                 'quantity' => 1,
-                'status' => 1
+                'status' => 1,
+                'branch_id' => $branch_id
             ]);
             $exchange->save();
 
