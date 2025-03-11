@@ -148,7 +148,7 @@ class HomeController extends HelperApiController
             })
             ->where(function ($query) use ($branchId) {
                 if ($branchId) {
-                    $query->where('branch_id', $branchId);
+                    $query->where('branch_id', $branchId)->orWhereNull('branch_id');;
                 }
             })
             ->orderByDesc('priority')
