@@ -4,6 +4,7 @@
 namespace App\Http\Controllers\API;
 
 
+use App\Models\Customer;
 use App\Models\DailyActivitySummary;
 use App\Services\KiotVietService;
 use Illuminate\Support\Facades\Http;
@@ -47,6 +48,27 @@ class InvoicesController extends HelperApiController
             ]);
 
             $customers = $response->json()['data'] ?? [];
+
+            // Bắt đầu test hardcode khách hàng hoá đơn
+            if (empty($customers)){
+                $customer = Customer::where('contact_number', $phone)->first();
+                $customerId = 0;
+                if ($customer){
+                    $customerId = $customer->kiotviet_id;
+                }
+                $data = Invoice::leftJoin('invoice_ratings', 'invoices.kiotviet_id', '=', 'invoice_ratings.kiotviet_invoice_id')
+                    ->where('invoices.customer_id', $customerId)
+                    ->select(
+                        'invoices.*',
+                        \DB::raw("IF(invoices.created_date < '$cutoffDate' OR invoice_ratings.kiotviet_invoice_id IS NOT NULL, true, false) as is_rated")
+                    )
+                    ->with('details')
+                    ->paginate($perPage);
+
+                return response()->json(['status' => true, 'data' => $data]);
+            }
+            //Kết thúc test hoá đơn
+
             if (!$phone || empty($customers)) {
                 return response()->json(['status' => false, 'data' => []], 200);
             }
@@ -105,7 +127,7 @@ class InvoicesController extends HelperApiController
                             'quantity' => $detail['quantity'],
                             'price' => $detail['price'],
                             'discount' => $detail['discount'],
-                            'use_point' => $detail['usePoint'],
+                            'use_point' => $detail['usePoint'] ?? 0,
                             'sub_total' => $detail['subTotal'],
                             'serial_numbers' => $detail['serialNumbers'] ?? null,
                             'return_quantity' => $detail['returnQuantity']
