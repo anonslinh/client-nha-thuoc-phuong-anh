@@ -190,6 +190,9 @@ class HomeController extends HelperApiController
             ->orderByDesc('priority')
             ->orderBy('start_date', 'asc')
             ->paginate($perPage);
+        foreach ($promotion as $k => $item){
+            $promotion[$k]->apply_to = optional($item->branch)->branch_name ?? 'Toàn hệ thống';
+        }
 
         return response()->json(['status' => true, 'data' => $promotion]);
     }
