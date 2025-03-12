@@ -35,6 +35,7 @@ class HomeController extends HelperApiController
             ]);
 
             $phone = $this->normalizePhone($validatedData['phone']);
+            $membership_level = $this->getMembershipLevel($phone);
 
             $this->syncCustomerInvoices($phone);
             $customer = Customer::where('contact_number', $phone)->first();
@@ -46,7 +47,8 @@ class HomeController extends HelperApiController
 
             return response()->json([
                 'status' => true,
-                'data' => $reward_point
+                'data' => $reward_point,
+                'membership_level' => $membership_level
             ], 200);
 
         } catch (\Illuminate\Validation\ValidationException $exception) {
@@ -214,6 +216,25 @@ class HomeController extends HelperApiController
 
             $this->syncCustomerInvoices($phone);
 
+            $data_return = $this->getMembershipLevel($phone);
+            return response()->json([
+                'status' => true,
+                'data' => $data_return
+            ], 200);
+
+        } catch (\Illuminate\Validation\ValidationException $exception) {
+            return response()->json(['error' => $exception->errors()], 422);
+        } catch (\Exception $exception) {
+            return response()->json(['error' => $exception->getMessage()], 500);
+        }
+    }
+
+    /**
+     * Trả về hạng thành viên của khách hàng
+    */
+    public function getMembershipLevel($phone){
+        try{
+
             // Tìm khách hàng theo số điện thoại
             $customer = Customer::where('contact_number', $phone)->first();
 
@@ -237,10 +258,7 @@ class HomeController extends HelperApiController
                     'amount_to_next'  => $amountNeeded,
                 ];
 
-                return response()->json([
-                    'status' => true,
-                    'data' => $data_return
-                ], 200);
+                return $data_return;
             }
 
             // Lấy tổng chi tiêu của khách hàng
@@ -275,15 +293,9 @@ class HomeController extends HelperApiController
                 'amount_to_next'  => $amountNeeded,
             ];
 
-            return response()->json([
-                'status' => true,
-                'data' => $data_return
-            ], 200);
+            return $data_return;
+        }catch (\Exception $exception){
 
-        } catch (\Illuminate\Validation\ValidationException $exception) {
-            return response()->json(['error' => $exception->errors()], 422);
-        } catch (\Exception $exception) {
-            return response()->json(['error' => $exception->getMessage()], 500);
         }
     }
 
