@@ -129,7 +129,7 @@ class GiftExchangesController extends HelperApiController
         $customer = Customer::where('contact_number', $phone)->first();
 
         if (!$customer) {
-            return response()->json(['status' => false, 'message' => 'Khách hàng không tồn tại'], 404);
+            return response()->json(['status' => false, 'message' => 'Khách hàng không tồn tại', 'data' => []], 200);
         }
 
         // Lấy danh sách quà, ưu tiên quà đang "pending"
