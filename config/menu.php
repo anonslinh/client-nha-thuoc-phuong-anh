@@ -157,6 +157,11 @@ return [
                 'name' => 'Cài đặt chung',
                 'icon' => 'solar:settings-linear',
                 'route' => 'config.setting-global'
+            ],
+            [
+                'name' => 'KIOTVIET',
+                'icon' => 'solar:settings-linear',
+                'route' => 'config.index-account-branches'
             ]
         ]
     ]

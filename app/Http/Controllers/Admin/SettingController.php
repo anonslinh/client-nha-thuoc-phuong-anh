@@ -4,6 +4,7 @@
 namespace App\Http\Controllers\Admin;
 
 
+use App\Models\AccountBranches;
 use App\Models\Branch;
 use App\Models\Contacts;
 use App\Models\Employee;
@@ -165,4 +166,69 @@ class SettingController extends SyncController
 
         return back()->with(['success' => 'Cập nhật dữ liệu thành công']);
     }
+
+    /**
+     * Danh sách tài khoản kiotviet
+    */
+    public function indexAccountBranches(){
+        $listData = AccountBranches::where('active', 1)->orderBy('created_at', 'desc')->paginate(20);
+
+        return view('config.account-branches', compact('listData'));
+    }
+
+    /**
+     * Thêm tài khoản kiotviet
+    */
+    public function storeAccountBranch(Request $request)
+    {
+        // Validate dữ liệu đầu vào
+        $validatedData = $request->validate([
+            'name'          => 'required|string|max:255',
+            'code'          => 'required|string|max:255|unique:account_branches,code',
+            'retailer'      => 'required|string|max:255',
+            'client_id'     => 'required|string|max:255',
+            'client_secret' => 'required|string|max:255',
+        ]);
+
+        // Tạo mới dữ liệu
+        AccountBranches::create($validatedData);
+
+        return back()->with(['success' => 'Thêm dữ liệu thành công!']);
+    }
+
+    /**
+     * cập nhật thông tin tài khoản
+    */
+    public function updateAccountBranch(Request $request, $id)
+    {
+        // Validate dữ liệu đầu vào
+        $validatedData = $request->validate([
+            'name'          => 'required|string|max:255',
+            'code'          => 'required|string|max:255|unique:account_branches,code,' . $id,
+            'retailer'      => 'required|string|max:255',
+            'client_id'     => 'required|string|max:255',
+            'client_secret' => 'required|string|max:255',
+        ]);
+
+        // Lấy bản ghi cần cập nhật
+        $accountBranch = AccountBranches::findOrFail($id);
+
+        // Cập nhật dữ liệu
+        $accountBranch->update($validatedData);
+
+        return back()->with(['success' => 'Cập nhật thành công!']);
+    }
+
+    /**
+     * xóa tài khoản
+    */
+    public function deleteAccountBranch($id)
+    {
+        $accountBranch = AccountBranches::findOrFail($id);
+        $accountBranch->delete();
+
+        return back()->with(['success' => 'Xóa thành công!']);
+    }
+
+
 }
