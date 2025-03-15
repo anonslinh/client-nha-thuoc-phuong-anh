@@ -7,10 +7,8 @@ namespace App\Http\Controllers\API;
 use App\Models\Customer;
 use App\Models\DailyActivitySummary;
 use App\Services\KiotVietService;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Http\Request;
 use App\Models\Invoice;
-use App\Models\InvoiceDetail;
 use App\Models\InvoiceRating;
 
 class InvoicesController extends HelperApiController
@@ -33,111 +31,16 @@ class InvoicesController extends HelperApiController
 
             $phone = $request->input('phone');
 
-            $accessToken = $this->kiotVietService->getAccessToken();
+            $customer = Customer::where('contact_number', $phone)->first();
 
-            $retailer = $this->kiotVietService->getRetailer();
-
-            $response = Http::withHeaders([
-                'Retailer'      => $retailer,
-                'Authorization' => 'Bearer ' . $accessToken,
-                'Content-Type'  => 'application/json',
-            ])->get('https://public.kiotapi.com/customers', [
-                'orderDirection' => 'Desc',
-                'contactNumber' => $phone,
-                'includeTotal' => 'true'
-            ]);
-
-            $customers = $response->json()['data'] ?? [];
-
-            // Bắt đầu test hardcode khách hàng hoá đơn
-            if (empty($customers)){
-                $customer = Customer::where('contact_number', $phone)->first();
-                $customerId = 0;
-                if ($customer){
-                    $customerId = $customer->kiotviet_id;
-                }
-                $data = Invoice::leftJoin('invoice_ratings', 'invoices.kiotviet_id', '=', 'invoice_ratings.kiotviet_invoice_id')
-                    ->where('invoices.customer_id', $customerId)
-                    ->select(
-                        'invoices.*',
-                        \DB::raw("IF(invoices.created_date < '$cutoffDate' OR invoice_ratings.kiotviet_invoice_id IS NOT NULL, true, false) as is_rated")
-                    )
-                    ->with('details')
-                    ->paginate($perPage);
-
-                return response()->json(['status' => true, 'data' => $data]);
-            }
-            //Kết thúc test hoá đơn
-
-            if (!$phone || empty($customers)) {
+            if (!$phone || empty($customer)) {
                 return response()->json(['status' => false, 'data' => []], 200);
             }
 
-            $customerId = $customers[0]['id'];
-
-            $invoiceResponse = Http::withHeaders([
-                'Retailer'      => $retailer,
-                'Authorization' => 'Bearer ' . $accessToken,
-                'Content-Type'  => 'application/json',
-            ])->get('https://public.kiotapi.com/invoices', [
-                'orderDirection' => 'Desc',
-                'customerIds' => $customerId,
-                'pageSize' => '100'
-            ]);
-
-            $invoices = $invoiceResponse->json()['data'] ?? [];
-            if (!$phone || empty($invoices)) {
-                return response()->json(['status' => false, 'data' => []], 200);
-            }
-
-            foreach ($invoices as $invoiceData) {
-                $existingInvoice = Invoice::where('kiotviet_id', $invoiceData['id'])->first();
-                if (!$existingInvoice) {
-                    $invoice = Invoice::create([
-                        'kiotviet_id' => $invoiceData['id'],
-                        'uuid' => $invoiceData['uuid'],
-                        'code' => $invoiceData['code'],
-                        'purchase_date' => $invoiceData['purchaseDate'],
-                        'branch_id' => $invoiceData['branchId'],
-                        'branch_name' => $invoiceData['branchName'],
-                        'sold_by_id' => $invoiceData['soldById'],
-                        'sold_by_name' => $invoiceData['soldByName'],
-                        'customer_id' => $invoiceData['customerId'],
-                        'customer_code' => $invoiceData['customerCode'],
-                        'customer_name' => $invoiceData['customerName'],
-                        'order_code' => $invoiceData['orderCode'],
-                        'total' => $invoiceData['total'],
-                        'total_payment' => $invoiceData['totalPayment'],
-                        'status' => $invoiceData['status'],
-                        'status_value' => $invoiceData['statusValue'],
-                        'using_cod' => $invoiceData['usingCod'],
-                        'created_date' => $invoiceData['createdDate']
-                    ]);
-
-                    foreach ($invoiceData['invoiceDetails'] as $detail) {
-                        InvoiceDetail::create([
-                            'invoice_id' => $invoice->id,
-                            'product_id' => $detail['productId'],
-                            'product_code' => $detail['productCode'],
-                            'product_name' => $detail['productName'],
-                            'category_id' => $detail['categoryId'],
-                            'category_name' => $detail['categoryName'],
-                            'trade_mark_id' => $detail['tradeMarkId'] ?? null,
-                            'trade_mark_name' => $detail['tradeMarkName'] ?? null,
-                            'quantity' => $detail['quantity'],
-                            'price' => $detail['price'],
-                            'discount' => $detail['discount'],
-                            'use_point' => $detail['usePoint'] ?? 0,
-                            'sub_total' => $detail['subTotal'],
-                            'serial_numbers' => $detail['serialNumbers'] ?? null,
-                            'return_quantity' => $detail['returnQuantity']
-                        ]);
-                    }
-                }
-            }
+            $customerId = $customer->kiotviet_id; //Bảng invoid thêm contact_number sẽ where theo bảng đó
 
             $data = Invoice::leftJoin('invoice_ratings', 'invoices.kiotviet_id', '=', 'invoice_ratings.kiotviet_invoice_id')
-                ->where('invoices.customer_id', $customerId)
+                ->where('invoices.customer_id', $customerId) //Bảng invoid thêm contact_number sẽ where theo bảng đó
                 ->select(
                     'invoices.*',
                     \DB::raw("IF(invoices.created_date < '$cutoffDate' OR invoice_ratings.kiotviet_invoice_id IS NOT NULL, true, false) as is_rated")

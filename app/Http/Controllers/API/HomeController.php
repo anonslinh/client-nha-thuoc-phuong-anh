@@ -35,9 +35,9 @@ class HomeController extends HelperApiController
             ]);
 
             $phone = $this->normalizePhone($validatedData['phone']);
-            $membership_level = $this->getMembershipLevel($phone);
 
             $this->syncCustomerInvoices($phone);
+            $membership_level = $this->getMembershipLevel($phone);
             $customer = Customer::where('contact_number', $phone)->first();
             // Lấy thông tin khách hàng & điểm thưởng
             $reward_point = optional($customer)->reward_point ?? 0;
