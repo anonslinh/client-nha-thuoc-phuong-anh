@@ -97,51 +97,57 @@ class SyncController extends HelperAdminController
     */
     public function syncEmployees(){
         try{
-
-            $accessToken = $this->kiotVietService->getAccessToken();
-            $retailer = $this->kiotVietService->getRetailer();
-
-            $pageSize = 100; // Số lượng tối đa mỗi lần gọi API
-            $currentItem = 0; // Bắt đầu từ khách hàng đầu tiên
+            $personalAccessTokens = PersonalAccessTokens::all();
             $totalFetched = 0;
 
-            do{
-                $response = Http::withHeaders([
-                    'Retailer'      => $retailer,
-                    'Authorization' => 'Bearer ' . $accessToken,
-                    'Content-Type'  => 'application/json',
-                ])->get("https://public.kiotapi.com/users?pageSize=$pageSize&currentItem=$currentItem");
+            foreach ($personalAccessTokens as $personalAccessToken) {
 
-                if ($response->failed()) {
-                    return response()->json(['error' => 'Không thể lấy dữ liệu từ KiotViet'], 500);
-                }
+                $tokens = $this->kiotVietService->getAccessTokenAllBranches($personalAccessToken->access_token_code);
+                $accessToken = $tokens->access_token;
+                $retailer = $tokens->retailer;
 
-                // Kiểm tra xem có dữ liệu không
-                $data = $response->json();
-                if (!isset($data['data']) || empty($data['data'])) {
-                    break; // Dừng lại nếu không còn dữ liệu
-                }
+                $pageSize = 100; // Số lượng tối đa mỗi lần gọi API
+                $currentItem = 0; // Bắt đầu từ khách hàng đầu tiên
 
-                $employeesData = $response->json()['data'] ?? [];
-                foreach ($employeesData as $employeeData) {
-                    Employee::updateOrCreate(
-                        ['kiotviet_id' => $employeeData['id']],
-                        [
-                            'user_name'    => $employeeData['userName'],
-                            'given_name'   => $employeeData['givenName'],
-                            'address'      => $employeeData['address'] ?? null,
-                            'mobile_phone' => $employeeData['mobilePhone'] ?? null,
-                            'retailer_id'  => $employeeData['retailerId'],
-                            'created_date' => $employeeData['createdDate'],
-                        ]
-                    );
-                }
+                do{
+                    $response = Http::withHeaders([
+                        'Retailer'      => $retailer,
+                        'Authorization' => 'Bearer ' . $accessToken,
+                        'Content-Type'  => 'application/json',
+                    ])->get($this->urlKiotViet['url_users']."pageSize=$pageSize&currentItem=$currentItem");
 
-                // Cập nhật chỉ số để lấy trang tiếp theo
-                $totalFetched += count($data['data']);
-                $currentItem += $pageSize;
+                    if ($response->failed()) {
+                        return response()->json(['error' => 'Không thể lấy dữ liệu từ KiotViet'], 500);
+                    }
 
-            } while (count($data['data']) === $pageSize); // Lặp cho đến khi hết dữ liệu
+                    // Kiểm tra xem có dữ liệu không
+                    $employeesData = $response->json()['data'] ?? [];
+                    if (!isset($employeesData) || empty($employeesData)) {
+                        break; // Dừng lại nếu không còn dữ liệu
+                    }
+
+                    foreach ($employeesData as $employeeData) {
+                        Employee::updateOrCreate(
+                            ['kiotviet_id' => $employeeData['id']],
+                            [
+                                'account_code'   => $personalAccessToken->access_token_code,
+                                'user_name'    => $employeeData['userName'],
+                                'given_name'   => $employeeData['givenName'],
+                                'address'      => $employeeData['address'] ?? null,
+                                'mobile_phone' => $employeeData['mobilePhone'] ?? null,
+                                'retailer_id'  => $employeeData['retailerId'],
+                                'created_date' => $employeeData['createdDate'],
+                            ]
+                        );
+                    }
+
+                    // Cập nhật chỉ số để lấy trang tiếp theo
+                    $totalFetched += count($employeesData);
+                    $currentItem += $pageSize;
+
+                } while (count($employeesData) === $pageSize); // Lặp cho đến khi hết dữ liệu
+
+            }
 
             return back()->with(['success' => "Đồng bộ nhân viên thành công! $totalFetched"]);
         }catch (\Exception $exception){

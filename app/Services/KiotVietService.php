@@ -87,6 +87,7 @@ class KiotVietService
         $data_return = [
             'url_connect_token' => 'https://id.kiotviet.vn/connect/token', //Lấy AccessTokens
             'url_branches' => 'https://public.kiotapi.com/branches?', //Lấy danh sách chi nhánh
+            'url_users' => 'https://public.kiotapi.com/users?', // Tài khoản nhân viên
         ];
 
         return $data_return;
