@@ -35,8 +35,9 @@ class SyncController extends HelperAdminController
 
             foreach ($personalAccessTokens as $personalAccessToken){
 
-                $accessToken = $personalAccessToken->access_token;
-                $retailer = $personalAccessToken->retailer;
+                $tokens = $this->kiotVietService->getAccessTokenAllBranches($personalAccessToken->access_token_code);
+                $accessToken = $tokens->access_token;
+                $retailer = $tokens->retailer;
 
                 $pageSize = 100; // Số lượng tối đa mỗi lần gọi API
                 $currentItem = 0; // Bắt đầu từ khách hàng đầu tiên
@@ -54,16 +55,14 @@ class SyncController extends HelperAdminController
                     }
 
                     // Kiểm tra xem có dữ liệu không
-                    $data = $response->json();
-                    if (!isset($data['data']) || empty($data['data'])) {
+                    $branches = $response->json()['data'] ?? [];
+                    if (!isset($branches) || empty($branches)) {
                         break; // Dừng lại nếu không còn dữ liệu
                     }
 
-                    $branches = $response->json()['data'] ?? [];
-
                     foreach ($branches as $branchData) {
                         Branch::updateOrCreate(
-                            ['kiotviet_id' => $branchData['id'], 'account_code' => $personalAccessToken->access_token_code],
+                            ['kiotviet_id' => $branchData['id']],
                             [
                                 'account_code'   => $personalAccessToken->access_token_code,
                                 'branch_name'    => $branchData['branchName'],
@@ -73,17 +72,17 @@ class SyncController extends HelperAdminController
                                 'contact_number' => $branchData['contactNumber'],
                                 'retailer_id'    => $branchData['retailerId'],
                                 'email'          => $branchData['email'] ?? null,
-                                'modified_date'  => @$branchData['modifiedDate'],
-                                'created_date'   => @$branchData['createdDate'],
+                                'modified_date'  => $branchData['modifiedDate'] ?? null,
+                                'created_date'   => $branchData['createdDate'] ?? null,
                             ]
                         );
                     }
 
                     // Cập nhật chỉ số để lấy trang tiếp theo
-                    $totalFetched += count($data['data']);
+                    $totalFetched += count($branches);
                     $currentItem += $pageSize;
 
-                } while (count($data['data']) === $pageSize); // Lặp cho đến khi hết dữ liệu
+                } while (count($branches) === $pageSize); // Lặp cho đến khi hết dữ liệu
 
             }
             return back()->with(['success' => "Đồng bộ chi nhánh thành công! $totalFetched"]);

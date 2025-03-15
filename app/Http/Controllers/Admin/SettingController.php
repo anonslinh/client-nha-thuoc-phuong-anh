@@ -16,8 +16,6 @@ use Illuminate\Support\Str;
 use App\Services\KiotVietService;
 
 use App\Models\PersonalAccessTokens;
-use Carbon\Carbon;
-use Illuminate\Support\Facades\Http;
 
 class SettingController extends SyncController
 {
@@ -212,7 +210,7 @@ class SettingController extends SyncController
 
         try {
             // Gọi API lấy token mới
-            $token = $this->refreshTokenAllBranches(
+            $token = $this->kiotVietService->refreshTokenAllBranches(
                 $validatedData['client_id'],
                 $validatedData['client_secret'],
                 $validatedData['code'],
@@ -251,7 +249,7 @@ class SettingController extends SyncController
 
         try {
             // Gọi API lấy token mới
-            $token = $this->refreshTokenAllBranches(
+            $token = $this->kiotVietService->refreshTokenAllBranches(
                 $validatedData['client_id'],
                 $validatedData['client_secret'],
                 $validatedData['code'],
@@ -282,37 +280,5 @@ class SettingController extends SyncController
         $accountBranch->delete();
 
         return back()->with(['success' => 'Xóa thành công!']);
-    }
-
-    /**
-     * Gọi API lấy token mới
-     */
-    public function refreshTokenAllBranches($clientId, $clientSecret, $access_token_code, $retailer)
-    {
-
-        $response = Http::asForm()->post($this->urlKiotViet['url_connect_token'], [
-            'scopes'       => 'PublicApi.Access',
-            'grant_type'   => 'client_credentials',
-            'client_id'    => $clientId,
-            'client_secret'=> $clientSecret,
-        ]);
-
-        if ($response->failed()) {
-            throw new \Exception('Lỗi khi lấy token từ KiotViet');
-        }
-
-        $data = $response->json();
-        $expiresAt = Carbon::now()->addSeconds($data['expires_in']);
-
-        PersonalAccessTokens::updateOrCreate(
-            ['access_token_code' => $access_token_code],
-            [
-                'access_token' => $data['access_token'],
-                'retailer'     => $retailer,
-                'expires_at'   => $expiresAt
-            ]
-        );
-
-        return $data['access_token'] ?? null;
     }
 }
