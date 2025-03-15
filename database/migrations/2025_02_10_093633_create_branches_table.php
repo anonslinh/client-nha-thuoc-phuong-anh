@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->unsignedBigInteger('kiotviet_id')->unique();
             $table->string('branch_name');
+            $table->string('account_code');
             $table->string('address');
             $table->string('location_name');
             $table->string('ward_name');

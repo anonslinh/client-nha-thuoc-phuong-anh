@@ -5,7 +5,7 @@
             <div class="row align-items-center">
                 <div class="col-12">
                     <div class="d-sm-flex align-items-center justify-space-between">
-                        <h4 class="mb-4 mb-sm-0 card-title">Tài khoản Kiotviet</h4>
+                        <h4 class="mb-4 mb-sm-0 card-title">Thiết lập kết nối API KIOTVIET</h4>
                         <nav aria-label="breadcrumb" class="ms-auto">
                             <ol class="breadcrumb">
                                 <li class="breadcrumb-item d-flex align-items-center">
@@ -19,6 +19,12 @@
                                         Thêm mới
                                     </button>
                                 </li>
+                                <li class="breadcrumb-item" aria-current="page">
+                                    <a class="justify-content-center badge fw-medium fs-2 btn btn-rounded btn-info d-flex align-items-center" target="_blank" href="https://www.kiotviet.vn/huong-dan-su-dung-kiotviet/thiet-lap-nang-cao/thiet-lap-ket-noi-api/">
+                                        <i class="ti ti-send fs-4 me-2"></i>
+                                        Tài liệu hướng dẫn kiotviet
+                                    </a>
+                                </li>
                             </ol>
                         </nav>
                     </div>
@@ -31,11 +37,8 @@
                     <thead>
                     <tr>
                         <th>STT</th>
-                        <th>Tiêu đề</th>
                         <th>Mã</th>
-                        <th>KIOTVIET RETAILER</th>
-                        <th>KIOTVIET CLIENT ID</th>
-                        <th>KIOTVIET SECRET ID</th>
+                        <th>KIOTVIET</th>
                         <th>Thao tác</th>
                     </tr>
                     </thead>
@@ -45,16 +48,14 @@
                             <tr>
                                 <td>{{$key + 1}}</td>
                                 <td>
-                                    <h6>{{$value->name}} </h6>
-                                </td>
-                                <td>
                                     <h6>{{$value->code}} </h6>
+                                    <span>{{$value->name}}</span>
                                 </td>
                                 <td>
-                                    <h6>{{$value->retailer}}</h6>
+                                    <span>Tên kết nối: {{$value->retailer}}</span><br>
+                                    <span>Client Id: {{$value->client_id}}</span><br>
+                                    <span>Mã bảo mật: {{$value->client_secret}}</span>
                                 </td>
-                                <td>{{$value->client_id}}</td>
-                                <td>{{$value->client_secret}}</td>
                                 <td>
                                     <div class="modal fade" id="modalUpdate{{$value->id}}" tabindex="-1" aria-labelledby="exampleModalLabel1">
                                         <div class="modal-dialog" role="document">
@@ -77,15 +78,15 @@
                                                             <input type="text" class="form-control" name="code" value="{{$value->code}}" readonly/>
                                                         </div>
                                                         <div class="mb-3">
-                                                            <label for="title" class="form-label">KIOTVIET RETAILER</label>
+                                                            <label for="title" class="form-label">Tên kết nối</label>
                                                             <input type="text" class="form-control" name="retailer" value="{{$value->retailer}}" required/>
                                                         </div>
                                                         <div class="mb-3">
-                                                            <label for="title" class="form-label">KIOTVIET CLIENT ID</label>
+                                                            <label for="title" class="form-label">Client Id</label>
                                                             <input type="text" class="form-control" name="client_id" value="{{$value->client_id}}" required/>
                                                         </div>
                                                         <div class="mb-3">
-                                                            <label for="title" class="form-label">KIOTVIET CLIENT SECRET</label>
+                                                            <label for="title" class="form-label">Mã bảo mật</label>
                                                             <input type="text" class="form-control" name="client_secret" value="{{$value->client_secret}}" required/>
                                                         </div>
                                                     </div>
@@ -144,18 +145,18 @@
                         </div>
                         <div class="mb-3">
                             <label for="title" class="form-label">Mã(tự đặt không trùng lặp)</label>
-                            <input type="text" class="form-control" name="code" value="{{ old('code') }}" required/>
+                            <input type="text" class="form-control" name="code" value="{{ old('code') }}" required oninput="formatCodeInput(this)"/>
                         </div>
                         <div class="mb-3">
-                            <label for="title" class="form-label">KIOTVIET RETAILER</label>
+                            <label for="title" class="form-label">Tên kết nối</label>
                             <input type="text" class="form-control" name="retailer" value="{{ old('retailer') }}" required/>
                         </div>
                         <div class="mb-3">
-                            <label for="title" class="form-label">KIOTVIET CLIENT ID</label>
+                            <label for="title" class="form-label">Client Id</label>
                             <input type="text" class="form-control" name="client_id" value="{{ old('client_id') }}" required/>
                         </div>
                         <div class="mb-3">
-                            <label for="title" class="form-label">KIOTVIET CLIENT SECRET</label>
+                            <label for="title" class="form-label">Mã bảo mật</label>
                             <input type="text" class="form-control" name="client_secret" value="{{ old('client_secret') }}" required/>
                         </div>
 
@@ -168,4 +169,22 @@
             </div>
         </div>
     </div>
+@endsection
+@section('script')
+    <script>
+        function formatCodeInput(input) {
+            let value = input.value;
+
+            // Loại bỏ dấu tiếng Việt
+            value = value.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+
+            // Loại bỏ ký tự đặc biệt, chỉ giữ chữ cái và số
+            value = value.replace(/[^a-zA-Z0-9]/g, "");
+
+            // Chuyển thành chữ thường
+            value = value.toLowerCase();
+
+            input.value = value;
+        }
+    </script>
 @endsection

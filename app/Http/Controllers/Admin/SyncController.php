@@ -3,7 +3,9 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Models\AccountBranches;
 use App\Models\HistoryPointEvent;
+use App\Models\PersonalAccessTokens;
 use App\Models\ProductsEvent;
 use App\Services\KiotVietService;
 use Illuminate\Support\Facades\Http;
@@ -15,9 +17,11 @@ use App\Models\Customer;
 class SyncController extends HelperAdminController
 {
     protected $kiotVietService;
+    protected $urlKiotViet;
 
     public function __construct(KiotVietService $kiotVietService) {
         $this->kiotVietService = $kiotVietService;
+        $this->urlKiotViet = $kiotVietService->urlKiotviet();
     }
 
     /**
@@ -26,56 +30,62 @@ class SyncController extends HelperAdminController
     public function syncBranches(){
         try{
 
-            $accessToken = $this->kiotVietService->getAccessToken();
-            $retailer = $this->kiotVietService->getRetailer();
-
-            $pageSize = 100; // Số lượng tối đa mỗi lần gọi API
-            $currentItem = 0; // Bắt đầu từ khách hàng đầu tiên
+            $personalAccessTokens = PersonalAccessTokens::all();
             $totalFetched = 0;
 
-            do{
+            foreach ($personalAccessTokens as $personalAccessToken){
 
-                $response = Http::withHeaders([
-                    'Retailer'      => $retailer,
-                    'Authorization' => 'Bearer ' . $accessToken,
-                    'Content-Type'  => 'application/json',
-                ])->get("https://public.kiotapi.com/branches?pageSize=$pageSize&currentItem=$currentItem");
+                $accessToken = $personalAccessToken->access_token;
+                $retailer = $personalAccessToken->retailer;
 
-                if ($response->failed()) {
-                    return response()->json(['error' => 'Không thể lấy dữ liệu từ KiotViet'], 500);
-                }
+                $pageSize = 100; // Số lượng tối đa mỗi lần gọi API
+                $currentItem = 0; // Bắt đầu từ khách hàng đầu tiên
 
-                // Kiểm tra xem có dữ liệu không
-                $data = $response->json();
-                if (!isset($data['data']) || empty($data['data'])) {
-                    break; // Dừng lại nếu không còn dữ liệu
-                }
+                do{
 
-                $branches = $response->json()['data'] ?? [];
+                    $response = Http::withHeaders([
+                        'Retailer'      => $retailer,
+                        'Authorization' => 'Bearer ' . $accessToken,
+                        'Content-Type'  => 'application/json',
+                    ])->get($this->urlKiotViet['url_branches']."pageSize=$pageSize&currentItem=$currentItem");
 
-                foreach ($branches as $branchData) {
-                    Branch::updateOrCreate(
-                        ['kiotviet_id' => $branchData['id']],
-                        [
-                            'branch_name'    => $branchData['branchName'],
-                            'address'        => $branchData['address'],
-                            'location_name'  => $branchData['locationName'],
-                            'ward_name'      => $branchData['wardName'],
-                            'contact_number' => $branchData['contactNumber'],
-                            'retailer_id'    => $branchData['retailerId'],
-                            'email'          => $branchData['email'] ?? null,
-                            'modified_date'  => @$branchData['modifiedDate'],
-                            'created_date'   => @$branchData['createdDate'],
-                        ]
-                    );
-                }
+                    if ($response->failed()) {
+                        return response()->json(['error' => 'Không thể lấy dữ liệu từ KiotViet'], 500);
+                    }
 
-                // Cập nhật chỉ số để lấy trang tiếp theo
-                $totalFetched += count($data['data']);
-                $currentItem += $pageSize;
+                    // Kiểm tra xem có dữ liệu không
+                    $data = $response->json();
+                    if (!isset($data['data']) || empty($data['data'])) {
+                        break; // Dừng lại nếu không còn dữ liệu
+                    }
 
-            } while (count($data['data']) === $pageSize); // Lặp cho đến khi hết dữ liệu
+                    $branches = $response->json()['data'] ?? [];
 
+                    foreach ($branches as $branchData) {
+                        Branch::updateOrCreate(
+                            ['kiotviet_id' => $branchData['id'], 'account_code' => $personalAccessToken->access_token_code],
+                            [
+                                'account_code'   => $personalAccessToken->access_token_code,
+                                'branch_name'    => $branchData['branchName'],
+                                'address'        => $branchData['address'],
+                                'location_name'  => $branchData['locationName'],
+                                'ward_name'      => $branchData['wardName'],
+                                'contact_number' => $branchData['contactNumber'],
+                                'retailer_id'    => $branchData['retailerId'],
+                                'email'          => $branchData['email'] ?? null,
+                                'modified_date'  => @$branchData['modifiedDate'],
+                                'created_date'   => @$branchData['createdDate'],
+                            ]
+                        );
+                    }
+
+                    // Cập nhật chỉ số để lấy trang tiếp theo
+                    $totalFetched += count($data['data']);
+                    $currentItem += $pageSize;
+
+                } while (count($data['data']) === $pageSize); // Lặp cho đến khi hết dữ liệu
+
+            }
             return back()->with(['success' => "Đồng bộ chi nhánh thành công! $totalFetched"]);
 
         }catch (\Exception $exception){

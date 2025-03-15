@@ -10,6 +10,6 @@ class PersonalAccessTokens extends Model
     use HasFactory;
 
     protected $fillable = [
-        'access_token_code', 'access_token', 'expires_at'
+        'access_token_code', 'access_token', 'retailer', 'expires_at'
     ];
 }

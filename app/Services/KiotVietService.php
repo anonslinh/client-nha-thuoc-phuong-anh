@@ -78,4 +78,16 @@ class KiotVietService
             return response()->json(['error' => $exception->getMessage()], 500);
         }
     }
+
+    /**
+     * Danh sách url từ kiotviet
+    */
+    public function urlKiotviet(){
+        $data_return = [
+            'url_connect_token' => 'https://id.kiotviet.vn/connect/token', //Lấy AccessTokens
+            'url_branches' => 'https://public.kiotapi.com/branches?', //Lấy danh sách chi nhánh
+        ];
+
+        return $data_return;
+    }
 }

@@ -13,9 +13,23 @@ use App\Models\SettingGlobal;
 use App\Models\Slogan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use App\Services\KiotVietService;
+
+use App\Models\PersonalAccessTokens;
+use Carbon\Carbon;
+use Illuminate\Support\Facades\Http;
 
 class SettingController extends SyncController
 {
+
+    protected $kiotVietService;
+    protected $urlKiotViet;
+
+    public function __construct(KiotVietService $kiotVietService) {
+        $this->kiotVietService = $kiotVietService;
+        $this->urlKiotViet = $kiotVietService->urlKiotviet();
+    }
+
     /**
      * danh sách nhân viên
     */
@@ -181,19 +195,41 @@ class SettingController extends SyncController
     */
     public function storeAccountBranch(Request $request)
     {
+        // Kiểm tra số lượng account branch không cho vượt quá giới hạn
+        $count = AccountBranches::count();
+        if ($count >= 2) {
+            return back()->with(['error' => 'Chỉ được tạo tối đa 2 tài khoản. Liên hệ để mở thêm!']);
+        }
+
         // Validate dữ liệu đầu vào
         $validatedData = $request->validate([
             'name'          => 'required|string|max:255',
             'code'          => 'required|string|max:255|unique:account_branches,code',
             'retailer'      => 'required|string|max:255',
-            'client_id'     => 'required|string|max:255',
-            'client_secret' => 'required|string|max:255',
+            'client_id'     => 'required|string|max:255|unique:account_branches,client_id',
+            'client_secret' => 'required|string|max:255|unique:account_branches,client_secret',
         ]);
 
-        // Tạo mới dữ liệu
-        AccountBranches::create($validatedData);
+        try {
+            // Gọi API lấy token mới
+            $token = $this->refreshTokenAllBranches(
+                $validatedData['client_id'],
+                $validatedData['client_secret'],
+                $validatedData['code'],
+                $validatedData['retailer']
+            );
 
-        return back()->with(['success' => 'Thêm dữ liệu thành công!']);
+            if (!$token) {
+                return back()->with(['error' => 'Lỗi khi lấy token từ KiotViet']);
+            }
+
+            // Tạo mới dữ liệu
+            AccountBranches::create($validatedData);
+
+            return back()->with(['success' => 'Thêm dữ liệu thành công!']);
+        } catch (\Exception $e) {
+            return back()->with(['error' => 'Lỗi: ' . $e->getMessage()]);
+        }
     }
 
     /**
@@ -204,19 +240,35 @@ class SettingController extends SyncController
         // Validate dữ liệu đầu vào
         $validatedData = $request->validate([
             'name'          => 'required|string|max:255',
-            'code'          => 'required|string|max:255|unique:account_branches,code,' . $id,
-            'retailer'      => 'required|string|max:255',
-            'client_id'     => 'required|string|max:255',
-            'client_secret' => 'required|string|max:255',
+            'code'          => "required|string|max:255|unique:account_branches,code,$id",
+            'retailer'      => "required|string|max:255",
+            'client_id'     => "required|string|max:255|unique:account_branches,client_id,$id",
+            'client_secret' => "required|string|max:255|unique:account_branches,client_secret,$id",
         ]);
 
         // Lấy bản ghi cần cập nhật
         $accountBranch = AccountBranches::findOrFail($id);
 
-        // Cập nhật dữ liệu
-        $accountBranch->update($validatedData);
+        try {
+            // Gọi API lấy token mới
+            $token = $this->refreshTokenAllBranches(
+                $validatedData['client_id'],
+                $validatedData['client_secret'],
+                $validatedData['code'],
+                $validatedData['retailer']
+            );
 
-        return back()->with(['success' => 'Cập nhật thành công!']);
+            if (!$token) {
+                return back()->with(['error' => 'Lỗi khi lấy token từ KiotViet']);
+            }
+
+            // Cập nhật dữ liệu nếu lấy token thành công
+            $accountBranch->update($validatedData);
+
+            return back()->with(['success' => 'Cập nhật thành công!']);
+        } catch (\Exception $e) {
+            return back()->with(['error' => 'Lỗi: ' . $e->getMessage()]);
+        }
     }
 
     /**
@@ -225,10 +277,42 @@ class SettingController extends SyncController
     public function deleteAccountBranch($id)
     {
         $accountBranch = AccountBranches::findOrFail($id);
+        $personalAccessTokens = PersonalAccessTokens::where('access_token_code', $accountBranch->code)->firstOrFail();
+        $personalAccessTokens->delete();
         $accountBranch->delete();
 
         return back()->with(['success' => 'Xóa thành công!']);
     }
 
+    /**
+     * Gọi API lấy token mới
+     */
+    public function refreshTokenAllBranches($clientId, $clientSecret, $access_token_code, $retailer)
+    {
 
+        $response = Http::asForm()->post($this->urlKiotViet['url_connect_token'], [
+            'scopes'       => 'PublicApi.Access',
+            'grant_type'   => 'client_credentials',
+            'client_id'    => $clientId,
+            'client_secret'=> $clientSecret,
+        ]);
+
+        if ($response->failed()) {
+            throw new \Exception('Lỗi khi lấy token từ KiotViet');
+        }
+
+        $data = $response->json();
+        $expiresAt = Carbon::now()->addSeconds($data['expires_in']);
+
+        PersonalAccessTokens::updateOrCreate(
+            ['access_token_code' => $access_token_code],
+            [
+                'access_token' => $data['access_token'],
+                'retailer'     => $retailer,
+                'expires_at'   => $expiresAt
+            ]
+        );
+
+        return $data['access_token'] ?? null;
+    }
 }

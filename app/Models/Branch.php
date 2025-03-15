@@ -12,6 +12,6 @@ class Branch extends Model
     protected $fillable = [
         'kiotviet_id', 'branch_name', 'address', 'location_name',
         'ward_name', 'contact_number', 'retailer_id',
-        'email', 'modified_date', 'created_date'
+        'email', 'modified_date', 'created_date', 'account_code'
     ];
 }
