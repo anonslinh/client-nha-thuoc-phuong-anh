@@ -102,7 +102,7 @@ class HomeController extends HelperApiController
         // Truy vấn danh sách quà tặng
         $gifts = Gift::query();
         if (!empty($customer)){
-            $customerRank = CustomerRank::where('customer_id', $customer->kiotviet_id)->first();
+            $customerRank = CustomerRank::where('contact_number', $request->phone)->first();
             $rankCode = $customerRank->current_rank?? 'than_thiet';
             $rank = MembershipLevel::where('rank', $rankCode)->first();
             if (isset($rank)){

@@ -37,10 +37,8 @@ class InvoicesController extends HelperApiController
                 return response()->json(['status' => false, 'data' => []], 200);
             }
 
-            $customerId = $customer->kiotviet_id; //Bảng invoid thêm contact_number sẽ where theo bảng đó
-
             $data = Invoice::leftJoin('invoice_ratings', 'invoices.kiotviet_id', '=', 'invoice_ratings.kiotviet_invoice_id')
-                ->where('invoices.customer_id', $customerId) //Bảng invoid thêm contact_number sẽ where theo bảng đó
+                ->where('invoices.contact_number', $phone) //Bảng invoid thêm contact_number sẽ where theo bảng đó
                 ->select(
                     'invoices.*',
                     \DB::raw("IF(invoices.created_date < '$cutoffDate' OR invoice_ratings.kiotviet_invoice_id IS NOT NULL, true, false) as is_rated")
