@@ -14,6 +14,8 @@ return new class extends Migration
         Schema::create('invoices', function (Blueprint $table) {
             $table->id();
             $table->bigInteger('kiotviet_id')->unique()->comment('ID hóa đơn từ KiotViet');
+            $table->string('contact_number')->index();
+            $table->string('personal_access_token');
             $table->string('uuid')->unique();
             $table->string('code')->unique();
             $table->dateTime('purchase_date');

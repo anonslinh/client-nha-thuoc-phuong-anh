@@ -13,7 +13,8 @@ class CustomerSpendingSummary extends Model
         'customer_id',
         'month',
         'year',
-        'total_spent'
+        'total_spent',
+        'contact_number'
     ];
 
     /**

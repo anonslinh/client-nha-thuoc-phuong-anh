@@ -214,7 +214,7 @@ class HomeController extends HelperApiController
 
             $phone = $this->normalizePhone($validatedData['phone']);
 
-            $this->syncCustomerInvoices($phone);
+//            $this->syncCustomerInvoices($phone);
 
             $data_return = $this->getMembershipLevel($phone);
             return response()->json([
@@ -262,10 +262,10 @@ class HomeController extends HelperApiController
             }
 
             // Lấy tổng chi tiêu của khách hàng
-            $totalSpent = CustomerSpendingSummary::where('customer_id', $customer->kiotviet_id)->sum('total_spent');
+            $totalSpent = CustomerSpendingSummary::where('contact_number', $phone)->sum('total_spent');
 
             // Lấy hạng thẻ hiện tại
-            $currentRank = CustomerRank::where('customer_id', $customer->kiotviet_id)->first();
+            $currentRank = CustomerRank::where('contact_number', $phone)->first();
 
             // Nếu chưa có hạng, mặc định "Thân Thiết"
             if (!$currentRank) {

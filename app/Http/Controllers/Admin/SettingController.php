@@ -195,8 +195,8 @@ class SettingController extends SyncController
     {
         // Kiểm tra số lượng account branch không cho vượt quá giới hạn
         $count = AccountBranches::count();
-        if ($count >= 2) {
-            return back()->with(['error' => 'Chỉ được tạo tối đa 2 tài khoản. Liên hệ để mở thêm!']);
+        if ($count >= 1) {
+            return back()->with(['error' => 'Chỉ được tạo tối đa 1 tài khoản. Liên hệ để mở thêm!']);
         }
 
         // Validate dữ liệu đầu vào
@@ -235,6 +235,7 @@ class SettingController extends SyncController
     */
     public function updateAccountBranch(Request $request, $id)
     {
+        return back()->with(['error' => 'Không được chỉnh sửa tài khoản khi đang hoạt động! Liên hệ để mở tính năng sửa']);
         // Validate dữ liệu đầu vào
         $validatedData = $request->validate([
             'name'          => 'required|string|max:255',

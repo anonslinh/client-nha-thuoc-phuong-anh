@@ -52,8 +52,8 @@ class GiftExchangesController extends HelperApiController
 
             $phone = $this->normalizePhone($validatedData['phone']);
 
-            // Đồng bộ hóa hóa đơn của khách hàng trước khi tiếp tục
-            $this->syncCustomerInvoices($phone);
+//            // Đồng bộ hóa hóa đơn của khách hàng trước khi tiếp tục
+//            $this->syncCustomerInvoices($phone);
 
 
             // Lấy thông tin khách hàng

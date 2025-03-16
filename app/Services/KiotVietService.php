@@ -88,6 +88,8 @@ class KiotVietService
             'url_connect_token' => 'https://id.kiotviet.vn/connect/token', //Lấy AccessTokens
             'url_branches' => 'https://public.kiotapi.com/branches?', //Lấy danh sách chi nhánh
             'url_users' => 'https://public.kiotapi.com/users?', // Tài khoản nhân viên
+            'url_customers' => 'https://public.kiotapi.com/customers?', //Khách hàng
+            'url_invoices' => 'https://public.kiotapi.com/invoices?', //Danh sách hoá đơn
         ];
 
         return $data_return;
