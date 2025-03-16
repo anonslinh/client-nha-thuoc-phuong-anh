@@ -73,6 +73,16 @@ class HelperApiController extends Controller
 
             foreach ($personalAccessTokens as $personalAccessToken){
 
+//                //Hard code du lieu test
+//                if ($personalAccessToken->access_token_code == 'hmvietnam'){
+//                    $phone = '0963119570';
+//                }elseif ($personalAccessToken->access_token_code == 'hethongbabychipchip'){
+//                    $phone = '0982375649';
+//                }
+//                else{
+//                    $phone = '0981163959';
+//                }
+
                 $tokens = $this->kiotVietService->getAccessTokenAllBranches($personalAccessToken->access_token_code);
                 $accessToken = $tokens->access_token;
                 $retailer = $tokens->retailer;
@@ -110,6 +120,7 @@ class HelperApiController extends Controller
     */
     public function customerSyncLogs($customer, $personalAccessToken){
 
+//        $customer['contactNumber'] = '0981163959';//Hard code du lieu test
         CustomerSyncLog::updateOrCreate(
             ['phone' => $customer['contactNumber'], 'personal_access_token' => $personalAccessToken->access_token_code],
             [
@@ -154,6 +165,7 @@ class HelperApiController extends Controller
             // Điểm thực tế = điểm từ KiotViet - điểm đã dùng + điểm thưởng từ đánh giá
             $actualRewardPoint = max($rewardPoint - $usedPoints , 0);
 
+//            $customer['contactNumber'] = '0981163959'; //Hard code du lieu test
             Customer::updateOrCreate(
                 ['kiotviet_id' => $customer['id']],
                 [
