@@ -51,7 +51,7 @@ class SyncController extends HelperAdminController
                     ])->get($this->urlKiotViet['url_branches']."pageSize=$pageSize&currentItem=$currentItem");
 
                     if ($response->failed()) {
-                        return response()->json(['error' => 'Không thể lấy dữ liệu từ KiotViet'], 500);
+                        return back()->with(['error' => 'Không thể lấy dữ liệu từ KiotViet']);
                     }
 
                     // Kiểm tra xem có dữ liệu không
@@ -117,7 +117,7 @@ class SyncController extends HelperAdminController
                     ])->get($this->urlKiotViet['url_users']."pageSize=$pageSize&currentItem=$currentItem");
 
                     if ($response->failed()) {
-                        return response()->json(['error' => 'Không thể lấy dữ liệu từ KiotViet'], 500);
+                        return back()->with(['error' => 'Không thể lấy dữ liệu từ KiotViet']);
                     }
 
                     // Kiểm tra xem có dữ liệu không

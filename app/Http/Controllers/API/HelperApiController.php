@@ -212,8 +212,8 @@ class HelperApiController extends Controller
                 }])
                 ->get();
 
-            $firstDayOfYear = Carbon::now()->startOfYear()->toDateString(); // Ngày đầu tiên của năm
-            $lastDayOfYear = Carbon::now()->endOfYear()->toDateString(); // Ngày cuối cùng của năm
+            $lastDayOfYear = Carbon::now()->addDay()->toDateString(); // Ngày hôm nay + 1 ngày
+            $firstDayOfYear = Carbon::now()->subYear()->addDay()->toDateString(); // Ngày hôm nay - 1 năm + 1 ngày
 
             foreach ($customerSyncLogs as $customerSyncLog){
                 $pageSize = 100;

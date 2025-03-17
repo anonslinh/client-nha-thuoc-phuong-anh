@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\DB;
 
 class EventsController extends SyncController
 {
-    public function getDataCustomer (Request $request)
+    public function getDataCustomer (Request $request, HelperApiController $helperApiController)
     {
         $events = EventsModel::whereDate('time_start', '<=', Carbon::now())->whereDate('time_end', '>=', Carbon::now())->get();
         $customerID = null;
@@ -31,8 +31,8 @@ class EventsController extends SyncController
                 'phone.regex' => 'Số điện thoại không hợp lệ.',
             ]);
 
-            $phone = $this->normalizePhone($validatedData['phone']);
-            $this->syncCustomerInvoices($phone);
+            $phone = $helperApiController->normalizePhone($validatedData['phone']);
+            $helperApiController->syncCustomerInvoices($phone);
             $customer = Customer::where('contact_number', $phone)->first();
             if (!empty($events) && !empty($customer)){
                 foreach ($events as $value){
