@@ -31,7 +31,7 @@ class HelperApiController extends Controller
     /**
      * Chuẩn hóa số điện thoại: Chuyển '84xxxxxxxxx' thành '0xxxxxxxxx'
      */
-    protected function normalizePhone($phone)
+    public function normalizePhone($phone)
     {
         return preg_replace('/^84/', '0', $phone);
     }
@@ -212,6 +212,9 @@ class HelperApiController extends Controller
                 }])
                 ->get();
 
+            $firstDayOfYear = Carbon::now()->startOfYear()->toDateString(); // Ngày đầu tiên của năm
+            $lastDayOfYear = Carbon::now()->endOfYear()->toDateString(); // Ngày cuối cùng của năm
+
             foreach ($customerSyncLogs as $customerSyncLog){
                 $pageSize = 100;
                 $currentItem = 0;
@@ -225,7 +228,8 @@ class HelperApiController extends Controller
                         'Retailer'      => $retailer,
                         'Authorization' => 'Bearer ' . $accessToken,
                         'Content-Type'  => 'application/json',
-                    ])->get($this->urlKiotViet['url_invoices']."customerIds=$customerId&status=1&orderDirection=Desc&pageSize=$pageSize&currentItem=$currentItem");
+                    ])->get($this->urlKiotViet['url_invoices']."customerIds=$customerId&status=1&orderDirection=Desc&pageSize=$pageSize
+                    &currentItem=$currentItem&fromPurchaseDate=$firstDayOfYear&toPurchaseDate=$lastDayOfYear");
 
                     $invoicesData = $response->json()['data'] ?? [];
 
