@@ -212,36 +212,57 @@ class HelperApiController extends Controller
                 }])
                 ->get();
 
+            foreach ($customerSyncLogs as $customerSyncLog){
+
+                $invoicesData = $this->getInvoicesDataKiotViet($customerSyncLog);
+                $this->storeInvoices($invoicesData, $customerSyncLog, $firstCustomer);
+            }
+        }catch (\Exception $exception){
+            \Log::error('Lỗi xảy ra: ' . $exception->getMessage(), [
+                'file' => $exception->getFile(),
+                'line' => $exception->getLine(),
+            ]);
+        }
+    }
+
+    /**
+     * Lấy dữ liệu hoá đơn của khách hàng theo từng tài khoản kiotviet;
+    */
+    public function getInvoicesDataKiotViet($customerSyncLog){
+        try{
             $lastDayOfYear = Carbon::now()->addDay()->toDateString(); // Ngày hôm nay + 1 ngày
             $firstDayOfYear = Carbon::now()->subYear()->addDay()->toDateString(); // Ngày hôm nay - 1 năm + 1 ngày
 
-            foreach ($customerSyncLogs as $customerSyncLog){
-                $pageSize = 100;
-                $currentItem = 0;
-                $tokens = $this->kiotVietService->getAccessTokenAllBranches($customerSyncLog->personal_access_token);
-                $accessToken = $tokens->access_token;
-                $retailer = $tokens->retailer;
-                $customerId = $customerSyncLog->kiotviet_id;
+            $pageSize = 100;
+            $currentItem = 0;
+            $tokens = $this->kiotVietService->getAccessTokenAllBranches($customerSyncLog->personal_access_token);
+            $accessToken = $tokens->access_token;
+            $retailer = $tokens->retailer;
+            $customerId = $customerSyncLog->kiotviet_id;
+            $allInvoices = [];
 
-                do {
-                    $response = Http::withHeaders([
-                        'Retailer'      => $retailer,
-                        'Authorization' => 'Bearer ' . $accessToken,
-                        'Content-Type'  => 'application/json',
-                    ])->get($this->urlKiotViet['url_invoices']."customerIds=$customerId&status=1&orderDirection=Desc&pageSize=$pageSize
+            do {
+                $response = Http::withHeaders([
+                    'Retailer'      => $retailer,
+                    'Authorization' => 'Bearer ' . $accessToken,
+                    'Content-Type'  => 'application/json',
+                ])->get($this->urlKiotViet['url_invoices']."customerIds=$customerId&status=1&orderDirection=Desc&pageSize=$pageSize
                     &currentItem=$currentItem&fromPurchaseDate=$firstDayOfYear&toPurchaseDate=$lastDayOfYear");
 
-                    $invoicesData = $response->json()['data'] ?? [];
+                $invoicesData = $response->json()['data'] ?? [];
 
-                    if (empty($invoicesData)) {
-                        break;
-                    }
+                if (empty($invoicesData)) {
+                    break;
+                }
 
-                    $this->storeInvoices($invoicesData, $customerSyncLog, $firstCustomer);
+                if (!empty($invoicesData)){
+                    $allInvoices = array_merge($allInvoices, $invoicesData);
+                }
 
-                    $currentItem += $pageSize;
-                } while (count($invoicesData) === $pageSize);
-            }
+                $currentItem += $pageSize;
+            } while (count($invoicesData) === $pageSize);
+
+            return $allInvoices;
         }catch (\Exception $exception){
             \Log::error('Lỗi xảy ra: ' . $exception->getMessage(), [
                 'file' => $exception->getFile(),

@@ -14,6 +14,7 @@ Route::get('gifts', [HomeController::class, 'getGifts']);
 Route::get('programs', [HomeController::class, 'getPrograms']);
 Route::get('promotions', [HomeController::class, 'getPromotions']);
 Route::get('invoices', [InvoicesController::class, 'getInvoices']);
+Route::get('today-invoices', [InvoicesController::class, 'getTodayInvoices']);
 Route::post('invoice-rating', [InvoicesController::class, 'invoiceRating']);
 Route::get('membership-info', [HomeController::class, 'getMembershipInfo']);
 Route::get('vouchers', [HomeController::class, 'getVouchers']);

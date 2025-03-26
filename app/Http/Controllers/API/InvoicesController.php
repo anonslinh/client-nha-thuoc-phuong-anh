@@ -31,9 +31,7 @@ class InvoicesController extends HelperApiController
 
             $phone = $request->input('phone');
 
-            $customer = Customer::where('contact_number', $phone)->first();
-
-            if (!$phone || empty($customer)) {
+            if (!$phone || !Invoice::where('contact_number', $phone)->exists()) {
                 return response()->json(['status' => false, 'data' => []], 200);
             }
 
@@ -48,7 +46,40 @@ class InvoicesController extends HelperApiController
 
             return response()->json(['status' => true, 'data' => $data]);
         }catch (\Exception $exception){
+            \Log::error('Lỗi khi lấy hóa đơn: ' . $exception->getMessage());
             return response()->json(['error' => $exception->getMessage()], 200);
+        }
+    }
+
+    /**
+     * Hoá đơn trong ngày hôm nay và chưa đánh giá hoá đơn
+    */
+    public function getTodayInvoices(Request $request)
+    {
+        try {
+            $today = now()->format('Y-m-d');
+            $perPage = $request->input('per_page', 10);
+            $phone = $request->input('phone');
+
+            if (!$phone || !Invoice::where('contact_number', $phone)->exists()) {
+                return response()->json(['status' => false, 'data' => []], 200);
+            }
+
+            $data = Invoice::leftJoin('invoice_ratings', 'invoices.kiotviet_id', '=', 'invoice_ratings.kiotviet_invoice_id')
+                ->where('invoices.contact_number', $phone) //Bảng invoid thêm contact_number sẽ where theo bảng đó
+                ->whereDate('invoices.created_date', $today)
+                ->whereNull('invoice_ratings.kiotviet_invoice_id') // Chỉ lấy hóa đơn chưa đánh giá
+                ->select(
+                    'invoices.*',
+                    \DB::raw("false as is_rated")
+                )
+                ->with('details')
+                ->paginate($perPage);
+
+            return response()->json(['status' => true, 'data' => $data]);
+        } catch (\Exception $exception) {
+            \Log::error('Lỗi khi lấy hóa đơn hôm nay: ' . $exception->getMessage());
+            return response()->json(['status' => false, 'message' => 'Đã xảy ra lỗi, vui lòng thử lại.'], 500);
         }
     }
 
