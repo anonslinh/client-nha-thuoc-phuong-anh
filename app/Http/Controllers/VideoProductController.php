@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\VideoYoutube;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 
 class VideoProductController extends Controller
 {
@@ -67,5 +68,13 @@ class VideoProductController extends Controller
         $video->is_active = $active;
         $video->save();
         return back()->with(['success' => 'Cập nhật video thành công']);
+    }
+    /**
+     * API lấy id video
+    **/
+    public function idVideoApi (Request $request)
+    {
+        $listVideo = VideoYoutube::where('is_active', 1)->orderBy('index', 'asc')->paginate(20);
+        return response()->json(['status' => true, 'data' => $listVideo], Response::HTTP_OK);
     }
 }
