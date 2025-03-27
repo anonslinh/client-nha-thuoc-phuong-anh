@@ -306,7 +306,7 @@ class SyncController extends HelperAdminController
     /**
      * Lấy danh sách nhóm hàng
      **/
-    public function getCategories ()
+    public function getCategories ($currentItem = 0)
     {
         $token = $this->kiotVietService->getAccessToken();
         $endpoint = 'https://public.kiotapi.com/categories';
@@ -316,9 +316,10 @@ class SyncController extends HelperAdminController
             'Authorization' => 'Bearer ' . $token,
         ])->get($endpoint,[
             'pageSize' => $pageSize,
+            'currentItem' => $currentItem
         ]);
         $categories  = $response->json();
-        $categories = collect($categories['data']);
+//        $categories = collect($categories['data']);
         return $categories;
     }
     /**
