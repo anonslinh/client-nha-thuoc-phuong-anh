@@ -7,6 +7,7 @@ use App\Http\Controllers\API\GiftExchangesController;
 use App\Http\Controllers\API\VoucherExchangesController;
 use App\Http\Controllers\API\EventsController;
 use App\Http\Controllers\API\SettingGlobalController;
+use App\Http\Controllers\VideoProductController;
 
 Route::post('reward-point', [HomeController::class, 'rewardPointCustomer']);
 Route::get('banners', [HomeController::class, 'getBanners']);
@@ -49,3 +50,6 @@ Route::prefix('follow')->group(function (){
     Route::post('', [SettingGlobalController::class, 'storeFollow']);
     Route::post('check-follow', [SettingGlobalController::class, 'checkFollow']);
 });
+
+// Video Product
+Route::get('id-video', [VideoProductController::class, 'idVideoApi']);
