@@ -86,6 +86,11 @@ return [
                 'name' => 'Video sản phẩm',
                 'icon' => 'solar:video-frame-play-horizontal-bold',
                 'route' => 'product.video'
+            ],
+            [
+                'name' => 'Mua là có quà',
+                'icon' => 'solar:gift-broken',
+                'route' => 'product.gift.index'
             ]
         ]
     ],

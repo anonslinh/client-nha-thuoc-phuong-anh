@@ -197,5 +197,15 @@ Route::middleware([CheckLogin::class])->group(function (){
        Route::post('store', [VideoProductController::class, 'store'])->name('store-video');
        Route::get('delete/{id}', [VideoProductController::class, 'delete'])->name('video.delete');
        Route::post('update/{id}', [VideoProductController::class, 'update'])->name('video.update');
+       // Cài đặt sản phẩm và quà
+       Route::prefix('gift')->name('gift.')->group(function (){
+            Route::get('', [VideoProductController::class, 'giftProduct'])->name('index');
+            Route::get('create', [VideoProductController::class, 'createProduct'])->name('create');
+            Route::post('store', [VideoProductController::class, 'storeProduct'])->name('store');
+            Route::get('detail/{id}', [VideoProductController::class, 'detailProduct'])->name('detail');
+            Route::post('update/{id}', [VideoProductController::class, 'updateProduct'])->name('update');
+            Route::get('list-gift/{id}', [VideoProductController::class, 'listGift'])->name('list-gift');
+            Route::get('delete/{id}', [VideoProductController::class, 'deleteProduct'])->name('delete');
+       });
     });
 });
