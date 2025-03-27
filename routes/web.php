@@ -13,6 +13,7 @@ use App\Http\Controllers\Admin\EmployeeController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\SettingAIAgentsController;
 use App\Http\Controllers\LoginZaloController;
+use App\Http\Controllers\Admin\DealController;
 
 Route::get('login', [LoginController::class, 'login'])->name('login');
 Route::get('authentication-forgot-password', [LoginController::class, 'forgotPassword'])->name('authentication-forgot-password');
@@ -175,5 +176,18 @@ Route::middleware([CheckLogin::class])->group(function (){
         //Test form mail tự động
         Route::get('test-mail-invoice/{id}', [SettingAIAgentsController::class, 'testMailInvoice'])->name('test-mail-invoice');
         Route::get('test-mail-employee-kpi', [SettingAIAgentsController::class, 'sendMailKpiEmployee'])->name('test-mail-employee-kpi');
+    });
+
+    //Deal chớp nhoáng
+    Route::prefix('deal')->name('deal.')->group(function (){
+        //Deal
+        Route::get('index-deal', [DealController::class, 'indexDeal'])->name('index-deal');
+        Route::post('store-deal', [DealController::class, 'storeDeal'])->name('store-deal');
+        Route::get('delete-deal/{id}', [DealController::class, 'destroyDeal'])->name('delete-deal');
+        Route::post('update-deal/{id}', [DealController::class, 'updateDeal'])->name('update-deal');
+
+        //Sản phẩm trong deal
+        Route::get('index-product-deal/{deal_id}', [DealController::class, 'indexDealProduct'])->name('index-product-deal');
+        Route::get('created-product-deal/{deal_id}', [DealController::class, 'indexDeal'])->name('created-product-deal/{deal_id}');
     });
 });

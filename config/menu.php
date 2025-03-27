@@ -38,43 +38,13 @@ return [
         ]
     ],
     [
-        'name' => 'Sự kiện',
-        'icon' => 'solar:widget-6-line-duotone',
+        'name' => 'Deal chớp nhoáng',
+        'icon' => 'solar:settings-linear',
         'submenu' => [
             [
                 'name' => 'Danh sách',
-                'icon' => 'solar:waterdrops-line-duotone',
-                'route' => 'events.list-data'
-            ],
-//            [
-//                'name' => 'Tạo sự kiện',
-//                'icon' => 'solar:tag-horizontal-line-duotone',
-//                'route' => 'events.create'
-//            ],
-            [
-                'name' => 'Sản phẩm',
-                'icon' => 'solar:waterdrops-line-duotone',
-                'route' => 'events.list-product'
-            ],
-            [
-                'name' => 'DS Khách Hàng',
-                'icon' => 'solar:waterdrops-line-duotone',
-                'route' => 'events.list-customer'
-            ],
-            [
-                'name' => 'Lịch sử điểm',
-                'icon' => 'solar:waterdrops-line-duotone',
-                'route' => 'events.history-point'
-            ],
-            [
-                'name' => 'Danh sách quà tặng',
-                'icon' => 'solar:waterdrops-line-duotone',
-                'route' => 'events.list-gift'
-            ],
-            [
-                'name' => 'Lịch sử đổi quà',
-                'icon' => 'solar:waterdrops-line-duotone',
-                'route' => 'events.history-exchange-gift'
+                'icon' => 'solar:calendar-mark-line-duotone',
+                'route' => 'deal.index-deal'
             ]
         ]
     ],
