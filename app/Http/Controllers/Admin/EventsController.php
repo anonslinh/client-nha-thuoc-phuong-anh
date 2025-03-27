@@ -162,6 +162,17 @@ class EventsController extends SyncController
             $value['check'] = ProductsEvent::where('events_id', $id)->where('product_id', $value['id'])->exists();
         }
         $categories = $this->getCategories();
+        $dataCategoryNew = [];
+        if ($categories['total'] > $categories['pageSize']){
+            $numberItem = $categories['total'] / $categories['pageSize'];
+            $page = explode('.', $numberItem);
+            for ($i = 1; $i <= $page[0]; $i++){
+                $currentItemCategory = $categories['pageSize'] * $i;
+                $categoriesNew = $this->getCategories($currentItemCategory);
+                $dataCategoryNew = $categoriesNew['data'];
+            }
+        }
+        $categories = array_merge($categories['data'], $dataCategoryNew);
         return view('events.product-kiotviet', compact('paginator', 'categories', 'events'));
     }
     /**

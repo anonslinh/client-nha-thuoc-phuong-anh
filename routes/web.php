@@ -14,6 +14,7 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\SettingAIAgentsController;
 use App\Http\Controllers\LoginZaloController;
 use App\Http\Controllers\Admin\DealController;
+use App\Http\Controllers\VideoProductController;
 
 Route::get('login', [LoginController::class, 'login'])->name('login');
 Route::get('authentication-forgot-password', [LoginController::class, 'forgotPassword'])->name('authentication-forgot-password');
@@ -189,5 +190,12 @@ Route::middleware([CheckLogin::class])->group(function (){
         //Sản phẩm trong deal
         Route::get('index-product-deal/{deal_id}', [DealController::class, 'indexDealProduct'])->name('index-product-deal');
         Route::get('created-product-deal/{deal_id}', [DealController::class, 'indexDeal'])->name('created-product-deal/{deal_id}');
+    });
+    // Video sản phẩm
+    Route::prefix('product')->name('product.')->group(function (){
+       Route::get('video', [VideoProductController::class, 'video'])->name('video');
+       Route::post('store', [VideoProductController::class, 'store'])->name('store-video');
+       Route::get('delete/{id}', [VideoProductController::class, 'delete'])->name('video.delete');
+       Route::post('update/{id}', [VideoProductController::class, 'update'])->name('video.update');
     });
 });

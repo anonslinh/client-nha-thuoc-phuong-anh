@@ -81,6 +81,11 @@ return [
                 'name' => 'Cài đặt quà tặng',
                 'icon' => 'solar:gift-broken',
                 'route' => 'gift.index'
+            ],
+            [
+                'name' => 'Video sản phẩm',
+                'icon' => 'solar:video-frame-play-horizontal-bold',
+                'route' => 'product.video'
             ]
         ]
     ],

@@ -1,4 +1,12 @@
 @extends('Layout.index')
+@section('style')
+    <link rel="stylesheet" href="assets/libs/select2/dist/css/select2.min.css">
+    <style>
+        body .select2-container--classic .select2-selection--single, body .select2-container--default .select2-selection--multiple, body .select2-container--default .select2-selection--single{
+            border-radius: inherit !important;
+        }
+    </style>
+@endsection
 @section('content')
     <div class="container-fluid">
         <div class="card w-100">
@@ -8,13 +16,13 @@
             <div class="card-header">
                 <p class="fw-bolder">Cài đặt sản phẩm theo nhóm hàng</p>
                 <form action="" id="addProduct" class="d-flex align-items-center">
-                    <select class="form-control" name="categoryID" required style="border-radius: inherit;max-width: 250px;margin-right: 15px">
-                        <option value="">Nhóm hàng</option>
+                    <select class="select2 form-control" name="categoryID" required style="border-radius: inherit;max-width: 250px;">
+                        <option>Nhóm hàng</option>
                         @foreach($categories as $item)
-                            <option value="{{$item['categoryId']}}" @if(request()->get('id_category') == $item['categoryId']) selected @endif>{{$item['categoryName']}}</option>
+                            <option value="{{$item['categoryId']}}">{{$item['categoryName']}}</option>
                         @endforeach
                     </select>
-                    <input name="point_category" class="form-control" required type="number" style="max-width: 200px;margin-right: 15px" placeholder="Số điểm">
+                    <input name="point_category" class="form-control" required type="number" style="max-width: 200px;margin:0 15px" placeholder="Số điểm">
                     <button class="btn btn-primary">Cài đặt</button>
                 </form>
             </div>
@@ -22,13 +30,13 @@
                 <div class="d-flex justify-content-end align-items-center">
                     <input name="events_id" value="{{$events->id}}" hidden>
                     <form action="{{route('events.add-product',$events->id)}}" class="d-flex justify-content-end align-items-center w-75">
-                        <select class="form-control" name="id_category" style="border-radius: inherit;max-width: 250px;margin-right: 15px">
+                        <select class="form-control select2" name="id_category" style="border-radius: inherit;max-width: 250px;">
                             <option value="">Nhóm hàng</option>
                             @foreach($categories as $item)
                                 <option value="{{$item['categoryId']}}" @if(request()->get('id_category') == $item['categoryId']) selected @endif>{{$item['categoryName']}}</option>
                             @endforeach
                         </select>
-                        <input class="form-control" style="border-radius: inherit;max-width: 250px;margin-right: 15px" value="{{request()->get('key_search')}}"
+                        <input class="form-control" style="border-radius: inherit;max-width: 250px;margin: 0 15px" value="{{request()->get('key_search')}}"
                                placeholder="Tìm kiếm..." name="key_search">
                         <button class="btn btn-outline-success" style="border-radius: inherit;margin-right: 15px">Tìm kiếm</button>
                         <a href="{{route('events.add-product',$events->id)}}" style="border-radius: inherit" class="btn btn-outline-danger">Hủy</a>
@@ -89,6 +97,9 @@
     </div>
 @endsection
 @section('script')
+    <script src="assets/libs/select2/dist/js/select2.full.min.js"></script>
+    <script src="assets/libs/select2/dist/js/select2.min.js"></script>
+    <script src="assets/js/forms/select2.init.js"></script>
     <script>
         $(document).ready(function () {
             $(".btn-add-product").click(function () {
