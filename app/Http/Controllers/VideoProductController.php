@@ -78,7 +78,7 @@ class VideoProductController extends Controller
     **/
     public function idVideoApi (Request $request)
     {
-        $listVideo = VideoYoutube::where('is_active', 1)->orderBy('index', 'asc')->paginate(20);
+        $listVideo = VideoYoutube::where('is_active', 1)->orderBy('index', 'asc')->paginate(5);
         return response()->json(['status' => true, 'data' => $listVideo], Response::HTTP_OK);
     }
     /**
@@ -238,5 +238,108 @@ class VideoProductController extends Controller
         }
         $product->delete();
         return back()->with(['success' => 'Xóa sản phẩm thành công']);
+    }
+
+    /**
+     * API mua là có quà
+    **/
+    /**
+     * Danh sách sản phẩm ngoài trang chủ
+    **/
+    public function homeAPI (){
+        $listProduct = ProductsModel::where('is_active', 1)->inrandomOrder()->limit(20)->get();
+        foreach ($listProduct as $value){
+            $value['image'] = json_decode($value->image);
+            $listGift = ProductGiftModel::join('gifts', 'gifts.id', '=','product_gift.gifts_id')->select('gifts.*')
+                ->where('product_gift.products_id', $value->id)->get();
+            $value['list_gift'] = $listGift;
+        }
+        return \response()->json(['status' => true, 'data' => $listProduct], Response::HTTP_OK);
+    }
+    /**
+     * Lấy danh mục winxu
+    **/
+    public function categoryPoint ()
+    {
+        $points = Gift::orderBy("points_required", 'asc')->pluck('points_required')->toArray();
+        $dataReturn = [];
+        foreach ($points as $point){
+            $item = [];
+            $item['point'] = $point;
+            $item['name'] = $point. ' Winxu';
+            $dataReturn[] = $item;
+        }
+        return \response()->json(['status' => true, 'data' => $dataReturn], Response::HTTP_OK);
+    }
+    /**
+     * Danh sách sản phẩm
+    **/
+    public function listProduct (Request $request)
+    {
+        $listProduct = ProductsModel::query();
+        if (isset($request->point)){
+            $listProduct = $listProduct->where('point', $request->get('point'));
+        }
+        $listProduct = $listProduct->where('is_active', 1)->paginate(20);
+        foreach ($listProduct as $value){
+            $value['image'] = json_decode($value->image);
+            $listGift = ProductGiftModel::join('gifts', 'gifts.id', '=','product_gift.gifts_id')->select('gifts.*')
+                ->where('product_gift.products_id', $value->id)->get();
+            $value['list_gift'] = $listGift;
+        }
+        return \response()->json(['status' => true, 'data' => $listProduct], Response::HTTP_OK);
+    }
+    /**
+     * Chi tiết sản phẩm API
+    **/
+    public function detailProductAPI (Request $request)
+    {
+        $product = ProductsModel::find($request->get('product_id'));
+        if (empty($product)){
+            return \response()->json(['status' => false, 'msg' => 'Sản phẩm không tồn tại'], Response::HTTP_BAD_REQUEST);
+        }
+        $giftID = ProductGiftModel::where('products_id', $request->get('product_id'))->pluck('gifts_id')->toArray();
+        $listGift = Gift::whereIn('id', $giftID)->where('is_display', 1)->limit(10)->get();
+        $similarProducts = ProductsModel::whereNot('id', $request->get('product_id'))->where('point', $product->point)->limit(10)->get();
+        foreach ($similarProducts as $value){
+            $value['image'] = json_decode($value->image);
+        }
+        $product['image'] = json_decode($product->image);
+        return \response()->json(['status' => true, 'data' => [
+            'product' => $product,
+            'list_gift' => $listGift,
+            'similar_products' => $similarProducts
+        ]], Response::HTTP_OK);
+    }
+    /**
+     * Danh sách quà tặng
+    **/
+    public function listGiftAPI (Request $request)
+    {
+        $listGift = Gift::query();
+        if (isset($request->point)){
+            $listGift = $listGift->where('points_required', $request->get('point'));
+        }
+        $listGift = $listGift->where('is_display', 1)->paginate(20);
+        return \response()->json(['status' => true, 'data' => $listGift], Response::HTTP_OK);
+    }
+    /**
+     * Chi tiết quà tặng
+    **/
+    public function detailGift (Request $request)
+    {
+        $gift = Gift::find($request->get('gift_id'));
+        if (empty($gift)){
+            return \response()->json(['status' => false, 'msg' => 'Quà tặng không tồn tại'], Response::HTTP_BAD_REQUEST);
+        }
+        $productID = ProductGiftModel::where('gifts_id', $gift->id)->pluck('products_id')->toArray();
+        $listProduct = ProductsModel::whereIn('id', $productID)->where('is_active', 1)->limit(10)->get();
+        foreach ($listProduct as $value){
+            $value['image'] = json_decode($value->id);
+        }
+        return \response()->json(['status' => true, 'data' => [
+            'gift' => $gift,
+            'list_product' => $listProduct
+        ]], Response::HTTP_OK);
     }
 }

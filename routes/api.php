@@ -53,3 +53,12 @@ Route::prefix('follow')->group(function (){
 
 // Video Product
 Route::get('id-video', [VideoProductController::class, 'idVideoApi']);
+// Mua là có quà
+Route::prefix('product-gift')->group(function (){
+   Route::get('home', [VideoProductController::class, 'homeAPI']);
+   Route::get('category-point', [VideoProductController::class, 'categoryPoint']);
+   Route::get('list-product', [VideoProductController::class, 'listProduct']);
+   Route::post('detail-product', [VideoProductController::class, 'detailProductAPI']);
+   Route::get('list-gift', [VideoProductController::class, 'listGiftAPI']);
+   Route::get('detail-gift', [VideoProductController::class, 'detailGift']);
+});

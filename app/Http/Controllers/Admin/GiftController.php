@@ -7,6 +7,8 @@ use App\Models\Branch;
 use App\Models\Gift;
 use App\Models\GiftInventories;
 use App\Models\MembershipLevel;
+use App\Models\ProductGiftModel;
+use App\Models\ProductsModel;
 use App\Models\Program;
 use App\Models\Promotion;
 use Dflydev\DotAccessData\Data;
@@ -94,6 +96,14 @@ class GiftController
                     $quantityGift->save();
                 }
             }
+            $listProduct = ProductsModel::where('point', $gift['points_required'])->get();
+            foreach ($listProduct as $value){
+                $productGift = new ProductGiftModel([
+                    'products_id' => $value->id,
+                    'gifts_id' => $gift['id']
+                ]);
+                $productGift->save();
+            }
             return redirect()->route('gift.index')->with(['success' => 'Thêm quà tặng thành công']);
         }catch (\Exception $exception){
             dd($exception->getMessage());
@@ -145,6 +155,15 @@ class GiftController
                 ]);
                 $quantityGift->save();
             }
+        }
+        ProductGiftModel::where('gifts_id', $id)->delete();
+        $listProduct = ProductsModel::where('point', $gift['points_required'])->get();
+        foreach ($listProduct as $value){
+            $productGift = new ProductGiftModel([
+                'products_id' => $value->id,
+                'gifts_id' => $id
+            ]);
+            $productGift->save();
         }
         return back()->with(['success' => 'Cập nhật dữ liệu thành công']);
     }
