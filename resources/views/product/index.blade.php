@@ -6,7 +6,7 @@
                 <div class="d-flex justify-content-between align-items-center">
                     <h4 class="mb-4 mb-sm-0 card-title">Mua là có quà </h4>
                     @if(count($point))
-                        <a href="{{route('product.gift.create')}}" class="justify-content-center badge fw-medium fs-2 btn btn-rounded btn-info d-flex align-items-center">
+                        <a href="{{route('events.product.create')}}" class="justify-content-center badge fw-medium fs-2 btn btn-rounded btn-info d-flex align-items-center">
                             <i class="ti ti-send fs-4 me-2"></i>
                             Thêm mới
                         </a>
@@ -20,8 +20,8 @@
             </div>
             <div class="card-body">
                 <div class="d-flex justify-content-end align-items-center">
-                    <form action="{{route('product.gift.index')}}" class="d-flex justify-content-end align-items-center w-75">
-                        <select class="form-control" name="events_id" style="border-radius: inherit;max-width: 250px;margin-right: 15px">
+                    <form action="{{route('events.list-product')}}" class="d-flex justify-content-end align-items-center w-75">
+                        <select class="form-control" name="point" style="border-radius: inherit;max-width: 250px;margin-right: 15px">
                             <option value="">Tất cả</option>
                             @foreach($point as $item)
                                 <option value="{{$item}}" @if(request()->get('point') == $item) selected @endif>SP tích {{$item}} điểm</option>
@@ -30,7 +30,7 @@
                         <input class="form-control" style="border-radius: inherit;max-width: 250px;margin-right: 15px" value="{{request()->get('key_search')}}"
                                placeholder="Tìm kiếm..." name="key_search">
                         <button class="btn btn-outline-success" style="border-radius: inherit;margin-right: 15px">Tìm kiếm</button>
-                        <a href="{{route('product.gift.index')}}" style="border-radius: inherit" class="btn btn-outline-danger">Hủy</a>
+                        <a href="{{route('events.list-product')}}" style="border-radius: inherit" class="btn btn-outline-danger">Hủy</a>
                     </form>
                 </div>
                 <div class="mt-4">
@@ -75,13 +75,13 @@
                                                 </button>
                                                 <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton" style="">
                                                     <li>
-                                                        <a href="{{route('product.gift.detail',$value->id)}}" class="dropdown-item text-info">Chi tiết</a>
+                                                        <a href="{{route('events.detail-product',$value->id)}}" class="dropdown-item text-info">Chi tiết</a>
                                                     </li>
                                                     <li>
-                                                        <a class="dropdown-item text-success" href="{{route('product.gift.list-gift', $value->id)}}">Xem quà tặng</a>
+                                                        <a class="dropdown-item text-success" href="{{route('events.list-gift-product', $value->id)}}">Xem quà tặng</a>
                                                     </li>
                                                     <li>
-                                                        <a class="dropdown-item text-danger btn-sa-confirm" href="{{route('product.gift.delete', $value->id)}}">Xóa</a>
+                                                        <a class="dropdown-item text-danger btn-sa-confirm" href="{{route('events.product.delete', $value->id)}}">Xóa</a>
                                                     </li>
                                                 </ul>
                                             </div>
@@ -114,71 +114,9 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                    <a href="{{route('gift.created')}}" class="btn btn-primary">Tạo quà tặng</a>
+                    <a href="{{route('events.gift.create')}}" class="btn btn-primary">Tạo quà tặng</a>
                 </div>
             </div>
         </div>
     </div>
-@endsection
-@section('script')
-    <script>
-        $(document).ready(function () {
-            $(".btn-add-product").click(function () {
-                $(".loading").addClass("active");
-                let data = [];
-                let dataProduct = {};
-                var parent = $(this).closest('tr');
-                dataProduct['product_id'] = parent.find('input[name="product_id"]').val();
-                dataProduct['point'] = parent.find('input[name="point"]').val();
-                data.push(dataProduct);
-                let dataParam = {};
-                dataParam['events_id'] = $('input[name="events_id"]').val();
-                dataParam['products'] = data;
-                addProduct(dataParam);
-            });
-            $(".btn-import").click(function () {
-                $(".loading").addClass("active");
-                let data = [];
-                $("tbody tr").each(function () {
-                    let dataProduct = {};
-                    var point = $(this).find('input[name="point"]').val();
-                    if (point != ''){
-                        dataProduct['point'] = point;
-                        dataProduct['product_id'] = $(this).find('input[name="product_id"]').val();
-                        data.push(dataProduct);
-                    }
-                });
-                let dataParam = {};
-                dataParam['events_id'] = $('input[name="events_id"]').val();
-                dataParam['products'] = data;
-                addProduct(dataParam);
-            });
-            function addProduct(data) {
-                $.ajax({
-                    url: "{{route('events.create-product')}}",
-                    data: data,
-                    type: 'post',
-                    dataType: 'json',
-                    success: function (data) {
-                        $(".loading").removeClass("active");
-                        if (data.status){
-                            Swal.fire(
-                                "Thành công",
-                                data.msg,
-                                "success"
-                            );
-                        }
-                    },
-                    error: function (data) {
-                        $(".loading").removeClass("active");
-                        Swal.fire(
-                            "Thêm sản phẩm thất bại",
-                            data.responseJSON.msg,
-                            "error"
-                        );
-                    }
-                })
-            }
-        });
-    </script>
 @endsection

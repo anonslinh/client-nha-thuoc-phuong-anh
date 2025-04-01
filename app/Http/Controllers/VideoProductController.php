@@ -2,15 +2,18 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\Admin\SyncController;
+use App\Http\Controllers\API\HelperApiController;
+use App\Models\Customer;
 use App\Models\Gift;
-use App\Models\ProductGiftModel;
+use App\Models\GiftEvent;
 use App\Models\ProductsModel;
 use App\Models\VideoYoutube;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Str;
 
-class VideoProductController extends Controller
+class VideoProductController extends SyncController
 {
     public function video (Request $request)
     {
@@ -109,7 +112,7 @@ class VideoProductController extends Controller
     **/
     public function createProduct (Request $request)
     {
-        $point = Gift::orderBy('points_required', 'asc')->pluck('points_required')->toArray();
+        $point = GiftEvent::orderBy('point', 'asc')->pluck('point')->toArray();
         $point = array_unique($point);
         return view('product.create', compact( 'point'));
     }
@@ -129,20 +132,12 @@ class VideoProductController extends Controller
                 'name' => $request->get('name'),
                 'code' => $request->get('code'),
                 'trademark' => $request->get('trademark'),
-                'price' => $request->get('price'),
+                'price' => $request->get('price')??0,
                 'point' => $request->get('point'),
                 'description' => $request->get('description'),
                 'image' => json_encode($image)
             ]);
             $product->save();
-            $dataGift = Gift::where('is_display', 1)->where('points_required', $request->get('point'))->select('id')->get();
-            foreach ($dataGift as $gift){
-                $productGift = new ProductGiftModel([
-                    'products_id' => $product['id'],
-                    'gifts_id' => $gift['id']
-                ]);
-                $productGift->save();
-            }
             return back()->with(['success' => 'Tạo sản phẩm thành công']);
         }catch (\Exception $exception){
             return back()->with(['error' => $exception->getMessage()]);
@@ -158,7 +153,7 @@ class VideoProductController extends Controller
             return back()->with(['error' => 'Dữ liệu không tồn tại.Vui lòng kiểm tra lại']);
         }
         $product['image'] = json_decode($product->image);
-        $point = Gift::orderBy('points_required', 'asc')->pluck('points_required')->toArray();
+        $point = GiftEvent::orderBy('point', 'asc')->pluck('point')->toArray();
         $point = array_unique($point);
         return view('product.detail', compact( 'point', 'product'));
     }
@@ -190,15 +185,6 @@ class VideoProductController extends Controller
         $product->description = $request->get('description');
         $product->image = json_encode($imageProduct);
         $product->save();
-        ProductGiftModel::where('products_id', $id)->delete();
-        $dataGift = Gift::where('is_display', 1)->where('points_required', $request->get('point'))->select('id')->get();
-        foreach ($dataGift as $gift){
-            $productGift = new ProductGiftModel([
-                'products_id' => $id,
-                'gifts_id' => $gift['id']
-            ]);
-            $productGift->save();
-        }
         return back()->with(['success' => 'Cập nhật dữ liệu thành công']);
     }
     /**
@@ -210,15 +196,14 @@ class VideoProductController extends Controller
         if (empty($product)){
             return back()->with(['error' => 'Dữ liệu không tồn tại.Vui lòng kiểm tra lại']);
         }
-        $listData = Gift::query();
-        $listData = $listData->join('product_gift', 'product_gift.gifts_id', '=', 'gifts.id')->select('gifts.*');
+        $listData = GiftEvent::query();
         if (isset($request->key_search)){
             $listData = $listData->where(function ($query) use ($request){
-                $query->where('gifts.name', 'like', '%'.$request->get('key_search').'%')
-                    ->orWhere('gifts.code', 'like', '%'.$request->get('key_search').'%');
+                $query->where('name', 'like', '%'.$request->get('key_search').'%')
+                    ->orWhere('code', 'like', '%'.$request->get('key_search').'%');
             });
         }
-        $listData = $listData->where('product_gift.products_id', $id)->paginate(20);
+        $listData = $listData->where('point', $product->point)->paginate(20);
         return view('product.list_gift', compact('listData', 'product'));
     }
     /**
@@ -250,8 +235,7 @@ class VideoProductController extends Controller
         $listProduct = ProductsModel::where('is_active', 1)->inrandomOrder()->limit(20)->get();
         foreach ($listProduct as $value){
             $value['image'] = json_decode($value->image);
-            $listGift = ProductGiftModel::join('gifts', 'gifts.id', '=','product_gift.gifts_id')->select('gifts.*')
-                ->where('product_gift.products_id', $value->id)->get();
+            $listGift = GiftEvent::where('point', $value->point)->where('active', 1)->get();
             $value['list_gift'] = $listGift;
         }
         return \response()->json(['status' => true, 'data' => $listProduct], Response::HTTP_OK);
@@ -261,7 +245,8 @@ class VideoProductController extends Controller
     **/
     public function categoryPoint ()
     {
-        $points = Gift::orderBy("points_required", 'asc')->pluck('points_required')->toArray();
+        $points = GiftEvent::orderBy("point", 'asc')->pluck('point')->toArray();
+        $points = array_unique($points);
         $dataReturn = [];
         foreach ($points as $point){
             $item = [];
@@ -283,8 +268,7 @@ class VideoProductController extends Controller
         $listProduct = $listProduct->where('is_active', 1)->paginate(20);
         foreach ($listProduct as $value){
             $value['image'] = json_decode($value->image);
-            $listGift = ProductGiftModel::join('gifts', 'gifts.id', '=','product_gift.gifts_id')->select('gifts.*')
-                ->where('product_gift.products_id', $value->id)->get();
+            $listGift = GiftEvent::where('point', $value->point)->where('active', 1)->get();
             $value['list_gift'] = $listGift;
         }
         return \response()->json(['status' => true, 'data' => $listProduct], Response::HTTP_OK);
@@ -298,8 +282,7 @@ class VideoProductController extends Controller
         if (empty($product)){
             return \response()->json(['status' => false, 'msg' => 'Sản phẩm không tồn tại'], Response::HTTP_BAD_REQUEST);
         }
-        $giftID = ProductGiftModel::where('products_id', $request->get('product_id'))->pluck('gifts_id')->toArray();
-        $listGift = Gift::whereIn('id', $giftID)->where('is_display', 1)->limit(10)->get();
+        $listGift = GiftEvent::where('point', $product->point)->where('active', 1)->limit(10)->get();
         $similarProducts = ProductsModel::whereNot('id', $request->get('product_id'))->where('point', $product->point)->limit(10)->get();
         foreach ($similarProducts as $value){
             $value['image'] = json_decode($value->image);
@@ -316,11 +299,11 @@ class VideoProductController extends Controller
     **/
     public function listGiftAPI (Request $request)
     {
-        $listGift = Gift::query();
+        $listGift = GiftEvent::query();
         if (isset($request->point)){
-            $listGift = $listGift->where('points_required', $request->get('point'));
+            $listGift = $listGift->where('point', $request->get('point'));
         }
-        $listGift = $listGift->where('is_display', 1)->paginate(20);
+        $listGift = $listGift->where('active', 1)->paginate(20);
         return \response()->json(['status' => true, 'data' => $listGift], Response::HTTP_OK);
     }
     /**
@@ -328,12 +311,11 @@ class VideoProductController extends Controller
     **/
     public function detailGift (Request $request)
     {
-        $gift = Gift::find($request->get('gift_id'));
+        $gift = GiftEvent::find($request->get('gift_id'));
         if (empty($gift)){
             return \response()->json(['status' => false, 'msg' => 'Quà tặng không tồn tại'], Response::HTTP_BAD_REQUEST);
         }
-        $productID = ProductGiftModel::where('gifts_id', $gift->id)->pluck('products_id')->toArray();
-        $listProduct = ProductsModel::whereIn('id', $productID)->where('is_active', 1)->limit(10)->get();
+        $listProduct = ProductsModel::where('point', $gift->point)->where('is_active', 1)->limit(10)->get();
         foreach ($listProduct as $value){
             $value['image'] = json_decode($value->id);
         }
@@ -341,5 +323,28 @@ class VideoProductController extends Controller
             'gift' => $gift,
             'list_product' => $listProduct
         ]], Response::HTTP_OK);
+    }
+    /**
+     * Lấy thông tin người dùng winxu
+    **/
+    public function infoCustomer (Request $request, HelperApiController $helperApiController)
+    {
+        $validatedData = $request->validate([
+            'phone' => ['required', 'regex:/^(0[1-9][0-9]{8,9}|84[1-9][0-9]{8,9})$/'],
+        ], [
+            'phone.required' => 'Số điện thoại là bắt buộc.',
+            'phone.regex' => 'Số điện thoại không hợp lệ.',
+        ]);
+        $phone = $helperApiController->normalizePhone($validatedData['phone']);
+        $customer = Customer::where('contact_number', $phone)->first();
+        $customerID = $customer->id??null;
+        $listsProduct = ProductsModel::where('is_active', 1)->get();
+        if (!empty($listsProduct) && !empty($customer)){
+            foreach ($listsProduct as $value){
+                $this->SynchronizePoint($customer->kiotviet_id, $value);
+            }
+        }
+        $data['customer'] = Customer::find($customerID);
+        return response()->json(['status' => true, 'data' => $data], Response::HTTP_OK);
     }
 }

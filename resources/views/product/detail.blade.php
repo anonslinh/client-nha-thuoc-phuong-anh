@@ -21,7 +21,7 @@
         </div>
         <div class="card">
             <div class="card-body">
-                <form action="{{route('product.gift.update',$product->id)}}" method="post" enctype="multipart/form-data">
+                <form action="{{route('events.update-product',$product->id)}}" method="post" enctype="multipart/form-data">
                     @csrf
                     <div class="mb-3">
                         <label class="form-label">Tên </label>

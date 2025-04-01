@@ -106,7 +106,6 @@ class KiotVietService
                 return $this->refreshTokenAllBranches($accountBranches->client_id, $accountBranches->client_secret,
                     $accountBranches->code, $accountBranches->retailer);
             }
-
             return $token;
 
         }catch (\Exception $exception){

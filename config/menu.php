@@ -86,11 +86,37 @@ return [
                 'name' => 'Video sản phẩm',
                 'icon' => 'solar:video-frame-play-horizontal-bold',
                 'route' => 'product.video'
+            ]
+        ]
+    ],
+    [
+        'name' => 'Mua là có quà',
+        'icon' => 'solar:gift-bold',
+        'submenu' => [
+            [
+                'name' => 'Danh sách quà tặng',
+                'icon' => 'solar:waterdrops-line-duotone',
+                'route' => 'events.list-gift'
             ],
             [
-                'name' => 'Mua là có quà',
-                'icon' => 'solar:gift-broken',
-                'route' => 'product.gift.index'
+                'name' => 'Sản phẩm',
+                'icon' => 'solar:waterdrops-line-duotone',
+                'route' => 'events.list-product'
+            ],
+            [
+                'name' => 'DS Khách Hàng',
+                'icon' => 'solar:waterdrops-line-duotone',
+                'route' => 'events.list-customer'
+            ],
+            [
+                'name' => 'Lịch sử điểm',
+                'icon' => 'solar:waterdrops-line-duotone',
+                'route' => 'events.history-point'
+            ],
+            [
+                'name' => 'Lịch sử đổi quà',
+                'icon' => 'solar:waterdrops-line-duotone',
+                'route' => 'events.history-exchange-gift'
             ]
         ]
     ],

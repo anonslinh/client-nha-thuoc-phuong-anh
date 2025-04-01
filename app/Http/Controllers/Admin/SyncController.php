@@ -4,10 +4,15 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Models\AccountBranches;
+use App\Models\ExchangeGiftEvent;
+use App\Models\GiftEvent;
 use App\Models\HistoryPointEvent;
 use App\Models\PersonalAccessTokens;
 use App\Models\ProductsEvent;
+use App\Models\ProductsModel;
+use App\Models\QuantityGiftEvents;
 use App\Services\KiotVietService;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Http;
 use App\Models\Branch;
 use App\Models\Employee;
@@ -191,10 +196,10 @@ class SyncController extends HelperAdminController
     /**
      * Đồng bộ điểm theo sự kiện
     **/
-    public function SynchronizePoint ($customerID, $events)
+    public function SynchronizePoint ($customerID, $product)
     {
         $token = $this->kiotVietService->getAccessToken();
-        $endpoint = 'https://public.kiotapi.com/invoices?fromPurchaseDate='.$events->time_start.'&toPurchaseDate='.$events->time_end.'&customerIds='.$customerID.'&pageSize=100';
+        $endpoint = 'https://public.kiotapi.com/invoices?fromPurchaseDate='.$product->created_at.'&toPurchaseDate='.Carbon::now('Asia/Ho_Chi_Minh').'&customerIds='.$customerID.'&pageSize=100';
         $response = Http::withHeaders([
             'Retailer' => $this->kiotVietService->getRetailer(),
             'Authorization' => 'Bearer ' . $token,
@@ -202,18 +207,18 @@ class SyncController extends HelperAdminController
         $listInvoice = $response->json();
         if (!empty($listInvoice) && !empty($listInvoice['data'])){
             $index = ceil($listInvoice['total'] / $listInvoice['pageSize']);
-            $this->updatePointCustomer($listInvoice['data'], $customerID, $events);
+            $this->updatePointCustomer($listInvoice['data'], $customerID, $product);
             if ($index > 1){
                 for ($i = 2; $i <= $index; $i++){
                     $currentItem = $i*100;
-                    $endpoint = 'https://public.kiotapi.com/invoices?fromPurchaseDate='.$events->time_start.'&toPurchaseDate='.$events->time_end.'&customerIds='.$customerID.'&pageSize=100&currentItem='.$currentItem;
+                    $endpoint = 'https://public.kiotapi.com/invoices?fromPurchaseDate='.$product->created_at.'&toPurchaseDate='.Carbon::now('Asia/Ho_Chi_Minh').'&customerIds='.$customerID.'&pageSize=100&currentItem='.$currentItem;
                     $response = Http::withHeaders([
                         'Retailer' => $this->kiotVietService->getRetailer(),
                         'Authorization' => 'Bearer ' . $token,
                     ])->get($endpoint);
                     $dataInvoice = $response->json();
                     if (!empty($dataInvoice) && !empty($dataInvoice['data'])){
-                        $this->updatePointCustomer($dataInvoice['data'],$customerID, $events);
+                        $this->updatePointCustomer($dataInvoice['data'],$customerID, $product);
                     }
                 }
             }
@@ -224,35 +229,77 @@ class SyncController extends HelperAdminController
     /**
      * Cập nhật điểm khách hàng theo data hóa đơn
     **/
-    protected function updatePointCustomer ($listInvoice, $customerID, $events)
+    protected function updatePointCustomer ($listInvoice, $customerID, $product)
     {
         $totalPoint = 0;
+        $usePoint = 0;
+        $listGiftCode = GiftEvent::where('active', 1)->pluck('code')->toArray();
         foreach ($listInvoice as $invoice){
             if ($invoice['statusValue'] == 'Hoàn thành'){
                 foreach ($invoice['invoiceDetails'] as $invoiceDetail){
                     $check = HistoryPointEvent::where('customer_id', $customerID)->where('code_order', $invoice['code'])
                         ->where('product_id', $invoiceDetail['productId'])->exists();
-                    $point = ProductsEvent::where('events_id', $events->id)->where('product_id', $invoiceDetail['productId'])->first();
-                    if (!$check && !empty($point)){
-                        $pointEvents = $point->point * $invoiceDetail['quantity'];
-                        $totalPoint += $pointEvents;
-                        $historyPoint = new HistoryPointEvent([
-                            'customer_id' => $customerID,
-                            'title' => 'Tích điểm sự kiện: '.$events->title,
-                            'code_order' => $invoice['code'],
-                            'product_id' => $invoiceDetail['productId'],
-                            'product_code' => $invoiceDetail['productCode'],
-                            'product_name' => $invoiceDetail['productName'],
-                            'point' => $pointEvents,
-                            'type' => 1
-                        ]);
-                        $historyPoint->save();
+                    if (!$check){
+                        if ($product->code == $invoiceDetail['productCode']){
+                            $pointEvents = $product->point * $invoiceDetail['quantity'];
+                            $totalPoint += $pointEvents;
+                            $historyPoint = new HistoryPointEvent([
+                                'customer_id' => $customerID,
+                                'title' => 'Tích điểm mua sản phẩm: '.$product->name,
+                                'code_order' => $invoice['code'],
+                                'product_id' => $invoiceDetail['productId'],
+                                'product_code' => $invoiceDetail['productCode'],
+                                'product_name' => $invoiceDetail['productName'],
+                                'point' => $pointEvents,
+                                'type' => 1
+                            ]);
+                            $historyPoint->save();
+                        }else if (in_array($invoiceDetail['productCode'], $listGiftCode)){
+                            if ($invoiceDetail['price'] == $invoiceDetail['discount']){
+                                $gift = GiftEvent::where('code', $invoiceDetail['productCode'])->first();
+                                $pointGift = $gift->point * $invoiceDetail['quantity'];
+                                $usePoint += $pointGift;
+                                $historyPoint = new HistoryPointEvent([
+                                    'customer_id' => $customerID,
+                                    'title' => 'Đổi quà tặng: '.$gift->name,
+                                    'code_order' => $invoice['code'],
+                                    'product_id' => $invoiceDetail['productId'],
+                                    'product_code' => $invoiceDetail['productCode'],
+                                    'product_name' => $invoiceDetail['productName'],
+                                    'point' => $pointGift,
+                                    'type' => 2
+                                ]);
+                                $historyPoint->save();
+                                $exchange = new ExchangeGiftEvent([
+                                    'customer_id' => $customerID,
+                                    'gift_id' => $gift->id,
+                                    'name_gift' => $gift->name,
+                                    'image_gift' => $gift->image,
+                                    'code_gift' => $gift->code,
+                                    'barcode_gift' => $gift->barcode ?? null,
+                                    'point' => $gift->point,
+                                    'quantity' => $invoiceDetail['quantity'],
+                                    'status' => 2,
+                                    'branch_id' => $invoice['branchId']
+                                ]);
+                                $exchange->save();
+                                $branch = Branch::where('kiotviet_id', $invoice['branchId'])->first();
+                                if (isset($branch)){
+                                    $quantityGift = QuantityGiftEvents::where('gift_events_id', $gift->id)->where('branch_id', $branch->id)->first();
+                                    if (isset($quantityGift)){
+                                        $quantityGift->quantity = $quantityGift->quantity - $invoiceDetail['quantity'];
+                                        $quantityGift->save();
+                                    }
+                                }
+                            }
+                        }
                     }
                 }
             }
         }
         $customer = Customer::where('kiotviet_id', $customerID)->first();
         $customer->total_point_event = $customer->total_point_event + $totalPoint;
+        $customer->used_point_event = $customer->used_point_event + $usePoint;
         $customer->save();
         return true;
     }

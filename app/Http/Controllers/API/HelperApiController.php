@@ -82,11 +82,9 @@ class HelperApiController extends Controller
 //                else{
 //                    $phone = '0981163959';
 //                }
-
                 $tokens = $this->kiotVietService->getAccessTokenAllBranches($personalAccessToken->access_token_code);
                 $accessToken = $tokens->access_token;
                 $retailer = $tokens->retailer;
-
                 $customer = $this->fetchCustomerByPhone($phone, $accessToken, $retailer);
                 if ($customer){
                     if (!$firstCustomer) {

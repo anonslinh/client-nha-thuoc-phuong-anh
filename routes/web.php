@@ -81,11 +81,11 @@ Route::middleware([CheckLogin::class])->group(function (){
        Route::get('detail/{id}', [EventsController::class, 'detail'])->name('detail');
        Route::get('delete/{id}', [EventsController::class, 'delete'])->name('delete');
        Route::post('update/{id}', [EventsController::class, 'update'])->name('update');
-       Route::get('add-product/{id}', [EventsController::class, 'addProduct'])->name('add-product');
-       Route::post('create-product', [EventsController::class, 'createProduct'])->name('create-product');
        Route::get('list-product', [EventsController::class, 'listProduct'])->name('list-product');
+//       Route::get('add-product/{id}', [EventsController::class, 'addProduct'])->name('add-product');
+//       Route::post('create-product', [EventsController::class, 'createProduct'])->name('create-product');
        Route::get('delete-product/{id}', [EventsController::class, 'deleteProduct'])->name('product.delete');
-       Route::post('update-product/{id}', [EventsController::class, 'updateProduct'])->name('product.update');
+//       Route::post('update-product/{id}', [EventsController::class, 'updateProduct'])->name('product.update');
        Route::get('list-customer', [EventsController::class, 'listCustomer'])->name('list-customer');
        Route::post('update-point', [EventsController::class, 'updatePoint'])->name('update-point');
        Route::get('history-point', [EventsController::class, 'historyPoint'])->name('history-point');
@@ -98,6 +98,10 @@ Route::middleware([CheckLogin::class])->group(function (){
        Route::get('delete-gift/{id}', [EventsController::class, 'deleteGift'])->name('gift.delete');
        Route::get('history-exchange-gift', [EventsController::class, 'historyExchangeGift'])->name('history-exchange-gift');
        Route::post('create-product-with-category', [EventsController::class, 'createProductWithCategory'])->name('create-product-with-category');
+       Route::get('product/create', [VideoProductController::class, 'createProduct'])->name('product.create');
+       Route::get('list-gift/{id}', [VideoProductController::class, 'listGift'])->name('list-gift-product');
+        Route::get('detail/{id}', [VideoProductController::class, 'detailProduct'])->name('detail-product');
+        Route::post('update/{id}', [VideoProductController::class, 'updateProduct'])->name('update-product');
     });
 
     Route::prefix('voucher')->name('voucher.')->group(function (){
@@ -197,15 +201,15 @@ Route::middleware([CheckLogin::class])->group(function (){
        Route::post('store', [VideoProductController::class, 'store'])->name('store-video');
        Route::get('delete/{id}', [VideoProductController::class, 'delete'])->name('video.delete');
        Route::post('update/{id}', [VideoProductController::class, 'update'])->name('video.update');
-       // Cài đặt sản phẩm và quà
-       Route::prefix('gift')->name('gift.')->group(function (){
-            Route::get('', [VideoProductController::class, 'giftProduct'])->name('index');
-            Route::get('create', [VideoProductController::class, 'createProduct'])->name('create');
-            Route::post('store', [VideoProductController::class, 'storeProduct'])->name('store');
-            Route::get('detail/{id}', [VideoProductController::class, 'detailProduct'])->name('detail');
-            Route::post('update/{id}', [VideoProductController::class, 'updateProduct'])->name('update');
-            Route::get('list-gift/{id}', [VideoProductController::class, 'listGift'])->name('list-gift');
-            Route::get('delete/{id}', [VideoProductController::class, 'deleteProduct'])->name('delete');
-       });
     });
+//    // Cài đặt sản phẩm và quà
+//    Route::prefix('product-gift')->name('product_gift.')->group(function (){
+//        Route::get('', [VideoProductController::class, 'giftProduct'])->name('index');
+//        Route::get('create', [VideoProductController::class, 'createProduct'])->name('create');
+//        Route::post('store', [VideoProductController::class, 'storeProduct'])->name('store');
+//        Route::get('detail/{id}', [VideoProductController::class, 'detailProduct'])->name('detail');
+//        Route::post('update/{id}', [VideoProductController::class, 'updateProduct'])->name('update');
+//        Route::get('list-gift/{id}', [VideoProductController::class, 'listGift'])->name('list-gift');
+//        Route::get('delete/{id}', [VideoProductController::class, 'deleteProduct'])->name('delete');
+//    });
 });

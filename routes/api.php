@@ -61,4 +61,5 @@ Route::prefix('product-gift')->group(function (){
    Route::post('detail-product', [VideoProductController::class, 'detailProductAPI']);
    Route::get('list-gift', [VideoProductController::class, 'listGiftAPI']);
    Route::get('detail-gift', [VideoProductController::class, 'detailGift']);
+   Route::post('info-customer', [VideoProductController::class, 'infoCustomer']);
 });

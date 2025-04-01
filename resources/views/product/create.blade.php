@@ -21,7 +21,7 @@
         </div>
         <div class="card">
             <div class="card-body">
-                <form action="{{route('product.gift.store')}}" method="post" enctype="multipart/form-data">
+                <form action="{{route('product_gift.store')}}" method="post" enctype="multipart/form-data">
                     @csrf
                     <div class="mb-3">
                         <label class="form-label">Tên </label>
