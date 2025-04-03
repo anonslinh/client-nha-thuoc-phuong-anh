@@ -543,7 +543,7 @@ function App() {
                         <div className="px-2 w-full ">
                             <div className="absolute top-20  w-full flex justify-center ">
                                 <img
-                                    src={"assets/static/logo.png"}
+                                    src={"assets/images/logos/logo_win_baby.svg"}
                                     alt="logo"
                                     className="w-64 h-auto object-cover"
                                 />

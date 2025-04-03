@@ -19,6 +19,7 @@ class KiotVietService
         $this->clientId = env('KIOTVIET_CLIENT_ID');
         $this->clientSecret = env('KIOTVIET_CLIENT_SECRET');
         $this->tokenUrl = 'https://id.kiotviet.vn/connect/token';
+        $this->retailer = env('RETAILER_KIOTVIET');
     }
 
     /**
@@ -26,7 +27,7 @@ class KiotVietService
     */
     public function getAccessToken(){
         try{
-            $token = PersonalAccessTokens::where('access_token_code', 'KIOTVIET')->first();
+            $token = PersonalAccessTokens::where('access_token_code', $this->retailer)->first();
             if (!$token || Carbon::now()->greaterThan($token->expires_at)) {
                 return $this->refreshToken();
             }
@@ -58,7 +59,7 @@ class KiotVietService
         $expiresAt = Carbon::now()->addSeconds($data['expires_in']);
 
         PersonalAccessTokens::updateOrCreate(
-            ['id' => 1, 'access_token_code' => 'KIOTVIET'],
+            ['id' => 1, 'access_token_code' => $this->retailer],
             [
                 'access_token' => $data['access_token'],
                 'expires_at' => $expiresAt
