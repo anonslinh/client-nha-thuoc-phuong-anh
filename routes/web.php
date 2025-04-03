@@ -13,6 +13,9 @@ use App\Http\Controllers\Admin\EmployeeController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\SettingAIAgentsController;
 use App\Http\Controllers\LoginZaloController;
+use App\Http\Controllers\Admin\DealController;
+use App\Http\Controllers\VideoProductController;
+use App\Http\Controllers\RotationController;
 
 Route::get('login', [LoginController::class, 'login'])->name('login');
 Route::get('authentication-forgot-password', [LoginController::class, 'forgotPassword'])->name('authentication-forgot-password');
@@ -79,11 +82,11 @@ Route::middleware([CheckLogin::class])->group(function (){
        Route::get('detail/{id}', [EventsController::class, 'detail'])->name('detail');
        Route::get('delete/{id}', [EventsController::class, 'delete'])->name('delete');
        Route::post('update/{id}', [EventsController::class, 'update'])->name('update');
-       Route::get('add-product/{id}', [EventsController::class, 'addProduct'])->name('add-product');
-       Route::post('create-product', [EventsController::class, 'createProduct'])->name('create-product');
        Route::get('list-product', [EventsController::class, 'listProduct'])->name('list-product');
+//       Route::get('add-product/{id}', [EventsController::class, 'addProduct'])->name('add-product');
+//       Route::post('create-product', [EventsController::class, 'createProduct'])->name('create-product');
        Route::get('delete-product/{id}', [EventsController::class, 'deleteProduct'])->name('product.delete');
-       Route::post('update-product/{id}', [EventsController::class, 'updateProduct'])->name('product.update');
+//       Route::post('update-product/{id}', [EventsController::class, 'updateProduct'])->name('product.update');
        Route::get('list-customer', [EventsController::class, 'listCustomer'])->name('list-customer');
        Route::post('update-point', [EventsController::class, 'updatePoint'])->name('update-point');
        Route::get('history-point', [EventsController::class, 'historyPoint'])->name('history-point');
@@ -96,6 +99,10 @@ Route::middleware([CheckLogin::class])->group(function (){
        Route::get('delete-gift/{id}', [EventsController::class, 'deleteGift'])->name('gift.delete');
        Route::get('history-exchange-gift', [EventsController::class, 'historyExchangeGift'])->name('history-exchange-gift');
        Route::post('create-product-with-category', [EventsController::class, 'createProductWithCategory'])->name('create-product-with-category');
+       Route::get('product/create', [VideoProductController::class, 'createProduct'])->name('product.create');
+       Route::get('list-gift/{id}', [VideoProductController::class, 'listGift'])->name('list-gift-product');
+        Route::get('detail/{id}', [VideoProductController::class, 'detailProduct'])->name('detail-product');
+        Route::post('update/{id}', [VideoProductController::class, 'updateProduct'])->name('update-product');
     });
 
     Route::prefix('voucher')->name('voucher.')->group(function (){
@@ -137,6 +144,12 @@ Route::middleware([CheckLogin::class])->group(function (){
         //Cài đặt chung
         Route::get('setting-global', [SettingController::class, 'settingGlobal'])->name('setting-global');
         Route::post('update-setting-global/{id}', [SettingController::class, 'updateSettingGlobal'])->name('update-setting-global');
+
+        //Cài đặt nhiều tài khoản kiotviet
+        Route::get('index-account-branches', [SettingController::class, 'indexAccountBranches'])->name('index-account-branches');
+        Route::post('store-account-branches', [SettingController::class, 'storeAccountBranch'])->name('store-account-branches');
+        Route::post('update-account-branches/{id}', [SettingController::class, 'updateAccountBranch'])->name('update-account-branches');
+        Route::get('delete-account-branches/{id}', [SettingController::class, 'deleteAccountBranch'])->name('delete-account-branches');
     });
 
     //Loyalty
@@ -170,4 +183,47 @@ Route::middleware([CheckLogin::class])->group(function (){
         Route::get('test-mail-invoice/{id}', [SettingAIAgentsController::class, 'testMailInvoice'])->name('test-mail-invoice');
         Route::get('test-mail-employee-kpi', [SettingAIAgentsController::class, 'sendMailKpiEmployee'])->name('test-mail-employee-kpi');
     });
+
+    //Deal chớp nhoáng
+    Route::prefix('deal')->name('deal.')->group(function (){
+        //Deal
+        Route::get('index-deal', [DealController::class, 'indexDeal'])->name('index-deal');
+        Route::post('store-deal', [DealController::class, 'storeDeal'])->name('store-deal');
+        Route::get('delete-deal/{id}', [DealController::class, 'destroyDeal'])->name('delete-deal');
+        Route::post('update-deal/{id}', [DealController::class, 'updateDeal'])->name('update-deal');
+
+        //Sản phẩm trong deal
+        Route::get('index-product-deal/{deal_id}', [DealController::class, 'indexDealProduct'])->name('index-product-deal');
+        Route::get('created-product-deal/{deal_id}', [DealController::class, 'indexDeal'])->name('created-product-deal/{deal_id}');
+    });
+    // Video sản phẩm
+    Route::prefix('product')->name('product.')->group(function (){
+       Route::get('video', [VideoProductController::class, 'video'])->name('video');
+       Route::post('store', [VideoProductController::class, 'store'])->name('store-video');
+       Route::get('delete/{id}', [VideoProductController::class, 'delete'])->name('video.delete');
+       Route::post('update/{id}', [VideoProductController::class, 'update'])->name('video.update');
+    });
+//    // Cài đặt sản phẩm và quà
+    Route::prefix('product-gift')->name('product_gift.')->group(function (){
+        Route::get('', [VideoProductController::class, 'giftProduct'])->name('index');
+        Route::get('create', [VideoProductController::class, 'createProduct'])->name('create');
+        Route::post('store', [VideoProductController::class, 'storeProduct'])->name('store');
+        Route::get('detail/{id}', [VideoProductController::class, 'detailProduct'])->name('detail');
+        Route::post('update/{id}', [VideoProductController::class, 'updateProduct'])->name('update');
+        Route::get('list-gift/{id}', [VideoProductController::class, 'listGift'])->name('list-gift');
+        Route::get('delete/{id}', [VideoProductController::class, 'deleteProduct'])->name('delete');
+    });
+    // Vòng quay may mắn
+    Route::prefix('rotation')->name('rotation.')->group(function (){
+       Route::get('setting', [RotationController::class, 'setting'])->name('setting');
+       Route::get('gift', [RotationController::class, 'gift'])->name('gift');
+       Route::post('create', [RotationController::class, 'create'])->name('create');
+       Route::get('delete', [RotationController::class, 'delete'])->name('delete');
+       Route::post('create-gift', [RotationController::class, 'createGift'])->name('create-gift');
+       Route::post('update-gift/{id}', [RotationController::class, 'updateGift'])->name('update-gift');
+       Route::get('delete-gift/{id}', [RotationController::class, 'deleteGift'])->name('delete-gift');
+       Route::get('history-exchange-gift', [RotationController::class, 'historyExchangeGift'])->name('history-exchange-gift');
+    });
 });
+// Giao diện vòng quay
+Route::get('play-rotation', [RotationController::class, 'playRotation']);

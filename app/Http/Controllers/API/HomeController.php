@@ -35,9 +35,9 @@ class HomeController extends HelperApiController
             ]);
 
             $phone = $this->normalizePhone($validatedData['phone']);
-            $membership_level = $this->getMembershipLevel($phone);
 
             $this->syncCustomerInvoices($phone);
+            $membership_level = $this->getMembershipLevel($phone);
             $customer = Customer::where('contact_number', $phone)->first();
             // Lấy thông tin khách hàng & điểm thưởng
             $reward_point = optional($customer)->reward_point ?? 0;
@@ -102,7 +102,7 @@ class HomeController extends HelperApiController
         // Truy vấn danh sách quà tặng
         $gifts = Gift::query();
         if (!empty($customer)){
-            $customerRank = CustomerRank::where('customer_id', $customer->kiotviet_id)->first();
+            $customerRank = CustomerRank::where('contact_number', $request->phone)->first();
             $rankCode = $customerRank->current_rank?? 'than_thiet';
             $rank = MembershipLevel::where('rank', $rankCode)->first();
             if (isset($rank)){
@@ -214,7 +214,7 @@ class HomeController extends HelperApiController
 
             $phone = $this->normalizePhone($validatedData['phone']);
 
-            $this->syncCustomerInvoices($phone);
+//            $this->syncCustomerInvoices($phone);
 
             $data_return = $this->getMembershipLevel($phone);
             return response()->json([
@@ -262,10 +262,10 @@ class HomeController extends HelperApiController
             }
 
             // Lấy tổng chi tiêu của khách hàng
-            $totalSpent = CustomerSpendingSummary::where('customer_id', $customer->kiotviet_id)->sum('total_spent');
+            $totalSpent = CustomerSpendingSummary::where('contact_number', $phone)->sum('total_spent');
 
             // Lấy hạng thẻ hiện tại
-            $currentRank = CustomerRank::where('customer_id', $customer->kiotviet_id)->first();
+            $currentRank = CustomerRank::where('contact_number', $phone)->first();
 
             // Nếu chưa có hạng, mặc định "Thân Thiết"
             if (!$currentRank) {

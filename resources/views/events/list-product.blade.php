@@ -3,7 +3,13 @@
     <div class="container-fluid">
         <div class="card w-100">
             <div class="card-header">
-                <h3>Danh sách sản phẩm trong sự kiện</h3>
+                <div class="d-flex justify-content-between align-items-center">
+                    <h3 class="mb-0">Danh sách sản phẩm</h3>
+                    <a href="{{route('events.product.create')}}" type="button" class="justify-content-center badge fw-medium fs-2 btn btn-rounded btn-info d-flex align-items-center">
+                        <i class="ti ti-send fs-4 me-2"></i>
+                        Thêm mới
+                    </a>
+                </div>
             </div>
             <div class="card-body">
                 <div class="d-flex justify-content-end align-items-center">

@@ -52,8 +52,8 @@ class GiftExchangesController extends HelperApiController
 
             $phone = $this->normalizePhone($validatedData['phone']);
 
-            // Đồng bộ hóa hóa đơn của khách hàng trước khi tiếp tục
-            $this->syncCustomerInvoices($phone);
+//            // Đồng bộ hóa hóa đơn của khách hàng trước khi tiếp tục
+//            $this->syncCustomerInvoices($phone);
 
 
             // Lấy thông tin khách hàng
@@ -112,7 +112,6 @@ class GiftExchangesController extends HelperApiController
         } catch (\Illuminate\Validation\ValidationException $exception) {
             return response()->json(['error' => $exception->errors()], 422);
         } catch (\Exception $e) {
-            dd($e);
             DB::rollBack();
             return response()->json(['status' => false, 'message' => 'Lỗi hệ thống', 'error' => $e->getMessage()], 500);
         }

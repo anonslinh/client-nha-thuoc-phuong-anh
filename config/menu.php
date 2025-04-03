@@ -38,47 +38,6 @@ return [
         ]
     ],
     [
-        'name' => 'Sự kiện',
-        'icon' => 'solar:widget-6-line-duotone',
-        'submenu' => [
-            [
-                'name' => 'Danh sách',
-                'icon' => 'solar:waterdrops-line-duotone',
-                'route' => 'events.list-data'
-            ],
-//            [
-//                'name' => 'Tạo sự kiện',
-//                'icon' => 'solar:tag-horizontal-line-duotone',
-//                'route' => 'events.create'
-//            ],
-            [
-                'name' => 'Sản phẩm',
-                'icon' => 'solar:waterdrops-line-duotone',
-                'route' => 'events.list-product'
-            ],
-            [
-                'name' => 'DS Khách Hàng',
-                'icon' => 'solar:waterdrops-line-duotone',
-                'route' => 'events.list-customer'
-            ],
-            [
-                'name' => 'Lịch sử điểm',
-                'icon' => 'solar:waterdrops-line-duotone',
-                'route' => 'events.history-point'
-            ],
-            [
-                'name' => 'Danh sách quà tặng',
-                'icon' => 'solar:waterdrops-line-duotone',
-                'route' => 'events.list-gift'
-            ],
-            [
-                'name' => 'Lịch sử đổi quà',
-                'icon' => 'solar:waterdrops-line-duotone',
-                'route' => 'events.history-exchange-gift'
-            ]
-        ]
-    ],
-    [
         'name' => 'Loyalty',
         'icon' => 'solar:notes-line-duotone',
         'submenu' => [
@@ -111,6 +70,58 @@ return [
                 'name' => 'Cài đặt quà tặng',
                 'icon' => 'solar:gift-broken',
                 'route' => 'gift.index'
+            ]
+        ]
+    ],
+    [
+        'name' => 'Mua là có quà',
+        'icon' => 'solar:gift-bold',
+        'submenu' => [
+            [
+                'name' => 'Danh sách quà tặng',
+                'icon' => 'solar:waterdrops-line-duotone',
+                'route' => 'events.list-gift'
+            ],
+            [
+                'name' => 'Sản phẩm',
+                'icon' => 'solar:waterdrops-line-duotone',
+                'route' => 'events.list-product'
+            ],
+            [
+                'name' => 'DS Khách Hàng',
+                'icon' => 'solar:waterdrops-line-duotone',
+                'route' => 'events.list-customer'
+            ],
+            [
+                'name' => 'Lịch sử điểm',
+                'icon' => 'solar:waterdrops-line-duotone',
+                'route' => 'events.history-point'
+            ],
+            [
+                'name' => 'Lịch sử đổi quà',
+                'icon' => 'solar:waterdrops-line-duotone',
+                'route' => 'events.history-exchange-gift'
+            ]
+        ]
+    ],
+    [
+        'name' => 'Vòng quay may mắn',
+        'icon' => 'solar:restart-broken',
+        'submenu' => [
+            [
+                'name' => 'Cài đặt',
+                'icon' => 'solar:settings-line-duotone',
+                'route' => 'rotation.setting'
+            ],
+            [
+                'name' => 'Quà tặng',
+                'icon' => 'solar:settings-line-duotone',
+                'route' => 'rotation.gift'
+            ],
+            [
+                'name' => 'Lịch sử đổi quà',
+                'icon' => 'solar:settings-line-duotone',
+                'route' => 'rotation.history-exchange-gift'
             ]
         ]
     ],
@@ -157,6 +168,11 @@ return [
                 'name' => 'Cài đặt chung',
                 'icon' => 'solar:settings-linear',
                 'route' => 'config.setting-global'
+            ],
+            [
+                'name' => 'KIOTVIET',
+                'icon' => 'solar:settings-linear',
+                'route' => 'config.index-account-branches'
             ]
         ]
     ]

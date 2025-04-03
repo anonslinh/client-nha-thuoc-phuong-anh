@@ -4,6 +4,7 @@
 namespace App\Http\Controllers\Admin;
 
 
+use App\Models\AccountBranches;
 use App\Models\Branch;
 use App\Models\Contacts;
 use App\Models\Employee;
@@ -12,9 +13,21 @@ use App\Models\SettingGlobal;
 use App\Models\Slogan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use App\Services\KiotVietService;
+
+use App\Models\PersonalAccessTokens;
 
 class SettingController extends SyncController
 {
+
+    protected $kiotVietService;
+    protected $urlKiotViet;
+
+    public function __construct(KiotVietService $kiotVietService) {
+        $this->kiotVietService = $kiotVietService;
+        $this->urlKiotViet = $kiotVietService->urlKiotviet();
+    }
+
     /**
      * danh sách nhân viên
     */
@@ -164,5 +177,109 @@ class SettingController extends SyncController
         $data->save();
 
         return back()->with(['success' => 'Cập nhật dữ liệu thành công']);
+    }
+
+    /**
+     * Danh sách tài khoản kiotviet
+    */
+    public function indexAccountBranches(){
+        $listData = AccountBranches::where('active', 1)->orderBy('created_at', 'desc')->paginate(20);
+
+        return view('config.account-branches', compact('listData'));
+    }
+
+    /**
+     * Thêm tài khoản kiotviet
+    */
+    public function storeAccountBranch(Request $request)
+    {
+        // Kiểm tra số lượng account branch không cho vượt quá giới hạn
+        $count = AccountBranches::count();
+        if ($count >= 1) {
+            return back()->with(['error' => 'Chỉ được tạo tối đa 1 tài khoản. Liên hệ để mở thêm!']);
+        }
+
+        // Validate dữ liệu đầu vào
+        $validatedData = $request->validate([
+            'name'          => 'required|string|max:255',
+            'code'          => 'required|string|max:255|unique:account_branches,code',
+            'retailer'      => 'required|string|max:255',
+            'client_id'     => 'required|string|max:255|unique:account_branches,client_id',
+            'client_secret' => 'required|string|max:255|unique:account_branches,client_secret',
+        ]);
+
+        try {
+            // Gọi API lấy token mới
+            $token = $this->kiotVietService->refreshTokenAllBranches(
+                $validatedData['client_id'],
+                $validatedData['client_secret'],
+                $validatedData['code'],
+                $validatedData['retailer']
+            );
+
+            if (!$token) {
+                return back()->with(['error' => 'Lỗi khi lấy token từ KiotViet']);
+            }
+
+            // Tạo mới dữ liệu
+            AccountBranches::create($validatedData);
+
+            return back()->with(['success' => 'Thêm dữ liệu thành công!']);
+        } catch (\Exception $e) {
+            return back()->with(['error' => 'Lỗi: ' . $e->getMessage()]);
+        }
+    }
+
+    /**
+     * cập nhật thông tin tài khoản
+    */
+    public function updateAccountBranch(Request $request, $id)
+    {
+        return back()->with(['error' => 'Không được chỉnh sửa tài khoản khi đang hoạt động! Liên hệ để mở tính năng sửa']);
+        // Validate dữ liệu đầu vào
+        $validatedData = $request->validate([
+            'name'          => 'required|string|max:255',
+            'code'          => "required|string|max:255|unique:account_branches,code,$id",
+            'retailer'      => "required|string|max:255",
+            'client_id'     => "required|string|max:255|unique:account_branches,client_id,$id",
+            'client_secret' => "required|string|max:255|unique:account_branches,client_secret,$id",
+        ]);
+
+        // Lấy bản ghi cần cập nhật
+        $accountBranch = AccountBranches::findOrFail($id);
+
+        try {
+            // Gọi API lấy token mới
+            $token = $this->kiotVietService->refreshTokenAllBranches(
+                $validatedData['client_id'],
+                $validatedData['client_secret'],
+                $validatedData['code'],
+                $validatedData['retailer']
+            );
+
+            if (!$token) {
+                return back()->with(['error' => 'Lỗi khi lấy token từ KiotViet']);
+            }
+
+            // Cập nhật dữ liệu nếu lấy token thành công
+            $accountBranch->update($validatedData);
+
+            return back()->with(['success' => 'Cập nhật thành công!']);
+        } catch (\Exception $e) {
+            return back()->with(['error' => 'Lỗi: ' . $e->getMessage()]);
+        }
+    }
+
+    /**
+     * xóa tài khoản
+    */
+    public function deleteAccountBranch($id)
+    {
+        $accountBranch = AccountBranches::findOrFail($id);
+        $personalAccessTokens = PersonalAccessTokens::where('access_token_code', $accountBranch->code)->firstOrFail();
+        $personalAccessTokens->delete();
+        $accountBranch->delete();
+
+        return back()->with(['success' => 'Xóa thành công!']);
     }
 }

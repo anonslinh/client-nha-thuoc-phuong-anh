@@ -40,6 +40,7 @@
                                     <p class="mb-1"><span class="text-danger">Tên:</span>{{$value->name_gift}}</p>
                                     <p class="mb-1"><span class="text-warning">Mã :</span>{{$value->code_gift}}</p>
                                     <p class="mb-1"><span class="text-danger">Thời gian </span>{{date_format(date_create($value->created_at), 'H:i d/m/Y')}}</p>
+                                    <p class="mb-1"><span class="text-info">Chi nhánh:  </span>{{$value->name_branch}}</p>
                                 </td>
                                 <td class="align-middle">
                                     <img src="{{$value->image_gift}}" style="max-width: 150px">

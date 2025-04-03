@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('customer_ranks', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('customer_id')->index()->comment('Liên kết với bảng customers');
+            $table->string('contact_number')->index();
             $table->enum('current_rank', ['than_thiet', 'bac', 'vang', 'kim_cuong'])->default('than_thiet');
             $table->dateTime('rank_start_date')->nullable()->comment('Ngày bắt đầu hạng hiện tại');
             $table->dateTime('rank_end_date')->nullable()->comment('Ngày kết thúc hạng hiện tại');

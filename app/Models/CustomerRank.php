@@ -16,5 +16,6 @@ class CustomerRank extends Model
         'current_rank',
         'rank_start_date',
         'rank_end_date',
+        'contact_number'
     ];
 }

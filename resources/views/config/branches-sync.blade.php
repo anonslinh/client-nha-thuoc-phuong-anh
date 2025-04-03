@@ -43,8 +43,14 @@
                     @foreach($listData as $key => $item)
                         <tr>
                             <td>{{ ($listData->currentPage() - 1) * $listData->perPage() + $key + 1 }}</td>
-                            <td>{{$item->branch_name}}</td>
-                            <td>{{$item->address}}</td>
+                            <td>
+                                <h6>{{$item->account_code}}</h6>
+                                {{$item->branch_name}}
+                            </td>
+                            <td>
+                                <h6>{{$item->location_name}}</h6>
+                                {{$item->address}}
+                            </td>
                             <td>{{$item->contact_number}}</td>
 {{--                            <td>{{$item->email}}</td>--}}
                             <td>{{$item->created_date}}</td>

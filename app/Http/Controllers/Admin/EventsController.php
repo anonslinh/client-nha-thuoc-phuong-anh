@@ -7,9 +7,11 @@ use App\Models\Branch;
 use App\Models\Customer;
 use App\Models\EventsModel;
 use App\Models\ExchangeGiftEvent;
+use App\Models\Gift;
 use App\Models\GiftEvent;
 use App\Models\HistoryPointEvent;
 use App\Models\ProductsEvent;
+use App\Models\ProductsModel;
 use App\Models\QuantityGiftEvents;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -173,7 +175,6 @@ class EventsController extends SyncController
             }
         }
         $categories = array_merge($categories['data'], $dataCategoryNew);
-
         return view('events.product-kiotviet', compact('paginator', 'categories', 'events'));
     }
     /**
@@ -215,30 +216,30 @@ class EventsController extends SyncController
     **/
     public function listProduct (Request $request)
     {
-        $listData = ProductsEvent::query();
-        if (isset($request->events_id)){
-            $listData = $listData->where('events_id', $request->get('events_id'));
-        }
+        $listProduct = ProductsModel::query();
         if (isset($request->key_search)){
-            $listData = $listData->where(function ($query) use ($request){
-               $query->where('name', 'like', '%'.$request->get('key_search').'%')
-                   ->orWhere('product_code', 'like', '%'.$request->get('key_search').'%')
-                   ->orWhere('product_id', 'like', '%'.$request->get('key_search').'%');
+            $listProduct = $listProduct->where(function ($query) use ($request){
+                $query->where('name', 'like', '%'.$request->get('key_search').'%')
+                    ->orWhere('code','like', '%'.$request->get('key_search').'%');
             });
         }
-        $listData = $listData->orderBy('created_at', 'desc')->paginate(20);
-        foreach ($listData as $value){
-            $value->events = EventsModel::find($value->events_id)->title ?? 'Sự kiện đã bị xóa';
+        if (isset($request->point)){
+            $listProduct = $listProduct->where('point', $request->get('point'));
         }
-        $events = EventsModel::orderBy('created_at', 'desc')->get();
-        return view('events.list-product', compact('listData', 'events'));
+        $listProduct = $listProduct->orderBy('created_at', 'desc')->paginate(20);
+        foreach ($listProduct as $value){
+            $value['image'] = json_decode($value->image);
+        }
+        $point = GiftEvent::orderBy('point', 'asc')->pluck('point')->toArray();
+        $point = array_unique($point);
+        return view('product.index', compact('listProduct', 'point'));
     }
     /**
      * Xóa sản phẩm trong sự kiện
     **/
     public function deleteProduct ($id)
     {
-        $product = ProductsEvent::find($id);
+        $product = ProductsModel::find($id);
         if (empty($product)){
             return back()->with(['error' => 'Sản phẩm không tồn tại']);
         }
@@ -517,6 +518,10 @@ class EventsController extends SyncController
             $listData = $listData->where('exchange_gift_event.status', $request->get('status'));
         }
         $listData = $listData->orderBy('created_at', 'desc')->paginate(20);
+        foreach ($listData as $value){
+            $branch = Branch::where('kiotviet_id', $value->branch_id)->first();
+            $value['name_branch'] = $branch->branch_name ?? '';
+        }
         return view('events.exchange-gift', compact('listData'));
     }
 

@@ -87,6 +87,7 @@
                     @endif
                     </tbody>
                 </table>
+                <div class="mt-4 d-flex justify-content-center">{{$listData->appends(request()->all())->links('pagination')}}</div>
             </div>
         </div>
     </div>

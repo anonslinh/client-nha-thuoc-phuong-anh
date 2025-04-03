@@ -15,6 +15,7 @@ return new class extends Migration
             $table->id();
             $table->text('access_token_code')->comment('Đơn vị token');
             $table->text('access_token')->comment('Token');
+            $table->text('retailer')->nullable()->comment('retailer kiotviet');
             $table->timestamp('expires_at')->comment('Ngày hết hạn');
             $table->timestamps();
         });

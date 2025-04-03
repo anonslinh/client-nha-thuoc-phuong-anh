@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('customer_spending_summaries', function (Blueprint $table) {
             $table->id();
             $table->integer('customer_id')->references('kiotviet_id')->on('customers')->onDelete('cascade');
+            $table->string('contact_number')->index();
             $table->integer('month'); // Tháng
             $table->integer('year');  // Năm
             $table->decimal('total_spent', 15, 2)->default(0)->comment('Tổng chi tiêu trong tháng');
