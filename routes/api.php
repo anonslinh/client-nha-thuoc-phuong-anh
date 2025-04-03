@@ -66,6 +66,7 @@ Route::prefix('product-gift')->group(function (){
 });
 // Vòng quay may mắn
 Route::prefix('rotation')->group(function (){
-//    Route::post('list-invoice', [RotationController::class, 'list'])
     Route::post('list-gift', [RotationController::class, 'listGiftAPI']);
+    Route::post('exchange-gift', [RotationController::class, 'exchangeGiftAPI']);
+    Route::post('get-my-gift', [RotationController::class, 'getMyGiftAPI']);
 });

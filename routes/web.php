@@ -222,6 +222,7 @@ Route::middleware([CheckLogin::class])->group(function (){
        Route::post('create-gift', [RotationController::class, 'createGift'])->name('create-gift');
        Route::post('update-gift/{id}', [RotationController::class, 'updateGift'])->name('update-gift');
        Route::get('delete-gift/{id}', [RotationController::class, 'deleteGift'])->name('delete-gift');
+       Route::get('history-exchange-gift', [RotationController::class, 'historyExchangeGift'])->name('history-exchange-gift');
     });
 });
 // Giao diện vòng quay

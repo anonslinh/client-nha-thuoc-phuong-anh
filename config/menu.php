@@ -121,6 +121,27 @@ return [
         ]
     ],
     [
+        'name' => 'Vòng quay may mắn',
+        'icon' => 'solar:restart-broken',
+        'submenu' => [
+            [
+                'name' => 'Cài đặt',
+                'icon' => 'solar:settings-line-duotone',
+                'route' => 'rotation.setting'
+            ],
+            [
+                'name' => 'Quà tặng',
+                'icon' => 'solar:settings-line-duotone',
+                'route' => 'rotation.gift'
+            ],
+            [
+                'name' => 'Lịch sử đổi quà',
+                'icon' => 'solar:settings-line-duotone',
+                'route' => 'rotation.history-exchange-gift'
+            ]
+        ]
+    ],
+    [
         'name' => 'Cài đặt',
         'icon' => 'solar:settings-linear',
         'submenu' => [
