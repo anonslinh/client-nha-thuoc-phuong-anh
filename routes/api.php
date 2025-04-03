@@ -8,6 +8,7 @@ use App\Http\Controllers\API\VoucherExchangesController;
 use App\Http\Controllers\API\EventsController;
 use App\Http\Controllers\API\SettingGlobalController;
 use App\Http\Controllers\VideoProductController;
+use App\Http\Controllers\RotationController;
 
 Route::post('reward-point', [HomeController::class, 'rewardPointCustomer']);
 Route::get('banners', [HomeController::class, 'getBanners']);
@@ -62,4 +63,9 @@ Route::prefix('product-gift')->group(function (){
    Route::get('list-gift', [VideoProductController::class, 'listGiftAPI']);
    Route::get('detail-gift', [VideoProductController::class, 'detailGift']);
    Route::post('info-customer', [VideoProductController::class, 'infoCustomer']);
+});
+// Vòng quay may mắn
+Route::prefix('rotation')->group(function (){
+//    Route::post('list-invoice', [RotationController::class, 'list'])
+    Route::post('list-gift', [RotationController::class, 'listGiftAPI']);
 });

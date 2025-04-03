@@ -15,6 +15,7 @@ use App\Http\Controllers\Admin\SettingAIAgentsController;
 use App\Http\Controllers\LoginZaloController;
 use App\Http\Controllers\Admin\DealController;
 use App\Http\Controllers\VideoProductController;
+use App\Http\Controllers\RotationController;
 
 Route::get('login', [LoginController::class, 'login'])->name('login');
 Route::get('authentication-forgot-password', [LoginController::class, 'forgotPassword'])->name('authentication-forgot-password');
@@ -203,13 +204,25 @@ Route::middleware([CheckLogin::class])->group(function (){
        Route::post('update/{id}', [VideoProductController::class, 'update'])->name('video.update');
     });
 //    // Cài đặt sản phẩm và quà
-//    Route::prefix('product-gift')->name('product_gift.')->group(function (){
-//        Route::get('', [VideoProductController::class, 'giftProduct'])->name('index');
-//        Route::get('create', [VideoProductController::class, 'createProduct'])->name('create');
-//        Route::post('store', [VideoProductController::class, 'storeProduct'])->name('store');
-//        Route::get('detail/{id}', [VideoProductController::class, 'detailProduct'])->name('detail');
-//        Route::post('update/{id}', [VideoProductController::class, 'updateProduct'])->name('update');
-//        Route::get('list-gift/{id}', [VideoProductController::class, 'listGift'])->name('list-gift');
-//        Route::get('delete/{id}', [VideoProductController::class, 'deleteProduct'])->name('delete');
-//    });
+    Route::prefix('product-gift')->name('product_gift.')->group(function (){
+        Route::get('', [VideoProductController::class, 'giftProduct'])->name('index');
+        Route::get('create', [VideoProductController::class, 'createProduct'])->name('create');
+        Route::post('store', [VideoProductController::class, 'storeProduct'])->name('store');
+        Route::get('detail/{id}', [VideoProductController::class, 'detailProduct'])->name('detail');
+        Route::post('update/{id}', [VideoProductController::class, 'updateProduct'])->name('update');
+        Route::get('list-gift/{id}', [VideoProductController::class, 'listGift'])->name('list-gift');
+        Route::get('delete/{id}', [VideoProductController::class, 'deleteProduct'])->name('delete');
+    });
+    // Vòng quay may mắn
+    Route::prefix('rotation')->name('rotation.')->group(function (){
+       Route::get('setting', [RotationController::class, 'setting'])->name('setting');
+       Route::get('gift', [RotationController::class, 'gift'])->name('gift');
+       Route::post('create', [RotationController::class, 'create'])->name('create');
+       Route::get('delete', [RotationController::class, 'delete'])->name('delete');
+       Route::post('create-gift', [RotationController::class, 'createGift'])->name('create-gift');
+       Route::post('update-gift/{id}', [RotationController::class, 'updateGift'])->name('update-gift');
+       Route::get('delete-gift/{id}', [RotationController::class, 'deleteGift'])->name('delete-gift');
+    });
 });
+// Giao diện vòng quay
+Route::get('play-rotation', [RotationController::class, 'playRotation']);
