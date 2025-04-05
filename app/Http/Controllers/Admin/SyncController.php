@@ -35,7 +35,7 @@ class SyncController extends HelperAdminController
     public function syncBranches(){
         try{
 
-            $personalAccessTokens = PersonalAccessTokens::all();
+            $personalAccessTokens = PersonalAccessTokens::whereNotNull('retailer')->get();
             $totalFetched = 0;
 
             foreach ($personalAccessTokens as $personalAccessToken){
@@ -102,7 +102,7 @@ class SyncController extends HelperAdminController
     */
     public function syncEmployees(){
         try{
-            $personalAccessTokens = PersonalAccessTokens::all();
+            $personalAccessTokens = PersonalAccessTokens::whereNotNull('retailer')->get();
             $totalFetched = 0;
 
             foreach ($personalAccessTokens as $personalAccessToken) {

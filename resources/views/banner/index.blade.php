@@ -72,20 +72,20 @@
                                                 </div>
                                                 <div class="modal-body">
                                                     <div class="form-group mb-2">
-                                                        <label>Tên</label>
+                                                        <label class="form-label">Tên</label>
                                                         <input class="form-control" value="{{$value->title}}" name="name" required>
                                                     </div>
                                                     <div class="form-group mb-2">
-                                                        <label class="d-block">Hình ảnh</label>
+                                                        <label class="d-block form-label">Hình ảnh(1200x600px)</label>
                                                         <img src="{{$value->image_url}}" style="width: 200px;margin: 10px 0">
                                                         <input class="form-control" type="file" accept="image/png" name="image">
                                                     </div>
                                                     <div class="form-group mb-2">
-                                                        <label>Đường link</label>
+                                                        <label class="form-label">Đường link</label>
                                                         <input class="form-control" value="{{$value->redirect_url}}" name="link">
                                                     </div>
                                                     <div class="form-group mb-2">
-                                                        <label>Chi nhánh</label>
+                                                        <label class="form-label">Chi nhánh</label>
                                                         <select name="branch_id" class="form-control">
                                                             <option value="">Tất cả cửa hàng</option>
                                                             @foreach($branches as $branch)
@@ -94,11 +94,11 @@
                                                         </select>
                                                     </div>
                                                     <div class="form-group mb-2">
-                                                        <label>Thời gian bắt đầu hiển thị</label>
+                                                        <label class="form-label">Thời gian bắt đầu hiển thị</label>
                                                         <input class="form-control" name="time_start" value="{{$value->start_date}}" type="datetime-local" required>
                                                     </div>
                                                     <div class="form-group mb-2">
-                                                        <label>Thời gian kết thúc</label>
+                                                        <label class="form-label">Thời gian kết thúc</label>
                                                         <input class="form-control" name="time_end" value="{{$value->end_date}}" type="datetime-local" required>
                                                     </div>
                                                 </div>
@@ -154,19 +154,19 @@
                     @csrf
                     <div class="modal-body">
                         <div class="form-group mb-2">
-                            <label>Tên</label>
+                            <label class="form-label">Tên</label>
                             <input class="form-control" name="name" required>
                         </div>
                         <div class="form-group mb-2">
-                            <label>Hình ảnh</label>
+                            <label class="form-label">Hình ảnh(1200x600px)</label>
                             <input class="form-control" type="file" accept="image/png" name="image" required>
                         </div>
                         <div class="form-group mb-2">
-                            <label>Đường link</label>
+                            <label class="form-label">Đường link</label>
                             <input class="form-control" name="redirect_url">
                         </div>
                         <div class="form-group mb-2">
-                            <label>Chi nhánh</label>
+                            <label class="form-label">Chi nhánh</label>
                             <select name="branch_id" class="form-control">
                                 <option value="">Tất cả cửa hàng</option>
                                 @foreach($branches as $branch)
@@ -177,15 +177,15 @@
                             </select>
                         </div>
                         <div class="form-group mb-2">
-                            <label>Thời gian bắt đầu hiển thị</label>
+                            <label class="form-label">Thời gian bắt đầu hiển thị</label>
                             <input class="form-control" name="time_start" type="datetime-local" required>
                         </div>
                         <div class="form-group mb-2">
-                            <label>Thời gian kết thúc</label>
+                            <label class="form-label">Thời gian kết thúc</label>
                             <input class="form-control" name="time_end" type="datetime-local" required>
                         </div>
                         <div class="mb-3">
-                            <label for="status" class="">Trạng thái</label>
+                            <label for="status"  class="form-label">Trạng thái</label>
                             <select name="status" class="form-control">
                                 <option value="active" {{ old('status') == 'active' ? 'selected' : '' }}>Đang hoạt động</option>
                                 <option value="inactive" {{ old('status') == 'inactive' ? 'selected' : '' }}>Đang khoá</option>

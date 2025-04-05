@@ -28,7 +28,7 @@
                         <input name="title" class="form-control" required>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Poster</label>
+                        <label class="form-label">Poster()</label>
                         <input name="thumbnail" class="form-control" type="file" accept="image/*" required>
                     </div>
                     <div class="mb-3">

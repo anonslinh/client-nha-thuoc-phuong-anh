@@ -63,7 +63,7 @@ class HelperApiController extends Controller
             return response()->json(['status' => false, 'data' => []], 400);
         }
         try {
-            $personalAccessTokens = PersonalAccessTokens::all();
+            $personalAccessTokens = PersonalAccessTokens::whereNotNull('retailer')->get();
             $firstCustomer = null;
             $totalInvoiced = 0;
             $totalRevenue = 0;
@@ -96,7 +96,6 @@ class HelperApiController extends Controller
                     $totalRevenue += $customer['totalRevenue'] ?? 0;
                     $totalPoint += $customer['totalPoint'] ?? 0;
                     $rewardPoint += $customer['rewardPoint'] ?? 0;
-                    break;
                 }
             }
             if (!empty($firstCustomer)) {
