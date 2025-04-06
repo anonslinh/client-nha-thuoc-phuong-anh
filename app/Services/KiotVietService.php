@@ -91,6 +91,7 @@ class KiotVietService
             'url_users' => 'https://public.kiotapi.com/users?', // Tài khoản nhân viên
             'url_customers' => 'https://public.kiotapi.com/customers?', //Khách hàng
             'url_invoices' => 'https://public.kiotapi.com/invoices?', //Danh sách hoá đơn
+            'url_voucher_campaign' => 'https://public.kiotapi.com/vouchercampaign?' //Danh sách đợt phát hành voucher
         ];
 
         return $data_return;

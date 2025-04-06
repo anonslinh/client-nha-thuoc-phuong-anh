@@ -4,6 +4,7 @@
 namespace App\Http\Controllers\Admin;
 
 
+use App\Models\AccountBranches;
 use App\Models\Customer;
 use App\Models\CustomerRank;
 use App\Models\Gift;
@@ -12,13 +13,24 @@ use App\Models\MembershipLevel;
 use App\Models\RankModel;
 use App\Models\Voucher;
 use App\Models\VoucherExchanges;
+use App\Services\KiotVietService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 
 class HomeController
 {
+
+    protected $kiotVietService;
+    protected $urlKiotViet;
+
+    public function __construct(KiotVietService $kiotVietService) {
+        $this->kiotVietService = $kiotVietService;
+        $this->urlKiotViet = $kiotVietService->urlKiotviet();
+    }
+
     public function home ()
     {
         return view('dashboard');
@@ -89,8 +101,9 @@ class HomeController
     public function createdVoucher(){
 
         $rank = MembershipLevel::orderBy('spending_threshold', 'asc')->get();
+        $account_branches = AccountBranches::where('active', 1)->get();
 
-        return view('voucher.create', compact('rank'));
+        return view('voucher.create', compact('rank', 'account_branches'));
     }
 
     public function detailVoucher($id){
@@ -110,6 +123,9 @@ class HomeController
     public function storeVoucher (Request $request)
     {
         try{
+            //Lấy id của voucher camping để khách hàng tạo voucher theo đợt phát hành và theo cửa hàng
+            $release_code = $this->dataReleaseCode($request->branch);
+//            dd($release_code);
             $image = null;
             if ($request->hasFile('image')){
                 $file = $request->file('image');
@@ -130,6 +146,61 @@ class HomeController
             return redirect()->route('voucher.list-data')->with(['success' => 'Tạo voucher thành công']);
         }catch (\Exception $exception){
             return back()->with(['error' => 'Vui lòng điền đầy đủ thông tin']);
+        }
+    }
+    /**
+     * Lấy voucher campeign theo mã phát hành và tài khoản kiotviet
+    */
+    public function dataReleaseCode($array_release_code){
+        try{
+            $data_return = [];
+            foreach ($array_release_code as $item){
+
+                $tokens = $this->kiotVietService->getAccessTokenAllBranches($item['code']);
+                $accessToken = $tokens->access_token;
+                $retailer = $tokens->retailer;
+
+                $pageSize = 100; // Số lượng tối đa mỗi lần gọi API
+                $currentItem = 0; // Bắt đầu từ khách hàng đầu tiên
+
+                $voucher_campaign_id = null;
+                do{
+                    $response = Http::withHeaders([
+                        'Retailer'      => $retailer,
+                        'Authorization' => 'Bearer ' . $accessToken,
+                        'Content-Type'  => 'application/json',
+                    ])->get($this->urlKiotViet['url_voucher_campaign']."pageSize=$pageSize&currentItem=$currentItem");
+
+                    if ($response->failed()) {
+                        return back()->with(['error' => 'Không thể lấy dữ liệu từ KiotViet']);
+                    }
+
+                    // Kiểm tra xem có dữ liệu không
+                    $responseData = $response->json()['data'] ?? [];
+                    if (!isset($responseData) || empty($responseData)) {
+                        break; // Dừng lại nếu không còn dữ liệu
+                    }
+
+                    foreach ($responseData as $responseItem) {
+                        if ($item['release_code'] == $responseItem['code']){
+                            $voucher_campaign_id = $responseItem['id'];
+                            break;
+                        }
+                    }
+
+                    // Cập nhật chỉ số để lấy trang tiếp theo
+                    $currentItem += $pageSize;
+
+                } while (count($responseData) === $pageSize); // Lặp cho đến khi hết dữ liệu
+
+                $item['voucher_campaign_id'] = $voucher_campaign_id;
+                if (!empty($voucher_campaign_id)){
+                    array_push($data_return, $item);
+                }
+            }
+            return $data_return;
+        }catch (\Exception $exception){
+            dd($exception);
         }
     }
     /**
