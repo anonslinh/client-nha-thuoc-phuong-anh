@@ -23,6 +23,9 @@ return new class extends Migration
             $table->timestamp('exchange_date')->nullable(); // Ngày đổi voucher
             $table->enum('status', ['pending', 'completed', 'cancelled'])->default('pending'); // Trạng thái đổi voucher
             $table->text('notes')->nullable(); // Ghi chú
+            $table->string('account_code')->nullable(); // Mã code của cửa hàng
+            $table->string('release_code')->nullable(); // Mã phát hành kiotviet
+            $table->string('voucher_campaign_id')->nullable(); // ID mã phát hành kiotviet
             $table->timestamps();
 
             // Foreign keys

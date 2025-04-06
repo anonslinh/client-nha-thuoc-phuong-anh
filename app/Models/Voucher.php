@@ -18,7 +18,8 @@ class Voucher extends Model
         'expiry_date',
         'applicable_products',
         'points_required',
-        'membership_levels_id'
+        'membership_levels_id',
+        'release_code'
     ];
 
     protected $casts = [

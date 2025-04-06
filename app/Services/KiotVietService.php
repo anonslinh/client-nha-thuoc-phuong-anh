@@ -91,7 +91,9 @@ class KiotVietService
             'url_users' => 'https://public.kiotapi.com/users?', // Tài khoản nhân viên
             'url_customers' => 'https://public.kiotapi.com/customers?', //Khách hàng
             'url_invoices' => 'https://public.kiotapi.com/invoices?', //Danh sách hoá đơn
-            'url_voucher_campaign' => 'https://public.kiotapi.com/vouchercampaign?' //Danh sách đợt phát hành voucher
+            'url_voucher_campaign' => 'https://public.kiotapi.com/vouchercampaign?', //Danh sách đợt phát hành voucher
+            'url_voucher_created' => 'https://public.kiotapi.com/voucher', // Tạo mã voucher để sử dụng theo mã phát hành voucher
+            'url_voucher_cancel' => 'https://public.kiotapi.com/voucher/cancel', // Huỷ voucher đã phát hành trên kiotviet
         ];
 
         return $data_return;

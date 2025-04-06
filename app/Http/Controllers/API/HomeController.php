@@ -3,6 +3,7 @@
 
 namespace App\Http\Controllers\API;
 
+use App\Models\Branch;
 use App\Models\Contacts;
 use App\Models\Customer;
 use App\Models\DailyActivitySummary;
@@ -307,8 +308,16 @@ class HomeController extends HelperApiController
         $perPage = $request->input('per_page', 10);
 
         $vouchers = Voucher::where('expiry_date', '>=', now())
+            ->whereNotNull('release_code')
             ->orderBy('expiry_date', 'asc')
             ->paginate($perPage);
+        foreach ($vouchers as $voucher){
+
+            $release_code = json_decode($voucher->release_code, true);
+            $codes = array_column($release_code, 'code');
+
+            $voucher->branches = Branch::select('kiotviet_id', 'branch_name', 'account_code')->whereIn('account_code', $codes)->get();
+        }
 
         return response()->json([
             'status' => true,

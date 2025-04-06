@@ -21,6 +21,7 @@ return new class extends Migration
             $table->date('expiry_date'); // Ngày hết hạn
             $table->text('applicable_products')->nullable(); // Danh sách sản phẩm áp dụng (JSON)
             $table->integer('points_required');
+            $table->text('release_code')->nullable(); // Mã phát hành các tài khoản kiotviet
             $table->timestamps();
         });
     }

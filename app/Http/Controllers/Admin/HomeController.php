@@ -109,12 +109,21 @@ class HomeController
     public function detailVoucher($id){
 
         $rank = MembershipLevel::orderBy('spending_threshold', 'asc')->get();
+        $account_branches = AccountBranches::where('active', 1)->get();
         $value = Voucher::find($id);
         if (empty($value)){
             return back()->with(['error' => 'Lỗi! không tìm thấy voucher']);
         }
+        $release_code = json_decode($value->release_code, true);
+        foreach ($account_branches as $account_branch){
+            foreach ($release_code as $item){
+                if ($account_branch->code == $item['code']){
+                    $account_branch->release_code = $item['release_code'];
+                }
+            }
+        }
 
-        return view('voucher.detail', compact('rank', 'value'));
+        return view('voucher.detail', compact('rank', 'value', 'account_branches'));
     }
 
     /**
@@ -125,7 +134,10 @@ class HomeController
         try{
             //Lấy id của voucher camping để khách hàng tạo voucher theo đợt phát hành và theo cửa hàng
             $release_code = $this->dataReleaseCode($request->branch);
-//            dd($release_code);
+            if (is_array($release_code) && empty($release_code)) {
+                return back()->with(['error' => 'Mã phát hành không tồn tại!']);
+            }
+
             $image = null;
             if ($request->hasFile('image')){
                 $file = $request->file('image');
@@ -140,7 +152,8 @@ class HomeController
                 'discount_amount' => $request->get('discount_amount'),
                 'expiry_date' => $request->get('expiry_date'),
                 'points_required' => $request->get('points_required'),
-                'description' => $request->get('description')
+                'description' => $request->get('description'),
+                'release_code' => json_encode($release_code)
             ]);
             $voucher->save();
             return redirect()->route('voucher.list-data')->with(['success' => 'Tạo voucher thành công']);
@@ -208,6 +221,12 @@ class HomeController
     **/
     public function updateVoucher (Request $request, $id)
     {
+        //Lấy id của voucher camping để khách hàng tạo voucher theo đợt phát hành và theo cửa hàng
+        $release_code = $this->dataReleaseCode($request->branch);
+        if (is_array($release_code) && empty($release_code)) {
+            return back()->with(['error' => 'Mã phát hành không tồn tại!']);
+        }
+
         $voucher = Voucher::find($id);
         if (empty($voucher)){
             return back()->with(['error' => 'Không tìm thấy dữ liệu']);
@@ -224,6 +243,7 @@ class HomeController
         $voucher->expiry_date = $request->get('expiry_date');
         $voucher->points_required = $request->get('points_required');
         $voucher->description = $request->get('description');
+        $voucher->release_code = json_encode($release_code);
         $voucher->save();
         return back()->with(['success' => 'Cập nhật voucher thành công']);
     }

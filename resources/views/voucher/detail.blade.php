@@ -44,6 +44,32 @@
                         <input class="form-control" name="expiry_date" value="{{$value->expiry_date}}" type="date" required>
                     </div>
                     <div class="mb-3">
+                        <label class="form-label">Mã phát hành voucher theo tài khoản</label>
+                        <div class="list-branch">
+                            <table class="table table-bordered">
+                                <thead>
+                                <tr>
+                                    <th>STT</th>
+                                    <th>Tên chi nhánh</th>
+                                    <th>Mã phát hành</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                @foreach($account_branches as $key => $_value)
+                                    <tr>
+                                        <td>{{$key + 1}}</td>
+                                        <td>{{$_value->code}}</td>
+                                        <td>
+                                            <input name="branch[{{$key}}][code]" value="{{$_value->code}}" hidden>
+                                            <input name="branch[{{$key}}][release_code]" type="text" class="form-control releaseCode" value="{{$_value->release_code}}">
+                                        </td>
+                                    </tr>
+                                @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="mb-3">
                         <label class="form-label">Hạng thẻ</label>
                         <select name="rank_id" class="form-control">
                             <option value="">Áp dụng cho tất hạng</option>

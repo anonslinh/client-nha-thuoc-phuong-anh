@@ -59,7 +59,7 @@
                                 @foreach($account_branches as $key => $value)
                                     <tr>
                                         <td>{{$key + 1}}</td>
-                                        <td>{{$value->name}}</td>
+                                        <td>{{$value->code}}</td>
                                         <td>
                                             <input name="branch[{{$key}}][code]" value="{{$value->code}}" hidden>
                                             <input name="branch[{{$key}}][release_code]" type="text" class="form-control releaseCode">

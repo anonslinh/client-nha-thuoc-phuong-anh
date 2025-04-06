@@ -20,7 +20,10 @@ class VoucherExchanges extends Model
         'status',
         'notes',
         'discount_amount',
-        'contact_phone'
+        'contact_phone',
+        'account_code',
+        'release_code',
+        'voucher_campaign_id'
     ];
 
     // Định nghĩa quan hệ đúng (số ít)
