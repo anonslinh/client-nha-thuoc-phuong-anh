@@ -193,7 +193,7 @@ class RotationController extends HelperAdminController
             $rotation = RotationModel::first();
             $ruleDefaultID = RuleRotation::first()->id??0;
             $customer = Customer::where('contact_number', $phone)->first();
-            if (empty($customer)){
+            if (empty($customer) || empty($rotation)){
                 $listGift = GiftRotation::where('rule_rotation_id', $ruleDefaultID)->get();
                 $countPlay = 0;
                 $dateReturn = [
@@ -250,9 +250,12 @@ class RotationController extends HelperAdminController
                 return $invoice->total >= $r->money_invoice_1 && $invoice->total <= $r->money_invoice_2;
             });
 
-            // Nếu không tìm thấy rule phù hợp, dùng rule có money_invoice_2 lớn nhất
+            // Nếu không tìm thấy rule phù hợp và total > max(money_invoice_2), gán rule cuối cùng
             if (!$rule) {
-                $rule = $rules->sortByDesc('money_invoice_2')->first();
+                $maxMoney = $rules->max('money_invoice_2');
+                if ($invoice->total > $maxMoney) {
+                    $rule = $rules->where('money_invoice_2', $maxMoney)->first();
+                }
             }
 
             if ($rule) {
