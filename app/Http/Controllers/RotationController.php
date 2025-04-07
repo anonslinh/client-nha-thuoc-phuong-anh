@@ -7,6 +7,7 @@ use App\Models\Customer;
 use App\Models\GiftRotation;
 use App\Models\HistoryGiftRotation;
 use App\Models\HistoryInvoiceRotation;
+use App\Models\Invoice;
 use App\Models\RotationModel;
 use App\Models\RuleRotation;
 use Carbon\Carbon;
@@ -177,51 +178,20 @@ class RotationController extends HelperAdminController
     **/
     public function listGiftAPI (Request $request)
     {
-        $token = $this->kiotVietService->getAccessToken();
         $rotation = RotationModel::first();
         $ruleDefaultID = RuleRotation::first()->id??0;
         $customer = Customer::where('contact_number', $request->get('phone'))->first();
         if (empty($customer)){
-            $dataCustomer = $this->infoCustomer($request->get('phone'), $token);
-            if (!empty($dataCustomer) && !empty($dataCustomer['data'])){
-                foreach ($dataCustomer['data'] as $infoCustomer){
-                    $customer = new Customer([
-                        'kiotviet_id' => $infoCustomer['id'],
-                        'code'           => $infoCustomer['code'] ?? null,
-                        'name'           => $infoCustomer['name'],
-                        'contact_number' => $infoCustomer['contactNumber'] ?? null,
-                        'address'        => $infoCustomer['address'] ?? null,
-                        'retailer_id'    => $infoCustomer['retailerId'],
-                        'branch_id'      => $infoCustomer['branchId'],
-                        'location_name'  => $infoCustomer['locationName'] ?? null,
-                        'ward_name'      => $infoCustomer['wardName'] ?? null,
-                        'modified_date'  => $infoCustomer['modifiedDate'] ?? null,
-                        'created_date'   => $infoCustomer['createdDate'] ?? null,
-                        'type'           => $infoCustomer['type'] ?? 0,
-                        'organization'   => $infoCustomer['organization'] ?? null,
-                        'comments'       => $infoCustomer['comments'] ?? null,
-                        'debt'           => $infoCustomer['debt'] ?? 0,
-                        'total_invoiced' => $infoCustomer['totalInvoiced'] ?? 0,
-                        'total_revenue'  => $infoCustomer['totalRevenue'] ?? 0,
-                        'total_point'    => $infoCustomer['totalPoint'] ?? 0,
-                        'kiotviet_reward_point' => $infoCustomer['rewardPoint'],
-                        'used_points'    => 0,
-                        'reward_point'   => $infoCustomer['rewardPoint'],
-                    ]);
-                    $customer->save();
-                }
-            }else{
-                $listGift = GiftRotation::where('rule_rotation_id', $ruleDefaultID)->get();
-                $countPlay = 0;
-                $dateReturn = [
-                    'status' => true,
-                    'data' => $listGift,
-                    'number_play' => $countPlay
-                ];
-                return response()->json($dateReturn, Response::HTTP_OK);
-            }
+            $listGift = GiftRotation::where('rule_rotation_id', $ruleDefaultID)->get();
+            $countPlay = 0;
+            $dateReturn = [
+                'status' => true,
+                'data' => $listGift,
+                'number_play' => $countPlay
+            ];
+            return response()->json($dateReturn, Response::HTTP_OK);
         }
-        $this->getInvoiceKiotviet($rotation, $customer, $token);
+        $this->getInvoiceKiotviet($rotation, $customer);
         $ruleID = HistoryInvoiceRotation::where('customer_id', $customer->id)->where('used', 0)->first()->rule_rotation_id??0;
         $countPlay = HistoryInvoiceRotation::where('customer_id', $customer->id)->where('used', 0)->count();
         if ($ruleID > 0){
@@ -240,39 +210,49 @@ class RotationController extends HelperAdminController
     /**
      * Lấy đơn hàng và cộng lượt quay cho khach hàng
     **/
-    public function getInvoiceKiotviet ($rotation, $customer, $token){
-        $endpoint = 'https://public.kiotapi.com/invoices?fromPurchaseDate='.$rotation->time_start.'&toPurchaseDate='.$rotation->time_end.'&customerIds='.$customer->kiotviet_id.'&pageSize=100';
-        $response = Http::withHeaders([
-            'Retailer' => $this->kiotVietService->getRetailer(),
-            'Authorization' => 'Bearer ' . $token,
-        ])->get($endpoint);
-        $listInvoice = $response->json();
-        if (!empty($listInvoice) && !empty($listInvoice['data'])){
-            foreach ($listInvoice['data'] as $dataInvoice){
-                $check = HistoryInvoiceRotation::where('invoice_code', $dataInvoice['code'])->exists();
-                if (!$check){
-                    $maxRuleMoney = RuleRotation::max('money_invoice_2');
-                    if ($dataInvoice['total'] > $maxRuleMoney){
-                        $rule = RuleRotation::where('money_invoice_2', $maxRuleMoney)->first();
-                    }else{
-                        $rule = RuleRotation::where('money_invoice_1', '<=', $dataInvoice['total'])->where('money_invoice_2', '>=', $dataInvoice['total'])->first();
-                    }
-                    if (isset($rule)){
-                        $historyInvoiceRule = new HistoryInvoiceRotation([
-                            'invoice_code' => $dataInvoice['code'],
-                            'customer_id' => $customer->id,
-                            'rule_rotation_id' => $rule->id,
-                            'branch_id' => $dataInvoice['branchId'],
-                            'money_invoice' => $dataInvoice['total'],
-                            'used' => 0
-                        ]);
-                        $historyInvoiceRule->save();
-                    }
-                }
+    public function getInvoiceKiotviet($rotation, $customer)
+    {
+        // Lấy danh sách invoice theo số điện thoại và khoảng thời gian
+        $listInvoice = Invoice::where('contact_number', $customer->contact_number)
+            ->whereBetween('created_date', [$rotation->time_start, $rotation->time_end])
+            ->get();
+
+        // Lấy các mã hóa đơn đã được ghi nhận trước đó để tránh duplicate
+        $existingInvoiceCodes = HistoryInvoiceRotation::whereIn('invoice_code', $listInvoice->pluck('code'))->pluck('invoice_code')->toArray();
+
+        // Lấy tất cả rule, sắp xếp theo money_invoice_1 tăng dần
+        $rules = RuleRotation::select('id', 'money_invoice_1', 'money_invoice_2')->orderBy('money_invoice_1', 'asc')->get();
+
+        foreach ($listInvoice as $invoice) {
+            if (in_array($invoice->code, $existingInvoiceCodes)) {
+                continue; // Đã xử lý => bỏ qua
+            }
+
+            // Tìm rule phù hợp với tổng tiền
+            $rule = $rules->first(function ($r) use ($invoice) {
+                return $invoice->total >= $r->money_invoice_1 && $invoice->total <= $r->money_invoice_2;
+            });
+
+            // Nếu không tìm thấy rule phù hợp, dùng rule có money_invoice_2 lớn nhất
+            if (!$rule) {
+                $rule = $rules->sortByDesc('money_invoice_2')->first();
+            }
+
+            if ($rule) {
+                HistoryInvoiceRotation::create([
+                    'invoice_code' => $invoice->code,
+                    'customer_id' => $customer->id,
+                    'rule_rotation_id' => $rule->id,
+                    'branch_id' => $invoice->branch_id,
+                    'money_invoice' => $invoice->total,
+                    'used' => 0
+                ]);
             }
         }
+
         return true;
     }
+
     /**
      * Đổi quà tặng
     **/
@@ -318,22 +298,5 @@ class RotationController extends HelperAdminController
         }
         $listMyGift = HistoryGiftRotation::where('customer_id',$customer->id)->orderBy('created_at', 'desc')->get();
         return \response()->json(['status' => true, 'data' => $listMyGift], Response::HTTP_OK);
-    }
-    /**
-     * Lấy thông tin khách hàng kiotviet = số điện thoại
-    **/
-    public function infoCustomer ($phone, $accessToken)
-    {
-        if (empty($phone)){
-            return [];
-        }
-        $response = Http::withHeaders([
-            'Retailer'      => $this->kiotVietService->getRetailer(),
-            'Authorization' => 'Bearer ' . $accessToken,
-            'Content-Type'  => 'application/json',
-        ])->get("https://public.kiotapi.com/customers?orderDirection=Desc&includeTotal=true&contactNumber=$phone");
-
-        $data = $response->json();
-        return $data;
     }
 }
