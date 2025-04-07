@@ -15,6 +15,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
+use App\Http\Controllers\API\HelperApiController;
 
 class RotationController extends HelperAdminController
 {
@@ -176,35 +177,51 @@ class RotationController extends HelperAdminController
     /**
      * API vòng quay may mắn
     **/
-    public function listGiftAPI (Request $request)
+    public function listGiftAPI (Request $request, HelperApiController $helperApiController)
     {
-        $rotation = RotationModel::first();
-        $ruleDefaultID = RuleRotation::first()->id??0;
-        $customer = Customer::where('contact_number', $request->get('phone'))->first();
-        if (empty($customer)){
-            $listGift = GiftRotation::where('rule_rotation_id', $ruleDefaultID)->get();
-            $countPlay = 0;
+        try {
+            // Validate số điện thoại
+            $validatedData = $request->validate([
+                'phone' => ['required', 'regex:/^(0[1-9][0-9]{8,9}|84[1-9][0-9]{8,9})$/'],
+            ], [
+                'phone.required' => 'Số điện thoại là bắt buộc.',
+                'phone.regex' => 'Số điện thoại không hợp lệ.',
+            ]);
+
+            $phone = $helperApiController->normalizePhone($validatedData['phone']);
+
+            $rotation = RotationModel::first();
+            $ruleDefaultID = RuleRotation::first()->id??0;
+            $customer = Customer::where('contact_number', $phone)->first();
+            if (empty($customer)){
+                $listGift = GiftRotation::where('rule_rotation_id', $ruleDefaultID)->get();
+                $countPlay = 0;
+                $dateReturn = [
+                    'status' => true,
+                    'data' => $listGift,
+                    'number_play' => $countPlay
+                ];
+                return response()->json($dateReturn, Response::HTTP_OK);
+            }
+            $this->getInvoiceKiotviet($rotation, $customer);
+            $ruleID = HistoryInvoiceRotation::where('customer_id', $customer->id)->where('used', 0)->first()->rule_rotation_id??0;
+            $countPlay = HistoryInvoiceRotation::where('customer_id', $customer->id)->where('used', 0)->count();
+            if ($ruleID > 0){
+                $listGift = GiftRotation::where('rule_rotation_id', $ruleID)->get();
+            }else{
+                $listGift = GiftRotation::where('rule_rotation_id', $ruleDefaultID)->get();
+            }
             $dateReturn = [
                 'status' => true,
                 'data' => $listGift,
                 'number_play' => $countPlay
             ];
             return response()->json($dateReturn, Response::HTTP_OK);
+        } catch (\Illuminate\Validation\ValidationException $exception) {
+            return response()->json(['error' => $exception->errors()], 200);
+        } catch (\Exception $exception) {
+            return response()->json(['error' => $exception->getMessage()], 200);
         }
-        $this->getInvoiceKiotviet($rotation, $customer);
-        $ruleID = HistoryInvoiceRotation::where('customer_id', $customer->id)->where('used', 0)->first()->rule_rotation_id??0;
-        $countPlay = HistoryInvoiceRotation::where('customer_id', $customer->id)->where('used', 0)->count();
-        if ($ruleID > 0){
-            $listGift = GiftRotation::where('rule_rotation_id', $ruleID)->get();
-        }else{
-            $listGift = GiftRotation::where('rule_rotation_id', $ruleDefaultID)->get();
-        }
-        $dateReturn = [
-            'status' => true,
-            'data' => $listGift,
-            'number_play' => $countPlay
-        ];
-        return response()->json($dateReturn, Response::HTTP_OK);
     }
 
     /**
