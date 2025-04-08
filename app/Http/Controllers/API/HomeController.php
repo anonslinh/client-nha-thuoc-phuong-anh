@@ -316,7 +316,7 @@ class HomeController extends HelperApiController
             $release_code = json_decode($voucher->release_code, true);
             $codes = array_column($release_code, 'code');
 
-            $voucher->branches = Branch::select('kiotviet_id', 'branch_name', 'account_code')->whereIn('account_code', $codes)->get();
+            $voucher->branches = Branch::select('id', 'kiotviet_id', 'branch_name', 'account_code')->whereIn('account_code', $codes)->get();
         }
 
         return response()->json([
