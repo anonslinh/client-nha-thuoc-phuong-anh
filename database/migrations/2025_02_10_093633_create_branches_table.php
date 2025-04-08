@@ -22,6 +22,7 @@ return new class extends Migration
             $table->string('contact_number');
             $table->unsignedBigInteger('retailer_id');
             $table->text('email')->nullable();
+            $table->integer('is_active')->default(0);
             $table->timestamp('modified_date')->nullable();
             $table->timestamp('created_date')->nullable();
             $table->timestamps();
