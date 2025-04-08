@@ -97,7 +97,7 @@ class VoucherExchangesController extends HelperApiController
             CustomerPointLog::updateUsedPoints($customer->kiotviet_id, $pointsRequired, 'increase');
 
             // Tạo mã đổi voucher lấy từ kiotviet
-            $exchangeCode = 'WIN' . strtoupper(Str::random(10)) . '.VC';
+            $exchangeCode = 'WIN' . strtoupper(Str::random(10));
 
             $_dataPost = [
                 'account_code' => $release_code['code'],
