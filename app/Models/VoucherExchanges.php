@@ -31,4 +31,10 @@ class VoucherExchanges extends Model
     {
         return $this->belongsTo(Voucher::class, 'voucher_id');
     }
+
+    // Quan hệ với bảng Branches
+    public function branch()
+    {
+        return $this->belongsTo(Branch::class, 'branch_id');
+    }
 }

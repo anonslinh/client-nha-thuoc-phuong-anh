@@ -215,7 +215,7 @@ class VoucherExchangesController extends HelperApiController
         $vouchers = VoucherExchanges::where('customer_id', $customer->kiotviet_id)
             ->orderByRaw("CASE WHEN status = 'pending' THEN 1 ELSE 2 END")
             ->orderBy('exchange_date', 'desc')
-            ->with('voucher')
+            ->with('voucher', 'branch')
             ->paginate($perPage);
 
         return response()->json(['status' => true, 'data' => $vouchers], 200);
