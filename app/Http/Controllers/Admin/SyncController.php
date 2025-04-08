@@ -65,6 +65,9 @@ class SyncController extends HelperAdminController
                         break; // Dừng lại nếu không còn dữ liệu
                     }
 
+                    Branch::where('account_code', $personalAccessToken->access_token_code)
+                        ->update(['is_active' => false]);
+
                     foreach ($branches as $branchData) {
                         Branch::updateOrCreate(
                             ['kiotviet_id' => $branchData['id']],
@@ -79,6 +82,7 @@ class SyncController extends HelperAdminController
                                 'email'          => $branchData['email'] ?? null,
                                 'modified_date'  => $branchData['modifiedDate'] ?? null,
                                 'created_date'   => $branchData['createdDate'] ?? null,
+                                'is_active'      => true,
                             ]
                         );
                     }

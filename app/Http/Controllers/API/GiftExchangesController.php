@@ -219,7 +219,7 @@ class GiftExchangesController extends HelperApiController
         if (!empty($request->key_search)){
             $branches = $branches->where('branch_name', 'like', "%$request->key_search%");
         }
-        $branches = $branches->get();
+        $branches = $branches->where('is_active', 1)->get();
         return response()->json(['status' => true, 'data' => $branches], 200);
     }
     /**

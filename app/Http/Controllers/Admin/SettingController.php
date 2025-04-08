@@ -44,7 +44,7 @@ class SettingController extends SyncController
     */
     public function getBranches(){
 
-        $listData = Branch::orderBy('created_at', 'desc')->paginate(20);
+        $listData = Branch::orderBy('created_at', 'desc')->where('is_active', 1)->paginate(20);
         $totalBranches = $listData->total();
         return view('config.branches-sync', compact('listData', 'totalBranches'));
     }
