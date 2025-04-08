@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Admin\HelperAdminController;
+use App\Models\Branch;
 use App\Models\Customer;
 use App\Models\GiftRotation;
+use App\Models\GiftRotationQuantity;
 use App\Models\HistoryGiftRotation;
 use App\Models\HistoryInvoiceRotation;
 use App\Models\Invoice;
@@ -81,12 +83,33 @@ class RotationController extends HelperAdminController
             $listData = $listData->where('rule_rotation_id', $request->get('rule_rotation_id'));
         }
         $listData = $listData->paginate(20);
+        foreach ($listData as $value){
+            $value['quantity'] = GiftRotationQuantity::where('gift_rotation_id', $value->id)->sum('quantity')??0;
+        }
         $rule_rotation = RuleRotation::all();
         return view('rotation.gift', compact('listData', 'rule_rotation'));
+    }
+    public function addGift (Request $request)
+    {
+        $listBranch = Branch::all();
+        $rule_rotation = RuleRotation::all();
+        return view('rotation.create_gift', compact('listBranch', 'rule_rotation'));
     }
     public function createGift (Request $request)
     {
         try{
+            $checkQuantity = false;
+            if (empty($request->get('branch'))){
+                return back()->with(['error' => 'Vui lòng thêm số lượng quà tặng cho các chi nhánh']);
+            }
+            foreach ($request->get('branch') as $value){
+                if (isset($value['quantity']) && $value['quantity'] > 1){
+                    $checkQuantity = true;
+                }
+            }
+            if (!$checkQuantity){
+                return back()->with(['error' => 'Vui lòng thêm số lượng quà tặng cho các chi nhánh']);
+            }
             if (!$request->hasFile('image')){
                 return back()->with(['error' => 'Vui lòng thêm hình ảnh quà tặng']);
             }
@@ -97,16 +120,39 @@ class RotationController extends HelperAdminController
             $gift = new GiftRotation([
                 'title' => $request->get('title'),
                 'code' => $request->get('code'),
-                'quantity' => $request->get('quantity'),
+                'quantity' => 0,
                 'percent' => $request->get('percent') / 100,
                 'rule_rotation_id' => $request->get('rule_rotation_id'),
                 'image' => $image
             ]);
             $gift->save();
+            foreach ($request->get('branch') as $value){
+                if (isset($value['quantity'])){
+                    $giftQuantity = new GiftRotationQuantity([
+                        'gift_rotation_id' => $gift['id'],
+                        'branches_id' => $value['id'],
+                        'quantity' => $value['quantity']
+                    ]);
+                    $giftQuantity->save();
+                }
+            }
             return back()->with(['success' => 'Cấu hình quà tặng thành công']);
         }catch (\Exception $exception){
             return back()->with(['error' => 'Đã có lỗi xảy ra. Vui lòng kiểm tra lại']);
         }
+    }
+    public function detailGift ($id)
+    {
+        $gift = GiftRotation::find($id);
+        if (empty($gift)){
+            return back()->with(['error' => 'Dữ liệu không tồn tại']);
+        }
+        $listBranch = Branch::all();
+        foreach ($listBranch as $value){
+            $value->quantity_gift = GiftRotationQuantity::where('branches_id', $value->id)->where('gift_rotation_id', $id)->first()->quantity??null;
+        }
+        $rule_rotation = RuleRotation::all();
+        return view('rotation.detail_gift', compact('listBranch', 'rule_rotation', 'gift'));
     }
     public function updateGift (Request $request, $id)
     {
@@ -114,6 +160,19 @@ class RotationController extends HelperAdminController
         if (empty($gift)){
             return back()->with(['error' => 'Dữ liệu không tồn tại']);
         }
+        $checkQuantity = false;
+        if (empty($request->get('branch'))){
+            return back()->with(['error' => 'Vui lòng thêm số lượng quà tặng cho các chi nhánh']);
+        }
+        foreach ($request->get('branch') as $value){
+            if (isset($value['quantity']) && $value['quantity'] > 1){
+                $checkQuantity = true;
+            }
+        }
+        if (!$checkQuantity){
+            return back()->with(['error' => 'Vui lòng thêm số lượng quà tặng cho các chi nhánh']);
+        }
+
         if ($request->hasFile('image')){
             $file = $request->file('image');
             $nameFile = time().Str::random(10).'.'.$file->getClientOriginalExtension();
@@ -126,10 +185,20 @@ class RotationController extends HelperAdminController
         }
         $gift->title = $request->get('title');
         $gift->code = $request->get('code');
-        $gift->quantity = $request->get('quantity');
         $gift->percent = $request->get('percent') / 100;
         $gift->rule_rotation_id = $request->get('rule_rotation_id');
         $gift->save();
+        GiftRotationQuantity::where('gift_rotation_id', $id)->delete();
+        foreach ($request->get('branch') as $value){
+            if (isset($value['quantity'])){
+                $giftQuantity = new GiftRotationQuantity([
+                    'gift_rotation_id' => $gift['id'],
+                    'branches_id' => $value['id'],
+                    'quantity' => $value['quantity']
+                ]);
+                $giftQuantity->save();
+            }
+        }
         return back()->with(['success' => 'Cập nhật quà tặng thành công']);
     }
 
@@ -282,15 +351,18 @@ class RotationController extends HelperAdminController
         if (empty($customer)){
             return \response()->json(['status' => false, 'msg' => 'Thông tin số điện thoại khách hàng không chính xác. Vui lòng kiểm tra lại'], Response::HTTP_OK);
         }
-        $gift = GiftRotation::where('id', $request->get('gift_id'))->lockForUpdate()->first();
+        $branch = Branch::where('kiotviet_id', $customer->branch_id)->first();
+        $gift = GiftRotation::where('id', $request->get('gift_id'))->first();
         if (empty($gift)){
             return \response()->json(['status' => false, 'msg' => 'Quà tặng sản phẩm không tồn tại.Vui lòng thử lại sau'], Response::HTTP_OK);
         }
-        if ($gift->quantity < 1){
+        $branchID = $branch->id??0;
+        $quantity = GiftRotationQuantity::where('gift_rotation_id', $gift->id)->where('branches_id', $branchID)->lockForUpdate()->first();
+        if (empty($quantity) || $quantity->quantity < 1){
             return \response()->json(['status' => false, 'msg' => 'Quà tặng sản phẩm đã hết. Xin vui lòng quay thêm lần nữa để nhận quà khác'], Response::HTTP_OK);
         }
-        $gift->quantity = $gift->quantity - 1;
-        $gift->save();
+        $quantity->quantity -= 1;
+        $quantity->save();
         $historyInvoice = HistoryInvoiceRotation::where('customer_id', $customer->id)->where('used', 0)->first();
         $historyInvoice->used = 1;
         $historyInvoice->save();

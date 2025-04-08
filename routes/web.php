@@ -207,6 +207,8 @@ Route::middleware([CheckLogin::class])->group(function (){
     Route::prefix('rotation')->name('rotation.')->group(function (){
        Route::get('setting', [RotationController::class, 'setting'])->name('setting');
        Route::get('gift', [RotationController::class, 'gift'])->name('gift');
+       Route::get('gift/create', [RotationController::class, 'addGift'])->name('gift.create');
+       Route::get('gift/detail/{id}', [RotationController::class, 'detailGift'])->name('gift.detail');
        Route::post('create', [RotationController::class, 'create'])->name('create');
        Route::get('delete', [RotationController::class, 'delete'])->name('delete');
        Route::post('create-gift', [RotationController::class, 'createGift'])->name('create-gift');

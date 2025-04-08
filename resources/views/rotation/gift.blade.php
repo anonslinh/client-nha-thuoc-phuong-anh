@@ -10,11 +10,10 @@
                             <ol class="breadcrumb">
                                 <li class="breadcrumb-item d-flex align-items-center">
                                     @if(count($rule_rotation))
-                                        <button type="button" class="justify-content-center badge fw-medium fs-2 btn btn-rounded btn-danger d-flex align-items-center"
-                                                data-bs-toggle="modal" data-bs-target="#modalCreate">
+                                        <a href="{{route('rotation.gift.create')}}" type="button" class="justify-content-center badge fw-medium fs-2 btn btn-rounded btn-danger d-flex align-items-center">
                                             <i class="ti ti-send fs-4 me-2"></i>
                                             Thêm quà tặng
-                                        </button>
+                                        </a>
                                         @else
                                         <a href="{{route('rotation.setting')}}" class="justify-content-center badge fw-medium fs-2 btn btn-rounded btn-danger d-flex align-items-center btnAddRule">
                                             <i class="ti ti-send fs-4 me-2"></i>
@@ -72,61 +71,12 @@
                                             </button>
                                             <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton" style="">
                                                 <li>
-                                                    <a class="dropdown-item" data-bs-toggle="modal" data-bs-target="#modalUpdate{{$value->id}}" href="javascript:void(0)">Sửa</a>
+                                                    <a class="dropdown-item" href="{{route('rotation.gift.detail',$value->id)}}">Sửa</a>
                                                 </li>
                                                 <li>
                                                     <a class="dropdown-item btn-sa-confirm" href="{{route('rotation.delete-gift',$value->id)}}">Xóa</a>
                                                 </li>
                                             </ul>
-                                        </div>
-                                        <div class="modal fade" id="modalUpdate{{$value->id}}" tabindex="-1">
-                                            <div class="modal-dialog" role="document">
-                                                <div class="modal-content">
-                                                    <div class="modal-header d-flex align-items-center">
-                                                        <h4 class="modal-title" id="exampleModalLabel1">
-                                                            Cài đặt quà tặng
-                                                        </h4>
-                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                                    </div>
-                                                    <form action="{{ route('rotation.update-gift',$value->id) }}" method="post" enctype="multipart/form-data" class="modal-content">
-                                                        @csrf
-                                                        <div class="modal-body">
-                                                            <div class="mb-3">
-                                                                <label for="title" class="form-label">Tên quà:</label>
-                                                                <input type="text" class="form-control" value="{{$value->title}}" name="title"/>
-                                                            </div>
-                                                            <div class="mb-3">
-                                                                <label for="link" class="form-label">Mã quà:</label>
-                                                                <input type="text" class="form-control" name="code" value="{{$value->code}}" required/>
-                                                            </div>
-                                                            <div class="mb-3">
-                                                                <label for="link" class="form-label">Hình ảnh:</label>
-                                                                <input type="file" class="form-control" accept="image/*" name="image"/>
-                                                            </div>
-                                                            <div class="mb-3">
-                                                                <label for="link" class="form-label">Số lượng:</label>
-                                                                <input type="number" class="form-control" name="quantity" value="{{$value->quantity}}" required/>
-                                                            </div>
-                                                            <div class="mb-3">
-                                                                <label for="link" class="form-label">Tỷ lệ chúng thưởng: (Lưu ý: Tổng tỉ lệ chúng quà phải là 100%)</label>
-                                                                <input type="number" class="form-control" name="percent" value="{{$value->percent * 100}}" required/>
-                                                            </div>
-                                                            <div class="mb-3">
-                                                                <label for="link" class="form-label">Nhóm giá trị đơn hàng:</label>
-                                                                <select name="rule_rotation_id" class="form-control" required>
-                                                                    @foreach($rule_rotation as $rule)
-                                                                        <option value="{{$rule->id}}" @if($rule->id == $value->rule_rotation_id) selected @endif>{{$rule->money_invoice_1.'-'.$rule->money_invoice_2}}</option>
-                                                                    @endforeach
-                                                                </select>
-                                                            </div>
-                                                        </div>
-                                                        <div class="modal-footer">
-                                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                                                            <button class="btn btn-primary">Xác nhận</button>
-                                                        </div>
-                                                    </form>
-                                                </div>
-                                            </div>
                                         </div>
                                     </td>
                                 </tr>
