@@ -323,7 +323,7 @@ class VideoProductController extends SyncController
         }
         $listProduct = ProductsModel::where('point', $gift->point)->where('is_active', 1)->limit(10)->get();
         foreach ($listProduct as $value){
-            $value['image'] = json_decode($value->id);
+            $value['image'] = json_decode($value->image);
         }
         return \response()->json(['status' => true, 'data' => [
             'gift' => $gift,
