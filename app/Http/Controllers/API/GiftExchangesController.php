@@ -95,7 +95,7 @@ class GiftExchangesController extends HelperApiController
                 'contact_phone' => $customer->contact_number,
                 'gift_id' => $gift->id,
                 'branch_id' => $validatedData['branch_id'] ?? null,
-                'exchange_code' => $exchangeCode,
+                'exchange_code' => $gift->code,
                 'points_used' => $pointsRequired,
                 'exchange_date' => now(),
                 'status' => 'pending',
