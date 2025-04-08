@@ -76,19 +76,9 @@ Route::middleware([CheckLogin::class])->group(function (){
         Route::get('delete/{id}', [GiftController::class, 'deletePromotion'])->name('delete');
     });
     Route::prefix('events')->name('events.')->group(function (){
-       Route::get('list-data', [EventsController::class, 'listData'])->name('list-data');
-       Route::get('create', [EventsController::class, 'create'])->name('create');
-       Route::post('store', [EventsController::class, 'store'])->name('store');
-       Route::get('detail/{id}', [EventsController::class, 'detail'])->name('detail');
-       Route::get('delete/{id}', [EventsController::class, 'delete'])->name('delete');
-       Route::post('update/{id}', [EventsController::class, 'update'])->name('update');
        Route::get('list-product', [EventsController::class, 'listProduct'])->name('list-product');
-//       Route::get('add-product/{id}', [EventsController::class, 'addProduct'])->name('add-product');
-//       Route::post('create-product', [EventsController::class, 'createProduct'])->name('create-product');
        Route::get('delete-product/{id}', [EventsController::class, 'deleteProduct'])->name('product.delete');
-//       Route::post('update-product/{id}', [EventsController::class, 'updateProduct'])->name('product.update');
        Route::get('list-customer', [EventsController::class, 'listCustomer'])->name('list-customer');
-       Route::post('update-point', [EventsController::class, 'updatePoint'])->name('update-point');
        Route::get('history-point', [EventsController::class, 'historyPoint'])->name('history-point');
        Route::post('customer-update-point', [EventsController::class, 'customerUpdatePoint'])->name('customer.update-point');
        Route::get('list-gift', [EventsController::class, 'listGift'])->name('list-gift');

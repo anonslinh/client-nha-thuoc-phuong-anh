@@ -7,7 +7,6 @@ use App\Models\Branch;
 use App\Models\Customer;
 use App\Models\EventsModel;
 use App\Models\ExchangeGiftEvent;
-use App\Models\Gift;
 use App\Models\GiftEvent;
 use App\Models\HistoryPointEvent;
 use App\Models\ProductsEvent;
@@ -16,7 +15,6 @@ use App\Models\QuantityGiftEvents;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Validator;
@@ -126,91 +124,6 @@ class EventsController extends SyncController
         ProductsEvent::where('events_id', $id)->delete();
         return back()->with(['success' => 'Xóa sự kiện thành công']);
     }
-
-    public function addProduct (Request $request, $id)
-    {
-        $events = EventsModel::find($id);
-        if (empty($events)){
-            return back()->with(['error' => 'Dữ liệu không tồn tại.Vui lòng kiểm tra lại']);
-        }
-        $token = $this->kiotVietService->getAccessToken();
-        $nameShop = $this->kiotVietService->getRetailer();
-        $endpoint = 'https://public.kiotapi.com/products';
-        $pageSize = 20;
-        $currentPage  = $request->page??1;
-        $currentItem = ($currentPage - 1) * $pageSize;
-        $Category_id = $request->id_category??'';
-        $name = $request->get('key_search')??'';
-        $response = Http::withHeaders([
-            'Retailer' => $nameShop,
-            'Authorization' => 'Bearer ' . $token,
-        ])->get($endpoint,[
-            'pageSize' => $pageSize,
-            'currentItem' => $currentItem,
-            'categoryId' => $Category_id,
-            'name' => $name
-        ]);
-        $products  = $response->json();
-        $totalItems = $products['total'];
-        $paginator = collect($products['data']);
-        $paginator = new LengthAwarePaginator(
-            $paginator,
-            $totalItems,
-            $pageSize,
-            $currentPage,
-            ['path' => url()->current(), 'query' => $request->except('page')]
-        );
-        foreach ($paginator as $value){
-            $value['check'] = ProductsEvent::where('events_id', $id)->where('product_id', $value['id'])->exists();
-        }
-        $categories = $this->getCategories();
-        $dataCategoryNew = [];
-        if ($categories['total'] > $categories['pageSize']){
-            $numberItem = $categories['total'] / $categories['pageSize'];
-            $page = explode('.', $numberItem);
-            for ($i = 1; $i <= $page[0]; $i++){
-                $currentItemCategory = $categories['pageSize'] * $i;
-                $categoriesNew = $this->getCategories($currentItemCategory);
-                $dataCategoryNew = $categoriesNew['data'];
-            }
-        }
-        $categories = array_merge($categories['data'], $dataCategoryNew);
-        return view('events.product-kiotviet', compact('paginator', 'categories', 'events'));
-    }
-    /**
-     * Thêm sản phẩm vào trong sự kiện
-    **/
-    public function createProduct (Request $request)
-    {
-        try{
-            if (empty($request->products)){
-                return \response()->json(['status' => false, 'msg' => 'Vui lòng điền đầy đủ thông tin'], Response::HTTP_BAD_REQUEST);
-            }
-            foreach ($request->get('products') as $value){
-                $productKiotviet = $this->detailProductKiotViet($value['product_id']);
-                $product = ProductsEvent::where('events_id', $request->get('events_id'))->where('product_id', $value['product_id'])->first();
-                if (empty($product)){
-                    $product = new ProductsEvent([
-                        'events_id' => $request->get('events_id'),
-                        'product_id' => $value['product_id'],
-                        'point' => $value['point'],
-                        'product_code' => $productKiotviet['code']??$productKiotviet['barCode'],
-                        'name' => $productKiotviet['name'],
-                        'base_price' => $productKiotviet['basePrice']
-                    ]);
-                }else{
-                    $product->point = $value['point'];
-                    $product->name = $productKiotviet['name'];
-                    $product->product_code = $productKiotviet['code']??$productKiotviet['barCode'];
-                    $product->base_price = $productKiotviet['basePrice'];
-                }
-                $product->save();
-            }
-            return \response()->json(['status' => true, 'msg' => 'Thêm sản phẩm vào sự kiện thành công'], Response::HTTP_OK);
-        }catch (\Exception $exception){
-            return response()->json(['status' => false, 'msg' => 'Đã có lỗi xảy ra.Xin vui lòng thử lại'], Response::HTTP_BAD_REQUEST);
-        }
-    }
     /**
      * Danh sách sản phẩm
     **/
@@ -247,19 +160,6 @@ class EventsController extends SyncController
         return back()->with(['success' => 'Xóa sản phẩm thành công']);
     }
     /**
-     * Cập nhật sản phẩm
-    **/
-    public function updateProduct (Request $request, $id)
-    {
-        $product = ProductsEvent::find($id);
-        if (empty($product)){
-            return back()->with(['error' => 'Sản phẩm không tồn tại']);
-        }
-        $product->point = $request->get('point');
-        $product->save();
-        return back()->with(['success' => 'Cập nhật điểm thành công']);
-    }
-    /**
      * Danh sách khách hàng
     **/
     public function listCustomer (Request $request)
@@ -275,24 +175,6 @@ class EventsController extends SyncController
         }
         $listData = $listData->orderBy('updated_at', 'desc')->paginate(20);
         return view('events.customer', compact('listData'));
-    }
-    /**
-     * Đồng bộ điểm cho khách
-    **/
-    public function updatePoint (Request $request)
-    {
-        $customer = Customer::where('kiotviet_id', $request->get('customer_id'))->first();
-        if (empty($customer)){
-            return \response()->json(['status' => false, 'msg' => 'Khách hàng không tồn tại'], Response::HTTP_BAD_REQUEST);
-        }
-        $events = EventsModel::whereDate('time_start', '<=', Carbon::now())->whereDate('time_end', '>=', Carbon::now())->get();
-        if (empty($events)){
-            return \response()->json(['status' => false, 'msg' => 'Không có chương trình nào cho thời gian hiện tại'], Response::HTTP_BAD_REQUEST);
-        }
-        foreach ($events as $value){
-            $this->SynchronizePoint($request->get('customer_id'),$value);
-        }
-        return \response()->json(['status' => true, 'msg' => 'Đồng bộ điểm khách hàng vào hệ thống thành công'], Response::HTTP_OK);
     }
     /**
      * Lịch sủ điểm của khách hàng
