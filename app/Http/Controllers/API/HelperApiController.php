@@ -106,7 +106,7 @@ class HelperApiController extends Controller
             }
             return response()->json(['status' => true, 'message' => 'Sync successful']);
         } catch (\Exception $e) {
-            return response()->json(['status' => false, 'message' => 'Internal Server Error'], 500);
+            return response()->json(['status' => false, 'message' => 'Internal Serve Error'], 500);
         }
     }
 

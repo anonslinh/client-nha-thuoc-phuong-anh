@@ -17,7 +17,7 @@ return new class extends Migration
             $table->string('contact_phone')->nullable(); // Số điện thoại của khách hàng
             $table->unsignedBigInteger('gift_id'); // ID quà tặng
             $table->unsignedBigInteger('branch_id')->nullable(); // ID chi nhánh
-            $table->string('exchange_code')->unique(); // Mã đổi quà (unique)
+            $table->string('exchange_code'); // Mã đổi quà (unique)
             $table->integer('points_used'); // Số điểm đã sử dụng
             $table->timestamp('exchange_date')->nullable(); // Ngày đổi quà
             $table->enum('status', ['pending', 'completed', 'cancelled'])->default('pending'); // Trạng thái đổi quà
