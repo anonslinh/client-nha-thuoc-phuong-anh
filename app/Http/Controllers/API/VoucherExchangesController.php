@@ -4,6 +4,7 @@
 namespace App\Http\Controllers\API;
 use App\Models\DailyActivitySummary;
 use App\Services\KiotVietService;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\Models\VoucherExchanges;
 use App\Models\Voucher;
@@ -12,8 +13,6 @@ use Illuminate\Support\Str;
 use App\Models\Customer;
 use App\Models\CustomerPointLog;
 use Illuminate\Support\Facades\Http;
-use function Carbon\this;
-
 
 class VoucherExchangesController extends HelperApiController
 {
@@ -140,10 +139,12 @@ class VoucherExchangesController extends HelperApiController
 
     /**
      * Tạo voucher dựa trên bản phát hành của
+     * Phát hành voucher ngay sau khi tạo voucher
      * param account_code, voucher_campaign_id, exchange_code
     */
     public function createdVoucherKiotviet($dataPost){
         try{
+            //Tạo voucher trên kiotviet
             $tokens = $this->kiotVietService->getAccessTokenAllBranches($dataPost['account_code']);
             $accessToken = $tokens->access_token;
             $retailer = $tokens->retailer;
@@ -159,6 +160,22 @@ class VoucherExchangesController extends HelperApiController
             ]);
 
             if ($response->failed()) {
+                return false;
+            }
+
+            //Phát hành voucher
+            $response_release = Http::withHeaders([
+                'Retailer'      => $retailer,
+                'Authorization' => 'Bearer ' . $accessToken,
+                'Content-Type'  => 'application/json',
+            ])->post($this->urlKiotViet['url_voucher_release'], [
+                'CampaignId' => $dataPost['voucher_campaign_id'],
+                'Vouchers' => [
+                    ['Code' => $dataPost['exchange_code']]
+                ],
+                'ReleaseDate' => now(),
+            ]);
+            if ($response_release->failed()) {
                 return false;
             }
 
