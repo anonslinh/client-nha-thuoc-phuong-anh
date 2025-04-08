@@ -75,9 +75,6 @@
                                         </button>
                                         <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton" style="">
                                             <li>
-                                                <button class="dropdown-item btn-update-point" value="{{$value->kiotviet_id}}">Đồng bộ điểm</button>
-                                            </li>
-                                            <li>
                                                 <button data-bs-toggle="modal" data-bs-target="#modalUpdate{{$value->id}}" class="dropdown-item">Sửa điểm</button>
                                             </li>
                                             <li>
@@ -101,37 +98,4 @@
             <div class="d-flex justify-content-center">{{$listData->appends(request()->all())->links('pagination')}}</div>
         </div>
     </div>
-@endsection
-@section('script')
-    <script>
-        $(document).ready(function () {
-           $(".btn-update-point").click(function () {
-               $(".loading").addClass("active");
-               let data = {};
-               data['customer_id'] = $(this).val();
-               $.ajax({
-                   url: "{{route('events.update-point')}}",
-                   data: data,
-                   type: "post",
-                   dataType: "json",
-                   success: function (data) {
-                       $(".loading").removeClass("active");
-                       Swal.fire(
-                           "Thành công",
-                           "Đồng bộ điểm lên hệ thống thành công",
-                           "success"
-                       );
-                   },
-                   error: function (data) {
-                       $(".loading").removeClass("active");
-                       Swal.fire(
-                           "Thất bại",
-                           data.msg,
-                           "error"
-                       );
-                   }
-               })
-           });
-        });
-    </script>
 @endsection
