@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Admin\SyncController;
 use App\Http\Controllers\API\HelperApiController;
 use App\Models\Branch;
+use App\Models\CartModel;
 use App\Models\Customer;
 use App\Models\ExchangeGiftEvent;
 use App\Models\Gift;
@@ -474,5 +475,46 @@ class VideoProductController extends SyncController
             dd($exception);
         }
     }
+    /**
+     * Mua sản phẩm
+    **/
+    public function addToCart (Request $request)
+    {
+        if (empty($request->phone)){
+            return \response()->json(['status' => false, 'msg' => 'Vui lòng điền số điện thoại khách hàng'], 401);
+        }
+        $customer = Customer::where('contact_number', $request->get('phone'))->first();
+        $product = ProductsModel::find($request->get('product_id'));
+        if (empty($product)){
+            return \response()->json(['status' => false, 'msg' => 'Không tìm thấy sản phẩm.Vui lòng kiểm tra lại'], 401);
+        }
+        $image = json_decode($product->image);
+        $cart = new CartModel([
+            'customer_id' => $customer->id??null,
+            'phone' => $request->get('phone'),
+            'name_customer' => $request->get('name')??null,
+            'name_product' => $product->name,
+            'image_product' => $image[0],
+            'code_product' => $product->code,
+            'price' => $product->price,
+            'status' => 1
+        ]);
+        $cart->save();
+        return \response()->json(['status' => true, 'msg' => 'Yêu cầu mua sản phẩm thành công. Chúng tôi sẽ liên hệ với bạn sớm.Chân trọng cảm ơn'], 200);
+    }
 
+    public function listCart (Request $request)
+    {
+        $listData = CartModel::query();
+        if (isset($request->key_search)){
+            $listData = $listData->where(function ($query) use ($request){
+               $query->where('phone', 'like', '%'.$request->get('key_search').'%')
+               ->orWhere('name_customer', 'like', '%'.$request->get('key_search').'%')
+               ->orWhere('name_product', 'like', '%'.$request->get('key_search').'%')
+               ->orWhere('code_product', 'like', '%'.$request->get('key_search').'%');
+            });
+        }
+        $listData = $listData->orderBy('created_at', 'desc')->paginate(20);
+        return view('product.list_cart', compact('listData'));
+    }
 }

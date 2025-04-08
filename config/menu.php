@@ -101,6 +101,11 @@ return [
                 'name' => 'Lịch sử đổi quà',
                 'icon' => 'solar:waterdrops-line-duotone',
                 'route' => 'events.history-exchange-gift'
+            ],
+            [
+                'name' => 'KH mua sản phẩm',
+                'icon' => 'solar:waterdrops-line-duotone',
+                'route' => 'events.cart'
             ]
         ]
     ],

@@ -93,6 +93,7 @@ Route::middleware([CheckLogin::class])->group(function (){
        Route::get('list-gift/{id}', [VideoProductController::class, 'listGift'])->name('list-gift-product');
         Route::get('detail/{id}', [VideoProductController::class, 'detailProduct'])->name('detail-product');
         Route::post('update/{id}', [VideoProductController::class, 'updateProduct'])->name('update-product');
+        Route::get('cart', [VideoProductController::class, 'listCart'])->name('cart');
     });
 
     Route::prefix('voucher')->name('voucher.')->group(function (){
