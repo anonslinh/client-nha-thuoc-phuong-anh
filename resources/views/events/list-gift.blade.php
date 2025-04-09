@@ -9,10 +9,10 @@
                 </div>
             </div>
             <div class="card-body">
-                <form action="{{route('index')}}" method="get" class="d-flex justify-content-end">
+                <form action="{{route('events.list-gift')}}" method="get" class="d-flex justify-content-end">
                     <input name="key_search" value="{{request()->get('key_search')}}" class="form-control" style="max-width: 250px;margin-right: 15px" placeholder="Tìm kiếm tên hoặc mã quà tặng">
                     <button class="btn btn-success" style="margin-right: 15px">Tìm kiếm</button>
-                    <a href="{{route('index')}}" class="btn btn-danger">Hủy</a>
+                    <a href="{{route('events.list-gift')}}" class="btn btn-danger">Hủy</a>
                 </form>
                 <table class="table table-bordered mt-4 table-hover">
                     <thead>
