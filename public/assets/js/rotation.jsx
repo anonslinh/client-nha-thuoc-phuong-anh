@@ -45,11 +45,9 @@ function App() {
     const refModalShowGift = useRef(null)
     const refModalShowListGift = useRef(null)
     const refModalAlert = useRef(null)
-    const refModalInfoGetGit = useRef(null)
     const [currentRotate, setCurrentRotate] = useState(0)
     const [isRotating, setIsRotating] = useState(false)
     const [currentGift, setCurrentGift] = useState(null)
-    const [currentGiftExchange, setCurrentGiftExchange] = useState(null)
     const [loading, setLoading] = useState(false)
     const refT = useRef("")
     const [listGift, setListGift] = useState([])
@@ -125,10 +123,10 @@ function App() {
             refModalAlert.current?.setShowModal(true);
         } else if (!isRotating) {
         setIsRotating(true)
-        const gift = getGift()
-        const newCurrentRotate = currentRotate + 360 * 10
-        setCurrentRotate(newCurrentRotate)
-        rotateWheel(newCurrentRotate, gift.index)
+        const gift = getGift();
+        const newCurrentRotate = currentRotate + 360 * 10;
+        rotateWheel(newCurrentRotate, gift.index);
+        setCurrentRotate(newCurrentRotate);
         try {
             const formData = new FormData()
             formData.append("phone", phoneUser)
@@ -410,10 +408,30 @@ function App() {
 
     const LoadingPage = () => <div>Đang tải...</div>
 
+    const checkPercent =(length)=>{
+        if(!length) return '80';
+        if(length<6){
+            return  '80'
+        }
+        if(length>=6&&length<9){
+            return  '75'
+        }
+        if(length>=9&&length<12){
+            return  '65'
+        }
+        if(length>=12&&length<16){
+            return  '50'
+        }
+        if(length>=16){
+            return  '40'
+        }
+    }
 
     useEffect(()=>{
         getListGift()
     },[phoneUser])
+
+    console.log(listGift?.length)
 
     return (
         <div className="main max-w-lg min-h-screen w-full m-auto">
@@ -421,8 +439,9 @@ function App() {
         {/* logo  */}
         <div className="mt-12">
         <img
-    src={"assets/images/logos/logo_win_baby.svg"}
+    src={"assets/static/logo.png"}
     alt="logo"
+    style={{width: "100px"}}
     className="w-64 h-auto object-cover"
         />
         </div>
@@ -445,6 +464,7 @@ function App() {
                         return (
                             <li
                                 key={index}
+                                className='border-li'
                                 style={{
                                     transform: `rotate(${
                                         rotate * index
@@ -465,7 +485,10 @@ function App() {
                                         <img
                                             // src="assets/static/iconGift.png"
                                             src={ `${baseUrl}` + item.image}
-                                            className="w-8 h-10 mt-3 rounded-lg"
+                                            className=" mt-[30%] ratio"
+                                            style={{
+                                                width:`${checkPercent(listGift.length)}%`
+                                            }}
                                         />
                                     </div>
                                 </div>
@@ -543,7 +566,7 @@ function App() {
                         <div className="px-2 w-full ">
                             <div className="absolute top-20  w-full flex justify-center ">
                                 <img
-                                    src={"assets/images/logos/logo_win_baby.svg"}
+                                    src={"assets/static/logo.png"}
                                     alt="logo"
                                     className="w-64 h-auto object-cover"
                                 />
