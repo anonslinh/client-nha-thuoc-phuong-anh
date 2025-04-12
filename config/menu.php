@@ -127,6 +127,11 @@ return [
                 'name' => 'Lịch sử đổi quà',
                 'icon' => 'solar:settings-line-duotone',
                 'route' => 'rotation.history-exchange-gift'
+            ],
+            [
+                'name' => 'Quà tặng Như Anh',
+                'icon' => 'solar:settings-line-duotone',
+                'route' => 'rotation.sub-gift'
             ]
         ]
     ],

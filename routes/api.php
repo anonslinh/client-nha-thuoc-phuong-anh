@@ -70,4 +70,7 @@ Route::prefix('rotation')->group(function (){
     Route::post('list-gift', [RotationController::class, 'listGiftAPI']);
     Route::post('exchange-gift', [RotationController::class, 'exchangeGiftAPI']);
     Route::post('get-my-gift', [RotationController::class, 'getMyGiftAPI']);
+
+    Route::post('list-gift-sub', [RotationController::class, 'listGiftSubAPI']);
+    Route::post('exchange-gift-sub', [RotationController::class, 'exchangeGiftSubAPI']);
 });

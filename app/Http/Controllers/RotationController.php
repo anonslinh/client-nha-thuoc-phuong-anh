@@ -7,6 +7,7 @@ use App\Models\Branch;
 use App\Models\Customer;
 use App\Models\GiftRotation;
 use App\Models\GiftRotationQuantity;
+use App\Models\GiftRotationSub;
 use App\Models\HistoryGiftRotation;
 use App\Models\HistoryInvoiceRotation;
 use App\Models\Invoice;
@@ -390,5 +391,124 @@ class RotationController extends HelperAdminController
         }
         $listMyGift = HistoryGiftRotation::where('customer_id',$customer->id)->orderBy('created_at', 'desc')->get();
         return \response()->json(['status' => true, 'data' => $listMyGift], Response::HTTP_OK);
+    }
+
+    /**
+     * Quà tặng ở cửa hàng cô Xuyến
+    **/
+    public function subGift (Request $request)
+    {
+        $listData = GiftRotationSub::query();
+        if (isset($request->key_search)){
+            $listData = $listData->where('title', 'like', '%'.$request->get('key_search').'%');
+        }
+        if (isset($request->rule_rotation_id)){
+            $listData = $listData->where('rule_rotation_id', $request->get('rule_rotation_id'));
+        }
+        $listData = $listData->paginate(20);
+        $rule_rotation = RuleRotation::all();
+        return view('rotation.gift_2', compact('listData', 'rule_rotation'));
+    }
+
+    public function createGift2 (Request $request)
+    {
+        try{
+            if (!$request->hasFile('image')){
+                return back()->with(['error' => 'Vui lòng thêm hình ảnh quà tặng']);
+            }
+            $file = $request->file('image');
+            $nameFile = time().Str::random(10).'.'.$file->getClientOriginalExtension();
+            $file->move('upload/gift-rotation/', $nameFile);
+            $image = 'upload/gift-rotation/'.$nameFile;
+            $gift = new GiftRotationSub([
+                'title' => $request->get('title'),
+                'code' => $request->get('code'),
+                'quantity' => $request->get('quantity'),
+                'percent' => $request->get('percent') / 100,
+                'rule_rotation_id' => $request->get('rule_rotation_id'),
+                'image' => $image
+            ]);
+            $gift->save();
+            return back()->with(['success' => 'Cấu hình quà tặng thành công']);
+        }catch (\Exception $exception){
+            return back()->with(['error' => 'Đã có lỗi xảy ra. Vui lòng kiểm tra lại']);
+        }
+    }
+
+    public function deleteGiftSub ($id)
+    {
+        $gift = GiftRotationSub::find($id);
+        if (empty($gift)){
+            return back()->with(['error' => 'Dữ liệu không tồn tại']);
+        }
+        if (file_exists(public_path($gift->image))) {
+            unlink(public_path($gift->image));
+        }
+        $gift->delete();
+        return back()->with(['error' => 'Xóa dữ liệu thành công']);
+    }
+
+    public function updateGift2 (Request $request, $id)
+    {
+        $gift = GiftRotationSub::find($id);
+        if (empty($gift)){
+            return back()->with(['error' => 'Dữ liệu không tồn tại']);
+        }
+        if ($request->hasFile('image')){
+            $file = $request->file('image');
+            $nameFile = time().Str::random(10).'.'.$file->getClientOriginalExtension();
+            $file->move('upload/gift-rotation/', $nameFile);
+            $image = 'upload/gift-rotation/'.$nameFile;
+            if (file_exists(public_path($gift->image))) {
+                unlink(public_path($gift->image));
+            }
+            $gift->image = $image;
+        }
+        $gift->title = $request->get('title');
+        $gift->code = $request->get('code');
+        $gift->percent = $request->get('percent') / 100;
+        $gift->quantity = $request->get('quantity');
+        $gift->rule_rotation_id = $request->get('rule_rotation_id');
+        $gift->save();
+        return back()->with(['success' => 'Cập nhật quà tặng thành công']);
+    }
+
+    /**
+     * API lấy danh sách quà tặng theo giá trị hóa đơn
+    **/
+    public function listGiftSubAPI (Request $request)
+    {
+        $money = $request->get('money');
+        if (isset($money) && is_numeric($money)){
+            $maxMoney = RuleRotation::max('money_invoice_2');
+            if ($maxMoney <= $money){
+                $ruleID = RuleRotation::where('money_invoice_2', $maxMoney)->first()->id??0;
+            }else{
+                $ruleID = RuleRotation::where('money_invoice_1', '<=', $money)->where('money_invoice_2', '>=', $money)->first()->id ?? 0;
+            }
+            $listGift = GiftRotationSub::where('rule_rotation_id', $ruleID)->get();
+        }else{
+            $listGift = [];
+        }
+        $dateReturn = [
+            'status' => true,
+            'data' => $listGift,
+            'number_play' => 1
+        ];
+        return response()->json($dateReturn, Response::HTTP_OK);
+    }
+
+    public function exchangeGiftSubAPI (Request $request)
+    {
+        $gift = GiftRotationSub::where('id', $request->get('gift_id'))->first();
+        if (empty($gift)){
+            return \response()->json(['status' => false, 'msg' => 'Quà tặng sản phẩm không tồn tại.Vui lòng thử lại sau'], Response::HTTP_OK);
+        }
+        if ($gift->quantity < 1){
+            return \response()->json(['status' => false, 'msg' => 'Quà tặng sản phẩm đã hết. Xin vui lòng quay thêm lần nữa để nhận quà khác'], Response::HTTP_OK);
+        }
+        $gift->quantity -= 1;
+        $gift->save();
+        return \response()->json(['status' => true, 'msg' => 'Chúc mừng bạn đã nhận được phần quà: '.$gift->title], Response::HTTP_OK);
     }
 }

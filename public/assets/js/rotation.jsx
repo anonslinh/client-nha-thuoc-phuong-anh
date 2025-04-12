@@ -431,7 +431,6 @@ function App() {
         getListGift()
     },[phoneUser])
 
-    console.log(listGift?.length)
 
     return (
         <div className="main max-w-lg min-h-screen w-full m-auto">
@@ -441,7 +440,7 @@ function App() {
         <img
     src={"assets/static/logo.png"}
     alt="logo"
-    style={{width: "100px"}}
+    style={{width: "200px"}}
     className="w-64 h-auto object-cover"
         />
         </div>
@@ -568,6 +567,7 @@ function App() {
                                 <img
                                     src={"assets/static/logo.png"}
                                     alt="logo"
+                                    style={{width: "200px"}}
                                     className="w-64 h-auto object-cover"
                                 />
                             </div>
