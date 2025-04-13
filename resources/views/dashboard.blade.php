@@ -276,7 +276,7 @@
             stacked: false,
             offsetX: -10,
           },
-          colors: ["var(--bs-danger)", "var(--bs-secondary)", "var(--bs-primary)", "var(--bs-warning)"],
+          colors: ["var(--bs-danger)", "var(--bs-secondary)", "var(--bs-primary)", "var(--bs-warning)", "var(--bs-info)"],
           plotOptions: {},
           dataLabels: {
             enabled: false,
@@ -331,6 +331,7 @@
               "var(--bs-secondary)",
               "var(--bs-primary)",
               "var(--bs-warning)",
+              "var(--bs-info)",
             ],
             strokeWidth: 2,
           },

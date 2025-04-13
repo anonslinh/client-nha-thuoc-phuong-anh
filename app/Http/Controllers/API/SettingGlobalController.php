@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API;
 
 
 use App\Models\CustomerOAFollow;
+use App\Models\DailyActivitySummary;
 use App\Models\SettingGlobal;
 use Illuminate\Http\Request;
 
@@ -38,6 +39,9 @@ class SettingGlobalController extends HelperApiController
             ]);
 
             $oa_id = SettingGlobal::where('code', 'oa_id')->value('comment');
+
+            //Ghi log follow Zalo OA
+            DailyActivitySummary::logAction($request->phone ? $request->phone :null, 'follow_oa');
 
             $followed = CustomerOAFollow::updateOrCreate(
                 ['phone' => $request->phone, 'oa_id' => $oa_id],

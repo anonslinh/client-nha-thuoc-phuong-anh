@@ -44,7 +44,7 @@ class DashboardController extends HelperAdminController
             $activityData = [];
 
             // Khởi tạo mảng rỗng cho từng loại hành động
-            $actions = ['access_to' => 'Truy cập', 'view_points' => 'Xem điểm', 'redeem_gift_voucher' => 'Đổi quà voucher', 'rate' => 'Đánh giá'];
+            $actions = ['access_to' => 'Truy cập', 'view_points' => 'Xem điểm', 'redeem_gift_voucher' => 'Đổi quà voucher', 'rate' => 'Đánh giá', 'follow_oa' => 'Follow OA'];
             foreach ($actions as $key => $label) {
                 $activityData[$key] = ['name' => $label, 'data' => []];
             }
