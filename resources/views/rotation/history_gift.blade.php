@@ -5,7 +5,7 @@
             <div class="row align-items-center">
                 <div class="col-12">
                     <div class="d-sm-flex align-items-center justify-space-between">
-                        <h4 class="mb-4 mb-sm-0 card-title">Danh sách khách hàng trúng quà</h4>
+                        <h4 class="mb-4 mb-sm-0 card-title">Danh sách khách hàng trúng quà: {{$totalGift}}</h4>
                     </div>
                 </div>
             </div>
@@ -39,7 +39,7 @@
                         @if($listData->total() > 0)
                             @foreach($listData as $key => $value)
                                 <tr>
-                                    <td class="align-middle">{{$key + 1}}</td>
+                                    <td>{{ ($listData->currentPage() - 1) * $listData->perPage() + $key + 1 }}</td>
                                     <td class="align-middle">
                                         <p class="m-0">{{$value->name_customer}}</p>
                                     </td>

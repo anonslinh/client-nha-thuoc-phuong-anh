@@ -241,8 +241,9 @@ class RotationController extends HelperAdminController
             $listData = $listData->whereIn('history_invoice_rotation_id', $listID);
         }
         $listData = $listData->orderBy('created_at', 'desc')->paginate(20);
+        $totalGift = $listData->total();
         $rule_rotation = RuleRotation::all();
-        return view('rotation.history_gift', compact('listData', 'rule_rotation'));
+        return view('rotation.history_gift', compact('listData', 'rule_rotation', 'totalGift'));
     }
     /**
      * API vòng quay may mắn
