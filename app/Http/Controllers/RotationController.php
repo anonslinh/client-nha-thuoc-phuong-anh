@@ -352,19 +352,18 @@ class RotationController extends HelperAdminController
         if (empty($customer)){
             return \response()->json(['status' => false, 'msg' => 'Thông tin số điện thoại khách hàng không chính xác. Vui lòng kiểm tra lại'], Response::HTTP_OK);
         }
-        $branch = Branch::where('kiotviet_id', $customer->branch_id)->first();
         $gift = GiftRotation::where('id', $request->get('gift_id'))->first();
         if (empty($gift)){
             return \response()->json(['status' => false, 'msg' => 'Quà tặng sản phẩm không tồn tại.Vui lòng thử lại sau'], Response::HTTP_OK);
         }
-        $branchID = $branch->id??0;
+        $historyInvoice = HistoryInvoiceRotation::where('customer_id', $customer->id)->where('used', 0)->first();
+        $branchID = $historyInvoice->branch_id??0;
         $quantity = GiftRotationQuantity::where('gift_rotation_id', $gift->id)->where('branches_id', $branchID)->lockForUpdate()->first();
         if (empty($quantity) || $quantity->quantity < 1){
             return \response()->json(['status' => false, 'msg' => 'Quà tặng sản phẩm đã hết. Xin vui lòng quay thêm lần nữa để nhận quà khác'], Response::HTTP_OK);
         }
         $quantity->quantity -= 1;
         $quantity->save();
-        $historyInvoice = HistoryInvoiceRotation::where('customer_id', $customer->id)->where('used', 0)->first();
         $historyInvoice->used = 1;
         $historyInvoice->save();
         $historyGift = new HistoryGiftRotation([
