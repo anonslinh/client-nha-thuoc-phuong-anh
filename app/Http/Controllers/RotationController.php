@@ -357,7 +357,9 @@ class RotationController extends HelperAdminController
             return \response()->json(['status' => false, 'msg' => 'Quà tặng sản phẩm không tồn tại.Vui lòng thử lại sau'], Response::HTTP_OK);
         }
         $historyInvoice = HistoryInvoiceRotation::where('customer_id', $customer->id)->where('used', 0)->first();
-        $branchID = $historyInvoice->branch_id??0;
+        $branchKiotVietID = $historyInvoice->branch_id??0;
+        $branch = Branch::where('kiotviet_id', $branchKiotVietID)->first();
+        $branchID = $branch->id??0;
         $quantity = GiftRotationQuantity::where('gift_rotation_id', $gift->id)->where('branches_id', $branchID)->lockForUpdate()->first();
         if (empty($quantity) || $quantity->quantity < 1){
             return \response()->json(['status' => false, 'msg' => 'Quà tặng sản phẩm đã hết. Xin vui lòng quay thêm lần nữa để nhận quà khác'], Response::HTTP_OK);
