@@ -44,6 +44,16 @@ class InvoicesController extends HelperApiController
                 ->with('details')
                 ->paginate($perPage);
 
+            //Giấy Tờ Chứng Nhận
+            foreach ($data as $invoice){
+                foreach ($invoice->details as $detail){
+                    $detail->certificate = null;
+                    if ($detail->product_code == 7350107133587){
+                        $detail->certificate = "https://drive.google.com/drive/folders/143fnJ_Ovdtmvj2prSBcr_iot2Gf1XJOV?usp=sharing";
+                    }
+                }
+            }
+
             return response()->json(['status' => true, 'data' => $data]);
         }catch (\Exception $exception){
             \Log::error('Lỗi khi lấy hóa đơn: ' . $exception->getMessage());
