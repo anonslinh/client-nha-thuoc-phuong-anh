@@ -10,6 +10,7 @@ use App\Services\KiotVietService;
 use Illuminate\Http\Request;
 use App\Models\Invoice;
 use App\Models\InvoiceRating;
+use App\Models\ProductCertificate;
 
 class InvoicesController extends HelperApiController
 {
@@ -44,13 +45,21 @@ class InvoicesController extends HelperApiController
                 ->with('details')
                 ->paginate($perPage);
 
-            //Giấy Tờ Chứng Nhận
-            foreach ($data as $invoice){
-                foreach ($invoice->details as $detail){
-                    $detail->certificate = null;
-                    if ($detail->product_code == 7350107133587){
-                        $detail->certificate = "https://drive.google.com/drive/folders/143fnJ_Ovdtmvj2prSBcr_iot2Gf1XJOV?usp=sharing";
-                    }
+            // Giấy Tờ Chứng Nhận
+            $productCodes = collect($data->items())
+                ->flatMap(function($invoice) {
+                    return $invoice->details;
+                })
+                ->pluck('product_code')
+                ->unique();
+
+            $certificates = ProductCertificate::whereIn('product_code', $productCodes)
+                ->where('is_active', true)
+                ->pluck('certificate_link', 'product_code');
+
+            foreach ($data as $invoice) {
+                foreach ($invoice->details as $detail) {
+                    $detail->certificate = $certificates[$detail->product_code] ?? null;
                 }
             }
 

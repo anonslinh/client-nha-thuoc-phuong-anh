@@ -16,6 +16,7 @@ use App\Http\Controllers\LoginZaloController;
 use App\Http\Controllers\Admin\DealController;
 use App\Http\Controllers\VideoProductController;
 use App\Http\Controllers\RotationController;
+use App\Http\Controllers\Admin\ProductCertificateController;
 
 Route::get('login', [LoginController::class, 'login'])->name('login');
 Route::get('authentication-forgot-password', [LoginController::class, 'forgotPassword'])->name('authentication-forgot-password');
@@ -194,7 +195,7 @@ Route::middleware([CheckLogin::class])->group(function (){
        Route::get('delete/{id}', [VideoProductController::class, 'delete'])->name('video.delete');
        Route::post('update/{id}', [VideoProductController::class, 'update'])->name('video.update');
     });
-//    // Cài đặt sản phẩm và quà
+    // Cài đặt sản phẩm và quà
     Route::prefix('product-gift')->name('product_gift.')->group(function (){
         Route::get('', [VideoProductController::class, 'giftProduct'])->name('index');
         Route::get('create', [VideoProductController::class, 'createProduct'])->name('create');
@@ -220,6 +221,16 @@ Route::middleware([CheckLogin::class])->group(function (){
        Route::post('create-gift-2', [RotationController::class, 'createGift2'])->name('create-gift-2');
        Route::post('update-gift-2/{id}', [RotationController::class, 'updateGift2'])->name('update-gift-2');
        Route::get('delete-gift-2/{id}', [RotationController::class, 'deleteGiftSub'])->name('sub-gift.delete');
+    });
+    //Giấy chứng nhận sản phẩm
+    Route::prefix('certificates')->name('certificates.')->group(function () {
+        Route::get('/', [ProductCertificateController::class, 'indexCertificates'])->name('index');
+        Route::post('/', [ProductCertificateController::class, 'storeCertificates'])->name('store');
+        Route::post('/{id}', [ProductCertificateController::class, 'updateCertificates'])->name('update');
+        Route::get('destroy/{id}', [ProductCertificateController::class, 'destroyCertificates'])->name('destroy');
+        Route::get('/certificates/export', [ProductCertificateController::class, 'exportCertificates'])->name('export');
+        Route::post('/certificates/import', [ProductCertificateController::class, 'importCertificates'])->name('import');
+
     });
 });
 // Giao diện vòng quay

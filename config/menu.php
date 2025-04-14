@@ -170,6 +170,11 @@ return [
                 'route' => 'config.setting-point-order-review'
             ],
             [
+                'name' => 'Giấy chứng nhận',
+                'icon' => 'solar:document-text-line-duotone',
+                'route' => 'certificates.index'
+            ],
+            [
                 'name' => 'AI Tự động',
                 'icon' => 'solar:atom-line-duotone',
                 'route' => 'setting-automatic.index-setting-email'
