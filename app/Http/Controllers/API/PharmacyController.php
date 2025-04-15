@@ -17,7 +17,7 @@ class PharmacyController extends HelperApiController
             'phone'      => 'required|string|max:20',
             'address'    => 'nullable|string',
             'note'       => 'nullable|string',
-            'images.*'   => 'image|mimes:jpeg,png,jpg|max:2048',
+            'images.*'   => 'image|mimes:jpeg,png,jpg',
             'images'     => 'array|max:3', // tối đa 3 ảnh
         ]);
         if ($validator->fails()) {

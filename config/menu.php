@@ -34,6 +34,11 @@ return [
                 'name' => 'Đánh hoá đơn',
                 'icon' => 'solar:star-fall-minimalistic-2-line-duotone',
                 'route' => 'employees.ratings-invoice'
+            ],
+            [
+                'name' => 'Gửi đơn thuốc, hình ảnh',
+                'icon' => 'solar:document-text-line-duotone',
+                'route' => 'pharmacy.prescription'
             ]
         ]
     ],

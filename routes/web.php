@@ -17,6 +17,7 @@ use App\Http\Controllers\Admin\DealController;
 use App\Http\Controllers\VideoProductController;
 use App\Http\Controllers\RotationController;
 use App\Http\Controllers\Admin\ProductCertificateController;
+use App\Http\Controllers\Admin\PharmacyController;
 
 Route::get('login', [LoginController::class, 'login'])->name('login');
 Route::get('authentication-forgot-password', [LoginController::class, 'forgotPassword'])->name('authentication-forgot-password');
@@ -230,7 +231,11 @@ Route::middleware([CheckLogin::class])->group(function (){
         Route::get('destroy/{id}', [ProductCertificateController::class, 'destroyCertificates'])->name('destroy');
         Route::get('/certificates/export', [ProductCertificateController::class, 'exportCertificates'])->name('export');
         Route::post('/certificates/import', [ProductCertificateController::class, 'importCertificates'])->name('import');
-
+    });
+    //Nhà thuốc
+    Route::prefix('pharmacy')->name('pharmacy.')->group(function () {
+        Route::get('prescription', [PharmacyController::class, 'indexPrescription'])->name('prescription');
+        Route::get('prescription-detail/{id}', [PharmacyController::class, 'showPrescription'])->name('prescription-detail');
     });
 });
 // Giao diện vòng quay
