@@ -9,6 +9,7 @@ use App\Http\Controllers\API\EventsController;
 use App\Http\Controllers\API\SettingGlobalController;
 use App\Http\Controllers\VideoProductController;
 use App\Http\Controllers\RotationController;
+use App\Http\Controllers\API\PharmacyController;
 
 Route::post('reward-point', [HomeController::class, 'rewardPointCustomer']);
 Route::get('banners', [HomeController::class, 'getBanners']);
@@ -73,4 +74,8 @@ Route::prefix('rotation')->group(function (){
 
     Route::post('list-gift-sub', [RotationController::class, 'listGiftSubAPI']);
     Route::post('exchange-gift-sub', [RotationController::class, 'exchangeGiftSubAPI']);
+});
+//Nhà thuốc
+Route::prefix('pharmacy')->group(function (){
+    Route::post('prescriptions', [PharmacyController::class, 'submitPrescription']);
 });
