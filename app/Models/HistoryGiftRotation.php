@@ -19,4 +19,9 @@ class HistoryGiftRotation extends Model
         'code_gift',
         'status'
     ];
+
+    public function invoiceRotation ()
+    {
+        return $this->belongsTo(HistoryInvoiceRotation::class, 'history_invoice_rotation_id');
+    }
 }
