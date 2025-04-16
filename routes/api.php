@@ -39,7 +39,7 @@ Route::post('voucher-exchange/cancel', [VoucherExchangesController::class, 'canc
 
 // Sụ kiện
 Route::prefix('events')->group(function (){
-    Route::get('get-data', [EventsController::class, 'getDataCustomer']);
+//    Route::get('get-data', [EventsController::class, 'getDataCustomer']);
     Route::post('exchange-gift', [EventsController::class, 'exchangeGift']);
     Route::get('history-exchange-gift', [EventsController::class, 'historyExchangeGift']);
     Route::post('status-exchange-gift', [EventsController::class, 'statusExchangeGift']);

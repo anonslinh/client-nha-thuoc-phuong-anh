@@ -197,38 +197,38 @@ class SyncController extends HelperAdminController
         $product = $response->json();
         return $product;
     }
-    /**
-     * Đồng bộ điểm theo sự kiện
-    **/
-    public function SynchronizePoint ($customerID, $product)
-    {
-        $token = $this->kiotVietService->getAccessToken();
-        $endpoint = 'https://public.kiotapi.com/invoices?fromPurchaseDate='.$product->created_at.'&toPurchaseDate='.Carbon::now('Asia/Ho_Chi_Minh').'&customerIds='.$customerID.'&pageSize=100';
-        $response = Http::withHeaders([
-            'Retailer' => $this->kiotVietService->getRetailer(),
-            'Authorization' => 'Bearer ' . $token,
-        ])->get($endpoint);
-        $listInvoice = $response->json();
-        if (!empty($listInvoice) && !empty($listInvoice['data'])){
-            $index = ceil($listInvoice['total'] / $listInvoice['pageSize']);
-            $this->updatePointCustomer($listInvoice['data'], $customerID, $product);
-            if ($index > 1){
-                for ($i = 2; $i <= $index; $i++){
-                    $currentItem = $i*100;
-                    $endpoint = 'https://public.kiotapi.com/invoices?fromPurchaseDate='.$product->created_at.'&toPurchaseDate='.Carbon::now('Asia/Ho_Chi_Minh').'&customerIds='.$customerID.'&pageSize=100&currentItem='.$currentItem;
-                    $response = Http::withHeaders([
-                        'Retailer' => $this->kiotVietService->getRetailer(),
-                        'Authorization' => 'Bearer ' . $token,
-                    ])->get($endpoint);
-                    $dataInvoice = $response->json();
-                    if (!empty($dataInvoice) && !empty($dataInvoice['data'])){
-                        $this->updatePointCustomer($dataInvoice['data'],$customerID, $product);
-                    }
-                }
-            }
-        }
-        return true;
-    }
+//    /**
+//     * Đồng bộ điểm theo sự kiện
+//    **/
+//    public function SynchronizePoint ($customerID, $product)
+//    {
+//        $token = $this->kiotVietService->getAccessToken();
+//        $endpoint = 'https://public.kiotapi.com/invoices?fromPurchaseDate='.$product->created_at.'&toPurchaseDate='.Carbon::now('Asia/Ho_Chi_Minh').'&customerIds='.$customerID.'&pageSize=100';
+//        $response = Http::withHeaders([
+//            'Retailer' => $this->kiotVietService->getRetailer(),
+//            'Authorization' => 'Bearer ' . $token,
+//        ])->get($endpoint);
+//        $listInvoice = $response->json();
+//        if (!empty($listInvoice) && !empty($listInvoice['data'])){
+//            $index = ceil($listInvoice['total'] / $listInvoice['pageSize']);
+//            $this->updatePointCustomer($listInvoice['data'], $customerID, $product);
+//            if ($index > 1){
+//                for ($i = 2; $i <= $index; $i++){
+//                    $currentItem = $i*100;
+//                    $endpoint = 'https://public.kiotapi.com/invoices?fromPurchaseDate='.$product->created_at.'&toPurchaseDate='.Carbon::now('Asia/Ho_Chi_Minh').'&customerIds='.$customerID.'&pageSize=100&currentItem='.$currentItem;
+//                    $response = Http::withHeaders([
+//                        'Retailer' => $this->kiotVietService->getRetailer(),
+//                        'Authorization' => 'Bearer ' . $token,
+//                    ])->get($endpoint);
+//                    $dataInvoice = $response->json();
+//                    if (!empty($dataInvoice) && !empty($dataInvoice['data'])){
+//                        $this->updatePointCustomer($dataInvoice['data'],$customerID, $product);
+//                    }
+//                }
+//            }
+//        }
+//        return true;
+//    }
 
     /**
      * Cập nhật điểm khách hàng theo data hóa đơn
