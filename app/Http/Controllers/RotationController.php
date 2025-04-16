@@ -312,7 +312,7 @@ class RotationController extends HelperAdminController
         $rules = RuleRotation::select('id', 'money_invoice_1', 'money_invoice_2')->orderBy('money_invoice_1', 'asc')->get();
 
         foreach ($listInvoice as $invoice) {
-            if (in_array($invoice->code, $existingInvoiceCodes)) {
+            if (in_array($invoice->code, $existingInvoiceCodes) || $invoice->total_payment == 0) {
                 continue; // Đã xử lý => bỏ qua
             }
 
