@@ -10,11 +10,13 @@ use App\Models\Customer;
 use App\Models\ExchangeGiftEvent;
 use App\Models\Gift;
 use App\Models\GiftEvent;
+use App\Models\GiftExchanges;
 use App\Models\HistoryPointEvent;
 use App\Models\Invoice;
 use App\Models\ProductsModel;
 use App\Models\QuantityGiftEvents;
 use App\Models\VideoYoutube;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Str;
@@ -422,8 +424,16 @@ class VideoProductController extends SyncController
                 $data_customer->save();
             }
 
+            // Kiểm tra quà tặng đã đổi từ đổi điểm hay mua là có quà. Nếu là đổi điểm thì không trừ điểm mua làm có quà.
+            // Cách kiểm tra: Lấy mã sản phẩm từ invoiceDetail so với mã quà từ bảng gift_exchanges
+            // và thời gian cập nhật gift_exchanges trên dưới 1 tiếng với thời gian tạo đơn trên kiotviet nếu tồn tại thì bỏ qua
             //Kiểm tra đơn hàng có quà tặng hay không. Nếu có thì trừ điểm đi và lưu lại lịch sử đổi quà tặng!
-            if ((int)$invoiceDetail['subTotal'] == 0){
+            $time = Carbon::parse($invoice['purchase_date']);
+            $start = $time->copy()->subMinutes(15);
+            $end = $time->copy()->addMinutes(15);
+            $checkGiftExchange = GiftExchanges::where('customer_id', $data_customer->kiotviet_id)->where('exchange_code', $invoiceDetail['product_code'])
+                ->whereBetween('updated_at', [$start,$end])->exists();
+            if ((int)$invoiceDetail['subTotal'] == 0 && !$checkGiftExchange){
                 $gift = GiftEvent::where('code', $invoiceDetail->product_code)
                     ->where('created_at', '<=', $invoice->created_date)
                     ->first();
