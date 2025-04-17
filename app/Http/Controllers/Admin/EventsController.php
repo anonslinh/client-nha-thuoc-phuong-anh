@@ -182,9 +182,11 @@ class EventsController extends SyncController
     public function historyPoint (Request $request)
     {
         $listData = HistoryPointEvent::query();
+        $listData = $listData->join('customers', 'customers.id', '=', 'history_point_event.customer_id')
+            ->select('history_point_event.*', 'customers.name as name_customer', 'customers.code as code_customer', 'customers.contact_number as phone_customer');
         if (isset($request->key_search)){
             $listData = $listData->where(function ($query) use ($request){
-                $query->where('customer_id', 'like', '%'.$request->get('key_search').'%')
+                $query->where('customers.kiotviet_id', 'like', '%'.$request->get('key_search').'%')
                     ->orWhere('title', 'like', '%'.$request->get('key_search').'%')
                     ->orWhere('code_order', 'like', '%'.$request->get('key_search').'%')
                     ->orWhere('product_id', 'like', '%'.$request->get('key_search').'%')
@@ -193,12 +195,12 @@ class EventsController extends SyncController
             });
         }
         $listData = $listData->orderBy('created_at', 'desc')->paginate(20);
-        foreach ($listData as $value){
-            $customer = Customer::where('kiotviet_id', $value->customer_id)->first();
-            $value['name_customer'] = $customer->name??'';
-            $value['code_customer'] = $customer->code??'';
-            $value['phone_customer'] = $customer->contact_number??'';
-        }
+//        foreach ($listData as $value){
+//            $customer = Customer::where('kiotviet_id', $value->customer_id)->first();
+//            $value['name_customer'] = $customer->name??'';
+//            $value['code_customer'] = $customer->code??'';
+//            $value['phone_customer'] = $customer->contact_number??'';
+//        }
         return view('events.history-point', compact('listData'));
     }
     /**
@@ -221,7 +223,7 @@ class EventsController extends SyncController
         $characters = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
 
         $history = new HistoryPointEvent([
-            'customer_id' => $customer->kiotviet_id,
+            'customer_id' => $customer->id,
             'title' => $title,
             'code_order' => substr(str_shuffle($characters), 0, 11),
             'point' => $request->get('point'),
@@ -385,7 +387,7 @@ class EventsController extends SyncController
     public function historyExchangeGift (Request $request)
     {
         $listData = ExchangeGiftEvent::query();
-        $listData = $listData->join('customers', 'customers.kiotviet_id', '=', 'exchange_gift_event.customer_id')->select('exchange_gift_event.*', 'customers.name', 'customers.code', 'customers.contact_number');
+        $listData = $listData->join('customers', 'customers.id', '=', 'exchange_gift_event.customer_id')->select('exchange_gift_event.*', 'customers.name', 'customers.code', 'customers.contact_number');
         if (isset($request->key_search)){
             $listData = $listData->where(function ($query) use ($request){
                $query->where('customers.contact_number', 'like', '%'.$request->get('key_search').'%')

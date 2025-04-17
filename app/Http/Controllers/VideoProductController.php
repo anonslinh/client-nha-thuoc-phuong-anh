@@ -10,13 +10,17 @@ use App\Models\Customer;
 use App\Models\ExchangeGiftEvent;
 use App\Models\Gift;
 use App\Models\GiftEvent;
+use App\Models\GiftExchanges;
 use App\Models\HistoryPointEvent;
 use App\Models\Invoice;
 use App\Models\ProductsModel;
 use App\Models\QuantityGiftEvents;
+use App\Models\SettingProductGift;
 use App\Models\VideoYoutube;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class VideoProductController extends SyncController
@@ -422,8 +426,17 @@ class VideoProductController extends SyncController
                 $data_customer->save();
             }
 
+            // Kiểm tra quà tặng đã đổi từ đổi điểm hay mua là có quà. Nếu là đổi điểm thì không trừ điểm mua làm có quà.
+            // Cách kiểm tra: Lấy mã sản phẩm từ invoiceDetail so với mã quà từ bảng gift_exchanges
+            // và thời gian cập nhật gift_exchanges trên dưới 1 tiếng với thời gian tạo đơn trên kiotviet nếu tồn tại thì bỏ qua
             //Kiểm tra đơn hàng có quà tặng hay không. Nếu có thì trừ điểm đi và lưu lại lịch sử đổi quà tặng!
-            if ((int)$invoiceDetail['subTotal'] == 0){
+            $time = Carbon::parse($invoice['purchase_date']);
+            $start = $time->copy()->subMinutes(15);
+            $end = $time->copy()->addMinutes(15);
+            $checkGiftExchange = GiftExchanges::where('customer_id', $data_customer->kiotviet_id)->where('exchange_code', $invoiceDetail['product_code'])
+                ->whereBetween('updated_at', [$start,$end])->exists();
+            $checkAPI = SettingProductGift::first()->active_api??1;
+            if ((int)$invoiceDetail['subTotal'] == 0 && !$checkGiftExchange && $checkAPI == 0){
                 $gift = GiftEvent::where('code', $invoiceDetail->product_code)
                     ->where('created_at', '<=', $invoice->created_date)
                     ->first();
@@ -516,5 +529,102 @@ class VideoProductController extends SyncController
         }
         $listData = $listData->orderBy('created_at', 'desc')->paginate(20);
         return view('product.list_cart', compact('listData'));
+    }
+
+    /**
+     * API đổi quà của phần mua là có quà
+    **/
+    public function exchangeGift (Request $request)
+    {
+        DB::beginTransaction();
+        try{
+            $customer = Customer::where('contact_number', $request->get('phone'))->lockForUpdate()->first();
+            if (empty($customer)){
+                return \response()->json(['status' => false, 'msg' => 'Bạn không đủ điểm để đổi quà'], Response::HTTP_BAD_REQUEST);
+            }
+            $gift = GiftEvent::find($request->get('gift_id'));
+            if (empty($gift)){
+                return \response()->json(['status' => false, 'msg' => 'Qùa tặng không tồn tại.Vui lòng kiểm tra lại'], Response::HTTP_BAD_REQUEST);
+            }
+            $pointUser = $customer->total_point_event - $customer->used_point_event;
+            if ($pointUser < $gift->point){
+                return \response()->json(['status' => false, 'msg' => 'Số điểm của quý khách không đủ để đổi phần quà này.Vui lòng kiểm tra lại'], Response::HTTP_BAD_REQUEST);
+            }
+            $branch = Branch::find($request->get('branch_id'));
+            if (empty($branch)){
+                return \response()->json(['status' => false, 'msg' => 'Chi nhánh không tồn tại.Vui lòng kiểm tra lại'], Response::HTTP_BAD_REQUEST);
+            }
+            $quantityGift = QuantityGiftEvents::where('gift_events_id', $request->get('gift_id'))->where('branch_id', $request->get('branch_id'))->first();
+            $quantity = $quantityGift->quantity??0;
+            if ($quantity < 1){
+                return \response()->json(['status' => false, 'msg' => 'Phần quà này ở chi nhánh '.$branch->branch_name.' đã hết. Vui lòng đổi phần quà khác'], Response::HTTP_BAD_REQUEST);
+            }
+            $pointGift = $gift->point;
+            //Lịch sử trừ điểm đổi quà
+            $historyPoint = new HistoryPointEvent([
+                'customer_id' => $customer->id,
+                'title' => "[Đổi -$pointGift"."Winxu] " . $gift->name,
+                'code_order' => Str::random(10),
+                'product_id' => $gift->id,
+                'product_code' => $gift->code,
+                'product_name' => $gift->name,
+                'point' => $pointGift,
+                'type' => 2
+            ]);
+            $historyPoint->save();
+
+            //Lịch sử quà tặng
+            $exchange = new ExchangeGiftEvent([
+                'customer_id' => $customer->id,
+                'gift_id' => $gift->id,
+                'name_gift' => $gift->name,
+                'image_gift' => $gift->image,
+                'code_gift' => $gift->code,
+                'barcode_gift' => $gift->barcode ?? null,
+                'point' => $gift->point,
+                'quantity' => 1,
+                'status' => 1,
+                'branch_id' => $branch->kiotviet_id
+            ]);
+            $exchange->save();
+            $customer->used_point_event += $gift->point;
+            $customer->save();
+            $quantityGift->quantity -= 1;
+            $quantityGift->save();
+            DB::commit();
+            return \response()->json(['status' => true, 'msg' => 'Đổi quà thành công'], Response::HTTP_OK);
+        }catch (\Exception $exception){
+            DB::rollBack();
+            dd($exception->getMessage());
+        }
+    }
+    /**
+     * Danh sách quà đã đổi ở mục mua là có quà
+    **/
+    public function listExchangeGift (Request $request)
+    {
+        $customer = Customer::where('contact_number', $request->get('phone'))->first();
+        $customerID = $customer->id??0;
+        $listData = ExchangeGiftEvent::where('customer_id', $customerID)->orderBy('created_at', 'desc')->paginate(20);
+        foreach ($listData as $value){
+            $branch = Branch::where('kiotviet_id', $value->branch_id)->first();
+            $value->name_branch = $branch->branch_name??'';
+        }
+        return \response()->json(['status' => true, 'data' => $listData], Response::HTTP_OK);
+    }
+    /**
+     * Cập nhật trạng thái lịch sử đổi quà từ chưa nhận sang đã nhận
+    **/
+    public function updateStatusExchangeGift (Request $request)
+    {
+        $customer = Customer::where('contact_number', $request->get('phone'))->first();
+        $customerID = $customer->id??0;
+        $exchangeGift = ExchangeGiftEvent::where('id', $request->get('exchange_gift_id'))->where('customer_id', $customerID)->first();
+        if (empty($exchangeGift)){
+            return \response()->json(['status' => false, 'msg' => 'Dữ liệu không tồn tại.Vui lòng kiểm tra lại'], Response::HTTP_BAD_REQUEST);
+        }
+        $exchangeGift->status = 2;
+        $exchangeGift->save();
+        return \response()->json(['status' => true, 'msg' => 'Cập nhật trạng thái thành công'], Response::HTTP_OK);
     }
 }

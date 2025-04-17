@@ -28,10 +28,10 @@
                         <thead>
                         <tr>
                             <th>STT</th>
-                            <th>Tên KH</th>
-                            <th>SĐT KH</th>
-                            <th>Tên/Mã Quà</th>
-                            <th>Hình ảnh</th>
+                            <th>Thông tin KH</th>
+                            <th>Thông tin Quà</th>
+                            <th>Mã hóa đơn</th>
+                            <th>Chi nhánh</th>
                             <th>Thời gian</th>
                         </tr>
                         </thead>
@@ -39,16 +39,18 @@
                         @if($listData->total() > 0)
                             @foreach($listData as $key => $value)
                                 <tr>
-                                    <td>{{ ($listData->currentPage() - 1) * $listData->perPage() + $key + 1 }}</td>
+                                    <td class="align-middle">{{ ($listData->currentPage() - 1) * $listData->perPage() + $key + 1 }}</td>
                                     <td class="align-middle">
-                                        <p class="m-0">{{$value->name_customer}}</p>
+                                        <p class="m-0">Tên: {{$value->name_customer}}</p>
+                                        <p class="m-0">SĐT: {{$value->phone_customer}}</p>
                                     </td>
-                                    <td class="align-middle">{{$value->phone_customer}}</td>
                                     <td class="align-middle">
-                                        <p class="m-0">{{$value->name_gift}}</p>
-                                        <p class="m-0">{{$value->code_gift}}</p>
+                                        <p class="m-0">Tên quà: {{$value->name_gift}}</p>
+                                        <p class="m-0">Mã quà: {{$value->code_gift}}</p>
+                                        <img src="{{$value->image_gift}}" style="width: 100px">
                                     </td>
-                                    <td class="align-middle"><img src="{{$value->image_gift}}" style="width: 100px"></td>
+                                    <td class="align-middle">{{$value->invoice_code}}</td>
+                                    <td class="align-middle">{{$value->branch_name}}</td>
                                     <td class="align-middle">{{date_format(date_create($value->created_at), 'H:i d/m/Y')}}</td>
                                 </tr>
                             @endforeach

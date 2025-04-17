@@ -241,6 +241,12 @@ class RotationController extends HelperAdminController
             $listData = $listData->whereIn('history_invoice_rotation_id', $listID);
         }
         $listData = $listData->orderBy('created_at', 'desc')->paginate(20);
+        foreach ($listData as $value){
+            $invoiceRotation = HistoryInvoiceRotation::find($value->history_invoice_rotation_id);
+            $branch = Branch::where('kiotviet_id', $invoiceRotation->branch_id)->first();
+            $value['invoice_code'] = $invoiceRotation->invoice_code;
+            $value['branch_name'] = $branch->branch_name??'';
+        }
         $totalGift = $listData->total();
         $rule_rotation = RuleRotation::all();
         return view('rotation.history_gift', compact('listData', 'rule_rotation', 'totalGift'));
@@ -312,7 +318,7 @@ class RotationController extends HelperAdminController
         $rules = RuleRotation::select('id', 'money_invoice_1', 'money_invoice_2')->orderBy('money_invoice_1', 'asc')->get();
 
         foreach ($listInvoice as $invoice) {
-            if (in_array($invoice->code, $existingInvoiceCodes)) {
+            if (in_array($invoice->code, $existingInvoiceCodes) || $invoice->total_payment == 0) {
                 continue; // Đã xử lý => bỏ qua
             }
 

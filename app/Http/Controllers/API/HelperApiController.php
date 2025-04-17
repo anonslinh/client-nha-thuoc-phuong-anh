@@ -321,10 +321,11 @@ class HelperApiController extends Controller
      */
     private function storeInvoiceDetails($invoiceId, $invoiceDetails)
     {
-        $details = array_map(function ($detail) use ($invoiceId) {
-            return [
+        foreach ($invoiceDetails as $detail){
+            InvoiceDetail::updateOrCreate([
                 'invoice_id'      => $invoiceId,
                 'product_id'      => $detail['productId'],
+            ],[
                 'product_code'    => $detail['productCode'],
                 'product_name'    => $detail['productName'],
                 'category_id'     => $detail['categoryId'],
@@ -340,10 +341,31 @@ class HelperApiController extends Controller
                 'return_quantity' => $detail['returnQuantity'],
                 'created_at'      => now(),
                 'updated_at'      => now(),
-            ];
-        }, $invoiceDetails);
-
-        InvoiceDetail::insert($details);
+            ]);
+        }
+//        $details = array_map(function ($detail) use ($invoiceId) {
+//            return [
+//                'invoice_id'      => $invoiceId,
+//                'product_id'      => $detail['productId'],
+//                'product_code'    => $detail['productCode'],
+//                'product_name'    => $detail['productName'],
+//                'category_id'     => $detail['categoryId'],
+//                'category_name'   => $detail['categoryName'],
+//                'trade_mark_id'   => $detail['tradeMarkId'] ?? null,
+//                'trade_mark_name' => $detail['tradeMarkName'] ?? null,
+//                'quantity'        => $detail['quantity'],
+//                'price'           => $detail['price'],
+//                'discount'        => $detail['discount'],
+//                'use_point'       => $detail['usePoint'] ?? 0,
+//                'sub_total'       => $detail['subTotal'],
+//                'serial_numbers'  => $detail['serialNumbers'] ?? null,
+//                'return_quantity' => $detail['returnQuantity'],
+//                'created_at'      => now(),
+//                'updated_at'      => now(),
+//            ];
+//        }, $invoiceDetails);
+//
+//        InvoiceDetail::insert($details);
     }
 
     /**
