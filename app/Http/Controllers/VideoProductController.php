@@ -592,7 +592,7 @@ class VideoProductController extends SyncController
             $quantityGift->quantity -= 1;
             $quantityGift->save();
             DB::commit();
-            return \response()->json(['status' => true, 'msg' => 'Đổi quà thành công'], Response::HTTP_OK);
+            return \response()->json(['status' => true, 'msg' => 'Đổi quà thành công', 'exchange_id' => $exchange['id']], Response::HTTP_OK);
         }catch (\Exception $exception){
             DB::rollBack();
             dd($exception->getMessage());
