@@ -14,6 +14,7 @@ use App\Models\ProductCertificate;
 use App\Models\InvoiceRequest;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
+use Carbon\Carbon;
 
 class InvoicesController extends HelperApiController
 {
@@ -61,10 +62,26 @@ class InvoicesController extends HelperApiController
                 ->pluck('certificate_link', 'product_code');
 
             foreach ($data as $invoice) {
-                $invoice->is_show_request_invoice = true;
-                $check_status_invoice = 1;
                 foreach ($invoice->details as $detail) {
                     $detail->certificate = $certificates[$detail->product_code] ?? null;
+                }
+
+                $invoice->can_request_invoice = false;
+                $invoice->result_url = null;
+
+                // Kiểm tra đã có yêu cầu xuất hóa đơn chưa
+                $existingRequest = InvoiceRequest::where('invoice_id', $invoice->id)->first();
+
+                if ($existingRequest) {
+                    // Đã có yêu cầu → luôn hiển thị nút và gắn trạng thái
+                    $invoice->can_request_invoice = true;
+                    $invoice->result_url = $existingRequest->result_url; // Có giá trị trả về mặc định là đã xong
+                } else {
+                    // Chưa có yêu cầu → kiểm tra thời gian tạo hoá đơn
+                    $createdAt = Carbon::parse($invoice->created_date);
+                    if ($createdAt->diffInMinutes(now()) <= 0) { // Chỉ được yêu cầu xuất hoá đơn trước 60 phút sau khi mua đơn hàng.
+                        $invoice->can_request_invoice = true;
+                    }
                 }
             }
 
