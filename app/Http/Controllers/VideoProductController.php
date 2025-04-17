@@ -15,6 +15,7 @@ use App\Models\HistoryPointEvent;
 use App\Models\Invoice;
 use App\Models\ProductsModel;
 use App\Models\QuantityGiftEvents;
+use App\Models\SettingProductGift;
 use App\Models\VideoYoutube;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -434,7 +435,8 @@ class VideoProductController extends SyncController
             $end = $time->copy()->addMinutes(15);
             $checkGiftExchange = GiftExchanges::where('customer_id', $data_customer->kiotviet_id)->where('exchange_code', $invoiceDetail['product_code'])
                 ->whereBetween('updated_at', [$start,$end])->exists();
-            if ((int)$invoiceDetail['subTotal'] == 0 && !$checkGiftExchange){
+            $checkAPI = SettingProductGift::first()->active_api??1;
+            if ((int)$invoiceDetail['subTotal'] == 0 && !$checkGiftExchange && $checkAPI == 0){
                 $gift = GiftEvent::where('code', $invoiceDetail->product_code)
                     ->where('created_at', '<=', $invoice->created_date)
                     ->first();
