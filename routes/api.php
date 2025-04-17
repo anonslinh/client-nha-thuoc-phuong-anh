@@ -64,6 +64,9 @@ Route::prefix('product-gift')->group(function (){
    Route::get('detail-gift', [VideoProductController::class, 'detailGift']);
    Route::post('info-customer', [VideoProductController::class, 'infoCustomer']);
    Route::post('add-to-cart', [VideoProductController::class, 'addToCart']);
+   Route::post('exchange-gift', [VideoProductController::class, 'exchangeGift']);
+   Route::post('list-exchange-gift', [VideoProductController::class, 'listExchangeGift']);
+   Route::post('status-exchange-gift', [VideoProductController::class, 'updateStatusExchangeGift']);
 });
 // Vòng quay may mắn
 Route::prefix('rotation')->group(function (){
