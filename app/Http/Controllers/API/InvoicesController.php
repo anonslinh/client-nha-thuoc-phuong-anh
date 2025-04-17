@@ -11,6 +11,9 @@ use Illuminate\Http\Request;
 use App\Models\Invoice;
 use App\Models\InvoiceRating;
 use App\Models\ProductCertificate;
+use App\Models\InvoiceRequest;
+use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 
 class InvoicesController extends HelperApiController
 {
@@ -58,6 +61,8 @@ class InvoicesController extends HelperApiController
                 ->pluck('certificate_link', 'product_code');
 
             foreach ($data as $invoice) {
+                $invoice->is_show_request_invoice = true;
+                $check_status_invoice = 1;
                 foreach ($invoice->details as $detail) {
                     $detail->certificate = $certificates[$detail->product_code] ?? null;
                 }
@@ -133,5 +138,52 @@ class InvoicesController extends HelperApiController
         }
     }
 
+    /**
+     * Yêu cầu xuất hoá đơn
+     */
+    public function storeInvoiceRequest(Request $request)
+    {
+        try {
+            $validated = $request->validate([
+                'invoice_id' => 'required|exists:invoices,id',
+                'type' => ['required', Rule::in(['personal', 'company'])],
+                'invoice_code' => 'required|string',
+
+                // Chung
+                'name' => 'nullable|string|required_if:type,personal',
+                'phone' => 'nullable|string|required_if:type,personal',
+                'address' => 'nullable|string',
+
+                // Công ty
+                'tax_code' => 'nullable|required_if:type,company',
+                'company_name' => 'nullable|required_if:type,company',
+            ]);
+        } catch (ValidationException $e) {
+            return response()->json([
+                'success' => false,
+                'errors' => $e->errors(),
+            ], 200);
+        }
+        $existingInvoice = Invoice::find($validated['invoice_id']);
+        if (empty($existingInvoice)){
+            return response()->json(['status' => false, 'msg' => 'Hoá đơn không tồn tại.'], 200);
+        }
+        $validated['email'] = $request->email;
+        $validated['note'] = $request->note;
+        $validated['status'] = 'pending';
+        // ❗ Kiểm tra xem hóa đơn này đã được yêu cầu xuất chưa
+        $existing = InvoiceRequest::where('invoice_id', $validated['invoice_id'])->first();
+        if (!empty($existing)){
+            return response()->json(['status' => false, 'msg' => 'Hoá đơn này đã được yêu cầu xuất trước đó.'], 200);
+        }
+
+        $invoiceRequest = InvoiceRequest::create($validated);
+
+        return response()->json([
+            'success' => true,
+            'data' => $invoiceRequest,
+            'msg' => 'Gửi yêu cầu thành công!'
+        ], 200);
+    }
 
 }

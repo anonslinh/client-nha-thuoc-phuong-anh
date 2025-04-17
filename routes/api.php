@@ -17,6 +17,7 @@ Route::get('gifts', [HomeController::class, 'getGifts']);
 Route::get('programs', [HomeController::class, 'getPrograms']);
 Route::get('promotions', [HomeController::class, 'getPromotions']);
 Route::get('invoices', [InvoicesController::class, 'getInvoices']);
+Route::post('invoice-requests', [InvoicesController::class, 'storeInvoiceRequest']); //Yêu cầu xuất hoá đơn
 Route::get('today-invoices', [InvoicesController::class, 'getTodayInvoices']);
 Route::post('invoice-rating', [InvoicesController::class, 'invoiceRating']);
 Route::get('membership-info', [HomeController::class, 'getMembershipInfo']);
