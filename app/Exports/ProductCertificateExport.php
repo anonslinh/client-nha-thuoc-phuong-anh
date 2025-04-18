@@ -18,8 +18,8 @@ class ProductCertificateExport implements FromCollection, WithHeadings, WithColu
             ->get()
             ->map(function ($item) {
                 return [
-                    'product_name'     => $item->product_name,
                     'product_code'     => $item->product_code,
+                    'product_name'     => $item->product_name,
                     'certificate_link' => $item->certificate_link,
                     'is_active'        => $item->is_active ? 'Hiển thị' : 'Ẩn',
                 ];
@@ -29,8 +29,8 @@ class ProductCertificateExport implements FromCollection, WithHeadings, WithColu
     public function headings(): array
     {
         return [
-            'Tên sản phẩm',
             'Mã sản phẩm',
+            'Tên sản phẩm',
             'Link giấy chứng nhận',
             'Trạng thái',
         ];
