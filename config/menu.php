@@ -34,6 +34,11 @@ return [
                 'name' => 'Đánh hoá đơn',
                 'icon' => 'solar:star-fall-minimalistic-2-line-duotone',
                 'route' => 'employees.ratings-invoice'
+            ],
+            [
+                'name' => 'Xuất hoá đơn',
+                'icon' => 'solar:bill-list-linear',
+                'route' => 'invoices-request.index'
             ]
         ]
     ],

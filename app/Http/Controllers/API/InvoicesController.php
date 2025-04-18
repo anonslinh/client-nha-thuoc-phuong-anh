@@ -67,7 +67,7 @@ class InvoicesController extends HelperApiController
                 }
 
                 $invoice->can_request_invoice = false;
-                $invoice->result_url = null;
+                $invoice->result_url = false;
 
                 // Kiểm tra đã có yêu cầu xuất hóa đơn chưa
                 $existingRequest = InvoiceRequest::where('invoice_id', $invoice->id)->first();

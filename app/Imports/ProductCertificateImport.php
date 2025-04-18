@@ -31,7 +31,7 @@ class ProductCertificateImport implements ToModel, WithHeadingRow
             return null; // không tạo mới
         } else {
             // Tạo mới nếu chưa tồn tại
-            if (!empty($row['link_giay_chung_nhan'])){
+            if (!empty($row['link_giay_chung_nhan']) || !empty($row['link_giấy_chứng_nhận'])){
                 return new ProductCertificate([
                     'product_name'     => $row['ten_san_pham'] ?? $row['tên_sản_phẩm'],
                     'product_code'     => $productCode,
