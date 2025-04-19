@@ -25,7 +25,8 @@ class InvoiceRequestsImport implements ToModel, WithHeadingRow
         $invoices_request = InvoiceRequest::where('invoice_code', $orderCode)->first();
         if (!empty($invoices_request)){
             $invoices_request->update([
-                'result_url' => $result_url
+                'result_url' => $result_url,
+                'status' => 'completed'
             ]);
         }
         return null;
