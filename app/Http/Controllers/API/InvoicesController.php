@@ -6,6 +6,7 @@ namespace App\Http\Controllers\API;
 
 use App\Models\Customer;
 use App\Models\DailyActivitySummary;
+use App\Models\SettingGlobal;
 use App\Services\KiotVietService;
 use Illuminate\Http\Request;
 use App\Models\Invoice;
@@ -35,6 +36,10 @@ class InvoicesController extends HelperApiController
             $perPage = $request->input('per_page', 10);
 
             $phone = $request->input('phone');
+
+            $setting = SettingGlobal::where('code', 'invoices_request')->first(); // Thời gian cho phép xuất hoá đơn sau khi mua sản phẩm
+            $_comment = optional($setting)->comment;
+            $_time_invoices_request = is_numeric($_comment) ? (int) $_comment : 0;
 
             if (!$phone || !Invoice::where('contact_number', $phone)->exists()) {
                 return response()->json(['status' => false, 'data' => []], 200);
@@ -79,7 +84,7 @@ class InvoicesController extends HelperApiController
                 } else {
                     // Chưa có yêu cầu → kiểm tra thời gian tạo hoá đơn
                     $createdAt = Carbon::parse($invoice->created_date);
-                    if ($createdAt->diffInMinutes(now()) <= 0) { // Chỉ được yêu cầu xuất hoá đơn trước 60 phút sau khi mua đơn hàng.
+                    if ($createdAt->diffInMinutes(now()) <= $_time_invoices_request) { // Chỉ được yêu cầu xuất hoá đơn trước 60 phút sau khi mua đơn hàng.
                         $invoice->can_request_invoice = true;
                     }
                 }
