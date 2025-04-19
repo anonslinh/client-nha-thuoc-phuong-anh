@@ -52,6 +52,7 @@ class InvoicesController extends HelperApiController
                     \DB::raw("IF(invoices.created_date < '$cutoffDate' OR invoice_ratings.kiotviet_invoice_id IS NOT NULL, true, false) as is_rated")
                 )
                 ->with('details')
+                ->orderBy('created_date', 'desc')
                 ->paginate($perPage);
 
             // Giấy Tờ Chứng Nhận
