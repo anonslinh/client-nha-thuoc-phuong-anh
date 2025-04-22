@@ -17,8 +17,10 @@ Route::get('gifts', [HomeController::class, 'getGifts']);
 Route::get('programs', [HomeController::class, 'getPrograms']);
 Route::get('promotions', [HomeController::class, 'getPromotions']);
 Route::get('invoices', [InvoicesController::class, 'getInvoices']);
+Route::post('invoice-requests', [InvoicesController::class, 'storeInvoiceRequest']); //Yêu cầu xuất hoá đơn
 Route::get('today-invoices', [InvoicesController::class, 'getTodayInvoices']);
 Route::post('invoice-rating', [InvoicesController::class, 'invoiceRating']);
+Route::post('invoice-buy-again', [InvoicesController::class, 'invoiceBuyAgain']); // Mua lại đơn hàng
 Route::get('membership-info', [HomeController::class, 'getMembershipInfo']);
 Route::get('vouchers', [HomeController::class, 'getVouchers']);
 Route::get('mini-games', [HomeController::class, 'getActiveMiniGames']);
@@ -40,7 +42,7 @@ Route::post('voucher-exchange/cancel', [VoucherExchangesController::class, 'canc
 
 // Sụ kiện
 Route::prefix('events')->group(function (){
-    Route::get('get-data', [EventsController::class, 'getDataCustomer']);
+//    Route::get('get-data', [EventsController::class, 'getDataCustomer']);
     Route::post('exchange-gift', [EventsController::class, 'exchangeGift']);
     Route::get('history-exchange-gift', [EventsController::class, 'historyExchangeGift']);
     Route::post('status-exchange-gift', [EventsController::class, 'statusExchangeGift']);
@@ -65,6 +67,9 @@ Route::prefix('product-gift')->group(function (){
    Route::get('detail-gift', [VideoProductController::class, 'detailGift']);
    Route::post('info-customer', [VideoProductController::class, 'infoCustomer']);
    Route::post('add-to-cart', [VideoProductController::class, 'addToCart']);
+   Route::post('exchange-gift', [VideoProductController::class, 'exchangeGift']);
+   Route::post('list-exchange-gift', [VideoProductController::class, 'listExchangeGift']);
+   Route::post('status-exchange-gift', [VideoProductController::class, 'updateStatusExchangeGift']);
 });
 // Vòng quay may mắn
 Route::prefix('rotation')->group(function (){

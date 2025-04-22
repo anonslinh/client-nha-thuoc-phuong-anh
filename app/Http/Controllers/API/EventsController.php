@@ -17,53 +17,53 @@ use Illuminate\Support\Facades\DB;
 
 class EventsController extends SyncController
 {
-    public function getDataCustomer (Request $request, HelperApiController $helperApiController)
-    {
-        $events = EventsModel::whereDate('time_start', '<=', Carbon::now())->whereDate('time_end', '>=', Carbon::now())->get();
-        $customerID = null;
-        $branchDefault = Branch::first();
-        $branch_id = $request->get('branch_id');
-        if (isset($request->phone)){
-            $validatedData = $request->validate([
-                'phone' => ['required', 'regex:/^(0[1-9][0-9]{8,9}|84[1-9][0-9]{8,9})$/'],
-            ], [
-                'phone.required' => 'Số điện thoại là bắt buộc.',
-                'phone.regex' => 'Số điện thoại không hợp lệ.',
-            ]);
-
-            $phone = $helperApiController->normalizePhone($validatedData['phone']);
-            $helperApiController->syncCustomerInvoices($phone);
-            $customer = Customer::where('contact_number', $phone)->first();
-            if (!empty($events) && !empty($customer)){
-                foreach ($events as $value){
-                    $this->SynchronizePoint($customer->kiotviet_id, $value);
-                }
-            }
-            $customerID = $customer->id??null;
-            if (!empty($customer->branch_id) && empty($branch_id)){
-                $branchCustomer = Branch::where('kiotviet_id', $customer->branch_id)->first();
-                $branch_id = $branchCustomer->id??null;
-            }
-        }
-        if (empty($branch_id)){
-            $branch_id = $branchDefault->id;
-        }
-        foreach ($events as $value){
-            $value->images = json_decode($value->images);
-        }
-        $giftID = QuantityGiftEvents::where('branch_id', $branch_id)->pluck('gift_events_id')->toArray();
-        $listGift = GiftEvent::whereIn('id', array_unique($giftID))->where('active', 1)->get();
-        foreach ($listGift as $value){
-            $quantity = QuantityGiftEvents::where('gift_events_id', $value->id)->where('branch_id', $branch_id)->first();
-            $value['quantity'] = $quantity->quantity;
-            $branch = Branch::find($branch_id);
-            $value['branch_name'] = $branch->branch_name??'';
-        }
-        $data['events'] = $events;
-        $data['customer'] = Customer::find($customerID);
-        $data['gifts'] = $listGift;
-        return response()->json(['status' => true, 'data' => $data], Response::HTTP_OK);
-    }
+//    public function getDataCustomer (Request $request, HelperApiController $helperApiController)
+//    {
+//        $events = EventsModel::whereDate('time_start', '<=', Carbon::now())->whereDate('time_end', '>=', Carbon::now())->get();
+//        $customerID = null;
+//        $branchDefault = Branch::first();
+//        $branch_id = $request->get('branch_id');
+//        if (isset($request->phone)){
+//            $validatedData = $request->validate([
+//                'phone' => ['required', 'regex:/^(0[1-9][0-9]{8,9}|84[1-9][0-9]{8,9})$/'],
+//            ], [
+//                'phone.required' => 'Số điện thoại là bắt buộc.',
+//                'phone.regex' => 'Số điện thoại không hợp lệ.',
+//            ]);
+//
+//            $phone = $helperApiController->normalizePhone($validatedData['phone']);
+//            $helperApiController->syncCustomerInvoices($phone);
+//            $customer = Customer::where('contact_number', $phone)->first();
+//            if (!empty($events) && !empty($customer)){
+//                foreach ($events as $value){
+//                    $this->SynchronizePoint($customer->kiotviet_id, $value);
+//                }
+//            }
+//            $customerID = $customer->id??null;
+//            if (!empty($customer->branch_id) && empty($branch_id)){
+//                $branchCustomer = Branch::where('kiotviet_id', $customer->branch_id)->first();
+//                $branch_id = $branchCustomer->id??null;
+//            }
+//        }
+//        if (empty($branch_id)){
+//            $branch_id = $branchDefault->id;
+//        }
+//        foreach ($events as $value){
+//            $value->images = json_decode($value->images);
+//        }
+//        $giftID = QuantityGiftEvents::where('branch_id', $branch_id)->pluck('gift_events_id')->toArray();
+//        $listGift = GiftEvent::whereIn('id', array_unique($giftID))->where('active', 1)->get();
+//        foreach ($listGift as $value){
+//            $quantity = QuantityGiftEvents::where('gift_events_id', $value->id)->where('branch_id', $branch_id)->first();
+//            $value['quantity'] = $quantity->quantity;
+//            $branch = Branch::find($branch_id);
+//            $value['branch_name'] = $branch->branch_name??'';
+//        }
+//        $data['events'] = $events;
+//        $data['customer'] = Customer::find($customerID);
+//        $data['gifts'] = $listGift;
+//        return response()->json(['status' => true, 'data' => $data], Response::HTTP_OK);
+//    }
     /**
      * Đổi quà tặng
     **/

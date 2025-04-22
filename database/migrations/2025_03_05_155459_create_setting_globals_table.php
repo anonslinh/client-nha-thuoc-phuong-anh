@@ -23,6 +23,7 @@ return new class extends Migration
         // Chèn dữ liệu mẫu sau khi tạo bảng
         DB::table('setting_globals')->insert([
             ['code' => 'oa_id','title' => 'Zalo OA ID', 'comment' => '4579606723122854828'],
+            ['code' => 'invoices_request','title' => 'Y/c xuất hoá đơn(phút)', 'comment' => '60'],
         ]);
     }
 

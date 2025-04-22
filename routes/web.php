@@ -18,6 +18,7 @@ use App\Http\Controllers\VideoProductController;
 use App\Http\Controllers\RotationController;
 use App\Http\Controllers\Admin\ProductCertificateController;
 use App\Http\Controllers\Admin\PharmacyController;
+use App\Http\Controllers\Admin\InvoicesController;
 
 Route::get('login', [LoginController::class, 'login'])->name('login');
 Route::get('authentication-forgot-password', [LoginController::class, 'forgotPassword'])->name('authentication-forgot-password');
@@ -231,6 +232,14 @@ Route::middleware([CheckLogin::class])->group(function (){
         Route::get('destroy/{id}', [ProductCertificateController::class, 'destroyCertificates'])->name('destroy');
         Route::get('/certificates/export', [ProductCertificateController::class, 'exportCertificates'])->name('export');
         Route::post('/certificates/import', [ProductCertificateController::class, 'importCertificates'])->name('import');
+
+    });
+    //Yêu cầu xuất hoá đơn
+    Route::prefix('invoices-request')->name('invoices-request.')->group(function () {
+        Route::get('/', [InvoicesController::class, 'indexRequestInvoice'])->name('index');
+        Route::get('destroy/{id}', [InvoicesController::class, 'destroyRequestInvoice'])->name('destroy');
+        Route::get('/invoices-request/export', [InvoicesController::class, 'exportInvoiceRequest'])->name('export');
+        Route::post('/invoices-request/import', [InvoicesController::class, 'importRequestInvoice'])->name('import');
     });
     //Nhà thuốc
     Route::prefix('pharmacy')->name('pharmacy.')->group(function () {

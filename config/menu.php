@@ -36,6 +36,11 @@ return [
                 'route' => 'employees.ratings-invoice'
             ],
             [
+                'name' => 'Xuất hoá đơn',
+                'icon' => 'solar:bill-list-linear',
+                'route' => 'invoices-request.index'
+            ],
+            [
                 'name' => 'Gửi đơn thuốc, hình ảnh',
                 'icon' => 'solar:document-text-line-duotone',
                 'route' => 'pharmacy.prescription'
