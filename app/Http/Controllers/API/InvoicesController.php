@@ -107,7 +107,6 @@ class InvoicesController extends HelperApiController
     {
         try {
             $today = now()->format('Y-m-d');
-            $perPage = $request->input('per_page', 10);
             $phone = $request->input('phone');
 
             if (!$phone || !Invoice::where('contact_number', $phone)->exists()) {
@@ -123,7 +122,7 @@ class InvoicesController extends HelperApiController
                     \DB::raw("false as is_rated")
                 )
                 ->with('details')
-                ->paginate($perPage);
+                ->get();
 
             return response()->json(['status' => true, 'data' => $data]);
         } catch (\Exception $exception) {
