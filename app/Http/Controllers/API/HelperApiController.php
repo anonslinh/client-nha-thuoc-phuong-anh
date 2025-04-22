@@ -294,6 +294,7 @@ class HelperApiController extends Controller
                         'total'           => $invoiceData['total'],
                         'total_payment'   => $invoiceData['totalPayment'],
                         'status'          => $invoiceData['status'],
+                        'discount'        => $invoiceData['discount'] ?? 0,
                         'status_value'    => $invoiceData['statusValue'],
                         'using_cod'       => $invoiceData['usingCod'],
                         'created_date'    => $invoiceData['createdDate'],
