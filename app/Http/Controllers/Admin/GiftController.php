@@ -32,6 +32,7 @@ class GiftController extends HelperApiController
                 $rank = MembershipLevel::find($value->rank_id);
                 $value['name_rank'] = $rank->name??'Hạng thẻ đã bị khóa';
             }
+            $value['quantity'] = GiftInventories::where('gift_id', $value->id)->sum('quantity');
         }
         $rank = MembershipLevel::orderBy('spending_threshold', 'asc')->get();
         return view('gift.list-data', compact('listData', 'rank'));
