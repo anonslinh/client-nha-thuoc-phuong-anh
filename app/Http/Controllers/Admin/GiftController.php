@@ -493,7 +493,7 @@ class GiftController extends HelperApiController
             foreach ($value['inventories'] as $item){
                 $branch = [
                     'branchId' => $item['branchId'],
-                    'quantity' => $item['onHand']
+                    'quantity' => round($item['onHand'])
                 ];
                 $dataBranch[] = $branch;
             }
