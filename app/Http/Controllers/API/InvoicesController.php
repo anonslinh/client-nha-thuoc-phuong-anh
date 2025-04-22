@@ -13,6 +13,8 @@ use App\Models\Invoice;
 use App\Models\InvoiceRating;
 use App\Models\ProductCertificate;
 use App\Models\InvoiceRequest;
+use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use Carbon\Carbon;
@@ -208,5 +210,73 @@ class InvoicesController extends HelperApiController
             'msg' => 'Gửi yêu cầu thành công!'
         ], 200);
     }
-
+    /**
+     * Mua lại đơn hàng
+    **/
+    public function invoiceBuyAgain (Request $request)
+    {
+        try{
+            $customer = Customer::where('contact_number', $request->get('phone'))->first();
+            if (empty($customer)){
+                return response()->json(['status' => false, 'msg' => 'Không tìm thấy đơn hàng. Vui lòng liên hệ với ZALO OA của doanh nghiệp để được hỗ trợ'], Response::HTTP_OK);
+            }
+            $invoice = Invoice::find($request->get('invoice_id'));
+            if (empty($invoice)){
+                return response()->json(['status' => false, 'msg' => 'Không tìm thấy đơn hàng. Vui lòng liên hệ với ZALO OA của doanh nghiệp để được hỗ trợ'], Response::HTTP_OK);
+            }
+            if ($invoice->total_payment < 1){
+                return response()->json(['status' => false, 'msg' => 'Tạo đơn hàng thất bại. Vui lòng kiểm tra lại giá trị đơn hàng'], Response::HTTP_OK);
+            }
+            $invoiceDetail = $invoice->details;
+            $orderDetail = [];
+            foreach ($invoiceDetail as $key => $value){
+                if ($key == 0){
+                    $isMaster = true;
+                }else{
+                    $isMaster = false;
+                }
+                if ($value->price > 0){
+                    $orderItem = [
+                        'productId' => $value->product_id,
+                        'productCode' => $value->product_code,
+                        'productName' => $value->product_name,
+                        'isMaster' => $isMaster,
+                        'quantity' => $value->quantity,
+                        'price' => $value->price,
+                        'discount' => $value->discount
+                    ];
+                    $orderDetail[] = $orderItem;
+                }
+            }
+            $customerOrder = [
+                'id' => $customer->kiotviet_id,
+                'code' => $customer->code,
+                'name' => $customer->name,
+                'contactNumber' => $customer->contact_number,
+                'address' => $customer->address,
+                'wardName' =>$customer->ward_name,
+            ];
+            $data = [
+                'branchId' => $invoice->branch_id,
+                'isApplyVoucher' => false,
+                'discount' => $invoice->discount,
+                'totalPayment' => $invoice->total_payment,
+                'makeInvoice' => true,
+                'orderDetails' => $orderDetail,
+                'customer' => $customerOrder,
+            ];
+            $tokens = $this->kiotVietService->getAccessTokenAllBranches($invoice->personal_access_token);
+            $accessToken = $tokens->access_token;
+            $retailer = $tokens->retailer;
+            $response = Http::withHeaders([
+                'Retailer'      => $retailer,
+                'Authorization' => 'Bearer ' . $accessToken,
+                'Content-Type'  => 'application/json',
+            ])->post('https://public.kiotapi.com/orders',$data);
+            $dataResponse = $response->json();
+            return \response()->json(['status' => true, 'msg' => 'Đặt mua lại đơn hàng thành công. Nhân viên sẽ gọi điện xác nhận lại đơn hàng sớm. Cảm ơn quý khách đã tin dùng'], Response::HTTP_OK);
+        }catch (\Exception $exception){
+            dd($exception->getMessage());
+        }
+    }
 }

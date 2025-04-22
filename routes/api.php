@@ -20,6 +20,7 @@ Route::get('invoices', [InvoicesController::class, 'getInvoices']);
 Route::post('invoice-requests', [InvoicesController::class, 'storeInvoiceRequest']); //Yêu cầu xuất hoá đơn
 Route::get('today-invoices', [InvoicesController::class, 'getTodayInvoices']);
 Route::post('invoice-rating', [InvoicesController::class, 'invoiceRating']);
+Route::post('invoice-buy-again', [InvoicesController::class, 'invoiceBuyAgain']); // Mua lại đơn hàng
 Route::get('membership-info', [HomeController::class, 'getMembershipInfo']);
 Route::get('vouchers', [HomeController::class, 'getVouchers']);
 Route::get('mini-games', [HomeController::class, 'getActiveMiniGames']);
