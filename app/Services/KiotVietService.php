@@ -95,7 +95,8 @@ class KiotVietService
             'url_voucher_created' => 'https://public.kiotapi.com/voucher', // Tạo mã voucher để sử dụng theo mã phát hành voucher
             'url_voucher_cancel' => 'https://public.kiotapi.com/voucher/cancel', // Huỷ voucher đã phát hành trên kiotviet
             'url_voucher_release' => 'https://public.kiotapi.com/voucher/release/give', // Phát hành voucher trên kiotviet
-            'url_create_invoice' => 'https://public.kiotapi.com/orders' // Tạo hóa đơn
+            'url_create_invoice' => 'https://public.kiotapi.com/orders', // Tạo hóa đơn
+            'url_detail_product' => 'https://public.kiotapi.com/products/code/'
         ];
 
         return $data_return;

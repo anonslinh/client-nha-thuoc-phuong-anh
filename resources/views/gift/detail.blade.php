@@ -45,6 +45,7 @@
                             <div class="d-flex align-items-center" style="margin-bottom: 15px">
                                 <input class="form-control" name="quantity_setup" placeholder="Số lương quà tặng" type="number" style="max-width: 250px;margin-right: 15px">
                                 <button class="btn btn-primary btnAddAll" type="button">Áp dụng cho tất cả</button>
+                                <button class="btn btn-primary btnAddProduct" type="button" style="margin-left: 15px">Đồng bộ với cửa hàng kiotviet</button>
                             </div>
                             <table class="table table-bordered">
                                 <thead>
@@ -62,6 +63,7 @@
                                         <td>{{$item->branch_name}}</td>
                                         <td>{{$item->address.'-'.$item->ward_name.'-'.$item->location_name}}</td>
                                         <td>
+                                            <input  value="{{$item->kiotviet_id}}" hidden class="kiotviet_id">
                                             <input name="branch[{{$key}}][id]" value="{{$item->id}}" hidden>
                                             <input name="branch[{{$key}}][quantity]" type="number" value="{{$item->quantity_gift}}" class="form-control quantity">
                                         </td>
@@ -110,6 +112,37 @@
                         var input = $(this).find(".quantity");
                         input.val(quantity);
                     });
+                }
+            });
+            $(".btnAddProduct").click(function () {
+                var product_code = $('input[name="code"]').val();
+                if (product_code === ''){
+                    Swal.fire(
+                        "Thất bại",
+                        "Vui lòng điền mã quà tặng",
+                        "error"
+                    );
+                }else{
+                    $.ajax({
+                        url : "{{route('gift.detail-product')}}",
+                        data:{'product_code' : product_code},
+                        type: "post",
+                        dataType: "json",
+                        success: function (data) {
+                            if(data.status){
+                                for (var i = 0; i < data.data.length; i++){
+                                    var branchId = data.data[i].branchId;
+                                    var quantity = data.data[i].quantity;
+                                    $("tbody tr").each(function () {
+                                        var kiotviet_id = $(this).find('input.kiotviet_id').val();
+                                        if (branchId == kiotviet_id){
+                                            $(this).find('input.quantity').val(quantity);
+                                        }
+                                    });
+                                }
+                            }
+                        }
+                    })
                 }
             });
         });

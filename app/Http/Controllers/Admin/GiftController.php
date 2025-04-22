@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Http\Controllers\API\HelperApiController;
 use App\Models\Banner;
 use App\Models\Branch;
 use App\Models\Gift;
@@ -11,12 +12,10 @@ use App\Models\ProductGiftModel;
 use App\Models\ProductsModel;
 use App\Models\Program;
 use App\Models\Promotion;
-use Dflydev\DotAccessData\Data;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
-use function Illuminate\Support\of;
 
-class GiftController
+class GiftController extends HelperApiController
 {
     public function index (Request $request)
     {
@@ -484,5 +483,21 @@ class GiftController
         }
         $promotion->delete();
         return back()->with(['success' => 'Xóa dữ liệu thành công']);
+    }
+
+    public function detailProductKiotviet (Request $request)
+    {
+        $product = $this->detailProduct($request->get('product_code'));
+        $dataBranch = [];
+        foreach ($product as $value){
+            foreach ($value['inventories'] as $item){
+                $branch = [
+                    'branchId' => $item['branchId'],
+                    'quantity' => $item['onHand']
+                ];
+                $dataBranch[] = $branch;
+            }
+        }
+        return response()->json(['status' => true, 'data' => $dataBranch], 200);
     }
 }

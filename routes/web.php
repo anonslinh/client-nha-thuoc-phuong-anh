@@ -54,6 +54,7 @@ Route::middleware([CheckLogin::class])->group(function (){
         Route::post('store', [GiftController::class, 'store'])->name('store');
         Route::post('update/{id}', [GiftController::class, 'update'])->name('update');
         Route::get('delete/{id}', [GiftController::class, 'delete'])->name('delete');
+        Route::post('detail-product-kiotviet', [GiftController::class, 'detailProductKiotviet'])->name('detail-product');
     });
     Route::prefix('banner')->name('banner.')->group(function (){
        Route::get('list-data', [GiftController::class, 'banner'])->name('list-data');
