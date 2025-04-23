@@ -426,4 +426,28 @@ class HelperApiController extends Controller
             ]);
         }
     }
+
+    /**
+     * Lấy dữ liệu sản phẩm theo mã sản phẩm
+    **/
+    public function detailProduct ($product_code)
+    {
+        $data = [];
+        $personalAccessTokens = PersonalAccessTokens::whereNotNull('retailer')->get();
+        foreach ($personalAccessTokens as $value){
+            $tokens = $this->kiotVietService->getAccessTokenAllBranches($value->access_token_code);
+            $accessToken = $tokens->access_token;
+            $retailer = $tokens->retailer;
+            $response = Http::withHeaders([
+                'Retailer'      => $retailer,
+                'Authorization' => 'Bearer ' . $accessToken,
+                'Content-Type'  => 'application/json',
+            ])->get($this->urlKiotViet['url_detail_product'].$product_code);
+            $product = $response->json();
+            if (empty($product['responseStatus'])){
+                $data[] = $product;
+            }
+        }
+        return $data;
+    }
 }

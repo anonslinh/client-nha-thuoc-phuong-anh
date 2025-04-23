@@ -58,53 +58,9 @@
 
                                 <td class="align-middle">
                                     <h6>Số điểm: {{$value->points_required}}</h6>
-                                    <span>Sản phẩm: 01</span>
+                                    <span>Tổng tồn: {{$value->quantity}}</span>
                                 </td>
                                 <td class="align-middle">
-
-                                    <div class="modal fade" id="modalUpdate{{$value->id}}" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
-                                        <div class="modal-dialog modal-dialog-centered" role="document">
-                                            <form action="{{route('gift.update',$value->id)}}" method="post" enctype="multipart/form-data" class="modal-content">
-                                                @csrf
-                                                <div class="modal-header">
-                                                    <h5 class="modal-title" id="exampleModalLongTitle">Cập nhật quà tặng</h5>
-                                                </div>
-                                                <div class="modal-body">
-                                                    <div class="form-group mb-2">
-                                                        <label>Tên</label>
-                                                        <input class="form-control" value="{{$value->name}}" name="name" required>
-                                                    </div>
-                                                    <div class="form-group mb-2">
-                                                        <label>Mã</label>
-                                                        <input class="form-control" value="{{$value->code}}" name="code" required>
-                                                    </div>
-                                                    <div class="form-group mb-2">
-                                                        <label class="d-block">Hình ảnh</label>
-                                                        <img src="{{$value->image}}" style="width: 200px;margin: 10px 0">
-                                                        <input class="form-control" type="file" accept="image/png" name="image">
-                                                    </div>
-                                                    <div class="form-group mb-2">
-                                                        <label>Điểm quy đổi</label>
-                                                        <input class="form-control" value="{{$value->points_required}}" name="point" type="number" min="0" required>
-                                                    </div>
-                                                    <div class="form-group">
-                                                        <label>Hạng thẻ</label>
-                                                        <select name="rank_id" class="form-control">
-                                                            <option value="">Không áp dụng</option>
-                                                            @foreach($rank as $rankItem)
-                                                                <option value="{{$rankItem->id}}" @if($rankItem->id == $value->rank_id) selected @endif>{{$rankItem->name}}</option>
-                                                            @endforeach
-                                                        </select>
-                                                    </div>
-                                                </div>
-                                                <div class="modal-footer">
-                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                                                    <button class="btn btn-primary">Xác nhận</button>
-                                                </div>
-                                            </form>
-                                        </div>
-                                    </div>
-
                                     <a href="{{route('gift.detail', ['id' => $value->id])}}" class="btn btn-primary" style="margin-right: 15px">
                                         <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
                                             <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>

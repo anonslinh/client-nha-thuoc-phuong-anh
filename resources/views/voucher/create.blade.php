@@ -28,7 +28,7 @@
                         <input class="form-control" name="name" required>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Hình ảnh</label>
+                        <label class="form-label">Hình ảnh(Tỷ lệ 2:1 1000x500px)</label>
                         <input class="form-control" type="file" accept="image/png" name="image" required>
                     </div>
                     <div class="mb-3">

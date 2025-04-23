@@ -28,11 +28,11 @@
                         <input name="title" class="form-control" required>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Poster()</label>
+                        <label class="form-label">Poster(Tỷ lệ 2:1 2000x1000)</label>
                         <input name="thumbnail" class="form-control" type="file" accept="image/*" required>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Hình ảnh</label>
+                        <label class="form-label">Hình ảnh(Tỷ lệ 1:1 1000x1000)</label>
                         <input name="images[]" class="form-control" type="file" accept="image/*" multiple required>
                     </div>
                     <div class="mb-3">

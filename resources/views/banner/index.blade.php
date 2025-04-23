@@ -76,7 +76,7 @@
                                                         <input class="form-control" value="{{$value->title}}" name="name" required>
                                                     </div>
                                                     <div class="form-group mb-2">
-                                                        <label class="d-block form-label">Hình ảnh(1200x600px)</label>
+                                                        <label class="d-block form-label">Hình ảnh(Tỷ lệ 2:1 1200x600px)</label>
                                                         <img src="{{$value->image_url}}" style="width: 200px;margin: 10px 0">
                                                         <input class="form-control" type="file" accept="image/png" name="image">
                                                     </div>
@@ -158,7 +158,7 @@
                             <input class="form-control" name="name" required>
                         </div>
                         <div class="form-group mb-2">
-                            <label class="form-label">Hình ảnh(1200x600px)</label>
+                            <label class="form-label">Hình ảnh(Tỷ lệ 2:1 1200x600px)</label>
                             <input class="form-control" type="file" accept="image/png" name="image" required>
                         </div>
                         <div class="form-group mb-2">
