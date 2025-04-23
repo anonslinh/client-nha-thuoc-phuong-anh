@@ -32,7 +32,7 @@
                         <input class="form-control" name="code" required>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Hình ảnh</label>
+                        <label class="form-label">Hình ảnh(Tỷ lệ 1:1 1000x1000px)</label>
                         <input class="form-control" type="file" accept="image/*" required name="image">
                     </div>
                     <div class="mb-3">

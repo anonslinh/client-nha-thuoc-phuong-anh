@@ -11,7 +11,7 @@
                         <input name="title" value="{{$promotion->title}}" class="form-control" required>
                     </div>
                     <div class="form-group mb-3">
-                        <label class="form-label d-block">Hình ảnh</label>
+                        <label class="form-label d-block">Hình ảnh(Tỷ lệ 2:1 2000x1000)</label>
                         <input name="image_path" class="form-control" type="file" accept="image/*">
                     </div>
                     <div class="form-group mb-3">

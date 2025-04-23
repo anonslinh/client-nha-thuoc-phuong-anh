@@ -40,7 +40,7 @@
                         <input class="form-control" name="price" value="{{$product->price}}" type="number">
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Hình ảnh</label>
+                        <label class="form-label">Hình ảnh(Tỷ lệ 1:1 1000x1000px)</label>
                         <div class="row list-image">
                             @foreach($product['image'] as $k => $image)
                                 <div class="col-3 mb-2 position-relative item-image">

@@ -11,11 +11,11 @@
                         <input name="title" value="{{$program->title}}" class="form-control" required>
                     </div>
                     <div class="form-group mb-3">
-                        <label class="form-label">Poster</label>
+                        <label class="form-label">Poster(Tỷ lệ 2:1 2000x1000)</label>
                         <input name="thumbnail" class="form-control" type="file" accept="image/*">
                     </div>
                     <div class="form-group mb-3">
-                        <label class="form-label d-block">Hình ảnh</label>
+                        <label class="form-label d-block">Hình ảnh(Tỷ lệ 1:1 1000x1000)</label>
                         <div class="d-flex flex-wrap" style="margin: 10px 0">
                             @foreach($program->images as $value)
                                 <div class="position-relative" style="margin-right: 15px;margin-bottom: 15px">
