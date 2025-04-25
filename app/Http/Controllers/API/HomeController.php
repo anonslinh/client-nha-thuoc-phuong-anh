@@ -269,7 +269,7 @@ class HomeController extends HelperApiController
                 // Lấy tổng chi tiêu của khách hàng
                 $totalSpent = CustomerSpendingSummary::where('contact_number', $phone)->sum('total_spent');
             }else{
-                $totalSpent = $customer->kiotviet_reward_point - $customer->used_points;
+                $totalSpent = $customer->reward_point;
             }
 
             $membershipLevels = MembershipLevel::orderBy('spending_threshold', 'desc')->get();
