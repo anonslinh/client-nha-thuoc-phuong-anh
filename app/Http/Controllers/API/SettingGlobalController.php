@@ -22,6 +22,11 @@ class SettingGlobalController extends HelperApiController
             ->where('oa_id', $oa_id)
             ->exists(); // Kiểm tra nhanh có tồn tại không
 
+        //Code dòng này để bật tắt chức năng follow zalo OA
+        if (!empty($oa_id) && $oa_id == 0){
+            $is_followed = true;
+        }
+
         return response()->json([
             'status' => $is_followed ? 0 : 1,
             'msg' => $is_followed ? "Đã follow OA!" : "Chưa follow OA!",
