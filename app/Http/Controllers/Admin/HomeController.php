@@ -11,6 +11,7 @@ use App\Models\Gift;
 use App\Models\GiftExchanges;
 use App\Models\MembershipLevel;
 use App\Models\RankModel;
+use App\Models\TypeRankModel;
 use App\Models\Voucher;
 use App\Models\VoucherExchanges;
 use App\Services\KiotVietService;
@@ -52,7 +53,19 @@ class HomeController
             $value->total_customer = CustomerRank::where('current_rank', $value->rank)
                 ->whereDate('rank_start_date', '<=', Carbon::now())->whereDate('rank_end_date', '>=', Carbon::now())->count();
         }
-        return view('rank.list-data', compact('listData'));
+        $typeRank = TypeRankModel::first();
+        return view('rank.list-data', compact('listData', 'typeRank'));
+    }
+    /**
+     * Cấu hình hạng thẻ
+    **/
+    public function typeRank (Request $request)
+    {
+        $typeRank = TypeRankModel::first();
+        $typeRank->type = $request->get('type');
+        $typeRank->time = $request->get('time')??0;
+        $typeRank->save();
+        return back()->with(['success' => 'Cấu hình thành công']);
     }
     /**
      * Cập nhật hạng thẻ

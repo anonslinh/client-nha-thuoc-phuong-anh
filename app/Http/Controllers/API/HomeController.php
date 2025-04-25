@@ -9,6 +9,8 @@ use App\Models\Customer;
 use App\Models\DailyActivitySummary;
 use App\Models\Promotion;
 use App\Models\Slogan;
+use App\Models\TypeRankModel;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use App\Models\Banner;
 use App\Models\Gift;
@@ -238,7 +240,6 @@ class HomeController extends HelperApiController
 
             // Tìm khách hàng theo số điện thoại
             $customer = Customer::where('contact_number', $phone)->first();
-
             if (!$customer) {
                 $currentRank = MembershipLevel::where('rank', 'than_thiet')->first();
                 // Tìm hạng tiếp theo cần thăng
@@ -262,12 +263,45 @@ class HomeController extends HelperApiController
                 return $data_return;
             }
 
-            // Lấy tổng chi tiêu của khách hàng
-            $totalSpent = CustomerSpendingSummary::where('contact_number', $phone)->sum('total_spent');
+            // Thay đổi cập nhật và tạo hạng thành viên
+            $typeRank = TypeRankModel::first()->type ?? 1;
+            if ($typeRank == 1){
+                // Lấy tổng chi tiêu của khách hàng
+                $totalSpent = CustomerSpendingSummary::where('contact_number', $phone)->sum('total_spent');
+            }else{
+                $totalSpent = $customer->kiotviet_reward_point - $customer->used_points;
+            }
+
+            $membershipLevels = MembershipLevel::orderBy('spending_threshold', 'desc')->get();
+
+            // Xác định hạng thẻ phù hợp
+            $newRank = null;
+            foreach ($membershipLevels as $level) {
+                if ($totalSpent >= $level->spending_threshold) {
+                    $newRank = $level->rank;
+                    break;
+                }
+            }
+            if (!$newRank) {
+                $newRank = 'than_thiet';
+            }
+
+            $year = Carbon::now()->year;
+            $month = Carbon::now()->month;
+            // Cập nhật hoặc tạo mới hạng thẻ trong customer_ranks
+            CustomerRank::updateOrCreate(
+                ['contact_number' => $phone],
+                [
+                    'customer_id' => $customer->kiotviet_id,
+                    'current_rank'    => $newRank,
+                    'rank_start_date' => Carbon::create($year, $month, 1), // Đầu tháng
+                    'rank_end_date'   => Carbon::create($year, $month, 1)->endOfMonth(), // Cuối tháng
+                ]
+            );
+            // Hết thay code
 
             // Lấy hạng thẻ hiện tại
             $currentRank = CustomerRank::where('contact_number', $phone)->first();
-
             // Nếu chưa có hạng, mặc định "Thân Thiết"
             if (!$currentRank) {
                 $currentRank = MembershipLevel::where('rank', 'than_thiet')->first();

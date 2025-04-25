@@ -393,32 +393,34 @@ class HelperApiController extends Controller
             // Lấy tổng chi tiêu sau cập nhật
             $totalSpent = $spendingSummary->fresh()->total_spent;
 
+            // Chuyển đoạn code tạo hoặc cập nhật hạng người dùng bên dưới sang mục lấy hạng hiện tại của khách hàng
+
             // Lấy danh sách hạng thẻ (sắp xếp giảm dần theo spending_threshold)
-            $membershipLevels = MembershipLevel::orderBy('spending_threshold', 'desc')->get();
-
-            // Xác định hạng thẻ phù hợp
-            $newRank = null;
-            foreach ($membershipLevels as $level) {
-                if ($totalSpent >= $level->spending_threshold) {
-                    $newRank = $level->rank;
-                    break;
-                }
-            }
-
-            if (!$newRank) {
-                return;
-            }
-
-            // Cập nhật hoặc tạo mới hạng thẻ trong customer_ranks
-            CustomerRank::updateOrCreate(
-                ['contact_number' => $phone],
-                [
-                    'customer_id' => $firstCustomerId,
-                    'current_rank'    => $newRank,
-                    'rank_start_date' => Carbon::create($year, $month, 1), // Đầu tháng
-                    'rank_end_date'   => Carbon::create($year, $month, 1)->endOfMonth(), // Cuối tháng
-                ]
-            );
+//            $membershipLevels = MembershipLevel::orderBy('spending_threshold', 'desc')->get();
+//
+//            // Xác định hạng thẻ phù hợp
+//            $newRank = null;
+//            foreach ($membershipLevels as $level) {
+//                if ($totalSpent >= $level->spending_threshold) {
+//                    $newRank = $level->rank;
+//                    break;
+//                }
+//            }
+//
+//            if (!$newRank) {
+//                return;
+//            }
+//
+//            // Cập nhật hoặc tạo mới hạng thẻ trong customer_ranks
+//            CustomerRank::updateOrCreate(
+//                ['contact_number' => $phone],
+//                [
+//                    'customer_id' => $firstCustomerId,
+//                    'current_rank'    => $newRank,
+//                    'rank_start_date' => Carbon::create($year, $month, 1), // Đầu tháng
+//                    'rank_end_date'   => Carbon::create($year, $month, 1)->endOfMonth(), // Cuối tháng
+//                ]
+//            );
         }catch (\Exception $exception){
             \Log::error('Lỗi xảy ra: ' . $exception->getMessage(), [
                 'file' => $exception->getFile(),

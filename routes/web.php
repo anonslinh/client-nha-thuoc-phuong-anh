@@ -110,6 +110,7 @@ Route::middleware([CheckLogin::class])->group(function (){
     Route::prefix('rank')->name('rank.')->group(function (){
        Route::get('index', [HomeController::class, 'listRank'])->name('index');
        Route::post('update/{id}', [HomeController::class, 'updateRank'])->name('update');
+       Route::post('type-rank', [HomeController::class,'typeRank'])->name('type_rank');
     });
 
     //Cài đặt
