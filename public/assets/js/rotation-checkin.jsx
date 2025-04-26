@@ -386,7 +386,7 @@ function App() {
 
                                     <div className="max-w-sm mx-auto mt-3">
                                         <label htmlFor="countries"
-                                               className="block mb-2 text-sm font-medium ">Chọn chi </label>
+                                               className="block mb-2 text-sm font-medium ">Chọn chi nhánh </label>
                                         <select id="countries"
                                                 onChange={(e)=>setBranchId(e.target.value)}
                                                 className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5 ">
