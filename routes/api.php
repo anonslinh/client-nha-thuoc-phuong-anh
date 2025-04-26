@@ -80,6 +80,11 @@ Route::prefix('rotation')->group(function (){
     Route::post('list-gift-sub', [RotationController::class, 'listGiftSubAPI']);
     Route::post('exchange-gift-sub', [RotationController::class, 'exchangeGiftSubAPI']);
 });
+// Vòng quay checkin
+Route::prefix('rotation-checkin')->group(function (){
+   Route::post('list-gift', [RotationController::class, 'listGiftCheckinAPI']);
+    Route::post('exchange-gift', [RotationController::class, 'exchangeGiftCheckinAPI']);
+});
 //Nhà thuốc
 Route::prefix('pharmacy')->group(function (){
     Route::post('prescriptions', [PharmacyController::class, 'submitPrescription']);

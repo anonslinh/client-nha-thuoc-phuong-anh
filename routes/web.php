@@ -224,6 +224,15 @@ Route::middleware([CheckLogin::class])->group(function (){
        Route::post('create-gift-2', [RotationController::class, 'createGift2'])->name('create-gift-2');
        Route::post('update-gift-2/{id}', [RotationController::class, 'updateGift2'])->name('update-gift-2');
        Route::get('delete-gift-2/{id}', [RotationController::class, 'deleteGiftSub'])->name('sub-gift.delete');
+       Route::prefix('gift-checkin')->name('gift_checkin.')->group(function (){
+          Route::get('', [RotationController::class, 'listGiftCheckin'])->name('index');
+          Route::get('create', [RotationController::class, 'createGiftCheckin'])->name('create');
+          Route::post('store', [RotationController::class, 'storedGiftCheckin'])->name('store');
+          Route::get('delete/{id}', [RotationController::class, 'deleteGiftCheckin'])->name('delete');
+          Route::get('detail/{id}', [RotationController::class, 'detailGiftCheckin'])->name('detail');
+          Route::post('update/{id}', [RotationController::class, 'updateGiftCheckin'])->name('update');
+          Route::get('exchange-gift', [RotationController::class, 'exchangeGiftCheckin'])->name('exchange-gift');
+       });
     });
     //Giấy chứng nhận sản phẩm
     Route::prefix('certificates')->name('certificates.')->group(function () {
@@ -247,4 +256,7 @@ Route::middleware([CheckLogin::class])->group(function (){
 Route::get('play-rotation', [RotationController::class, 'playRotation']);
 Route::get('lucky-wheel', function (){
    return view('lucky-wheel');
+});
+Route::get('rotation-checkin', function (){
+   return view('rotation-checkin');
 });

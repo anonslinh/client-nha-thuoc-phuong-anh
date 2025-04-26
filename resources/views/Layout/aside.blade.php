@@ -34,20 +34,29 @@
                                 <span class="hide-menu">{{$value['name']}}</span>
                             </li>
                             @foreach($value['submenu'] as $k => $item)
-                                @if($key == 0)
-                                    <li class="sidebar-item">
-                                        <a class="sidebar-link" href="{{route($item['route'])}}" @if($k == 0) id="get-url" @endif aria-expanded="false">
-                                            <iconify-icon icon="{{$item['icon']}}"></iconify-icon>
-                                            <span class="hide-menu">{{$item['name']}}</span>
-                                        </a>
+                                @if(isset($item['type']) && $item['type'] == 'title')
+                                    <li>
+                                        <span class="sidebar-divider lg"></span>
                                     </li>
-                                @else
-                                    <li class="sidebar-item">
-                                        <a href="{{route($item['route'])}}" class="sidebar-link">
-                                            <iconify-icon icon="{{$item['icon']}}"></iconify-icon>
-                                            <span class="hide-menu">{{$item['name']}}</span>
-                                        </a>
+                                    <li class="nav-small-cap">
+                                        <span class="hide-menu">{{$item['name']}}</span>
                                     </li>
+                                    @else
+                                    @if($key == 0)
+                                        <li class="sidebar-item">
+                                            <a class="sidebar-link" href="{{route($item['route'])}}" @if($k == 0) id="get-url" @endif aria-expanded="false">
+                                                <iconify-icon icon="{{$item['icon']}}"></iconify-icon>
+                                                <span class="hide-menu">{{$item['name']}}</span>
+                                            </a>
+                                        </li>
+                                    @else
+                                        <li class="sidebar-item">
+                                            <a href="{{route($item['route'])}}" class="sidebar-link">
+                                                <iconify-icon icon="{{$item['icon']}}"></iconify-icon>
+                                                <span class="hide-menu">{{$item['name']}}</span>
+                                            </a>
+                                        </li>
+                                @endif
                                 @endif
                             @endforeach
                         </ul>

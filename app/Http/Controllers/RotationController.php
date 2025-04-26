@@ -5,18 +5,23 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Admin\HelperAdminController;
 use App\Models\Branch;
 use App\Models\Customer;
+use App\Models\CustomerGiftCheckin;
+use App\Models\GiftCheckin;
 use App\Models\GiftRotation;
 use App\Models\GiftRotationQuantity;
 use App\Models\GiftRotationSub;
 use App\Models\HistoryGiftRotation;
 use App\Models\HistoryInvoiceRotation;
 use App\Models\Invoice;
+use App\Models\QuantityGiftCheckin;
+use App\Models\RotationCheckin;
 use App\Models\RotationModel;
 use App\Models\RuleRotation;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use App\Http\Controllers\API\HelperApiController;
 
@@ -518,5 +523,251 @@ class RotationController extends HelperAdminController
         $gift->quantity -= 1;
         $gift->save();
         return \response()->json(['status' => true, 'msg' => 'Chúc mừng bạn đã nhận được phần quà: '.$gift->title], Response::HTTP_OK);
+    }
+    /**
+     * Vòng quay checkin
+    **/
+    public function listGiftCheckin (Request $request)
+    {
+        $listData = GiftCheckin::query();
+        if (isset($request->key_search)){
+            $listData = $listData->where('title', 'like', '%'.$request->get('key_search').'%');
+        }
+        $listData = $listData->paginate(20);
+        foreach ($listData as $value){
+            $value['quantity'] = QuantityGiftCheckin::where('gift_checkin_id', $value->id)->sum('quantity')??0;
+        }
+        return view('rotation.gift_checkin', compact('listData'));
+    }
+
+    public function createGiftCheckin ()
+    {
+        $listBranch = Branch::all();
+        return view('rotation.create_gift_checkin', compact('listBranch'));
+    }
+
+    public function storedGiftCheckin (Request $request)
+    {
+        try{
+            $checkQuantity = false;
+            if (empty($request->get('branch'))){
+                return back()->with(['error' => 'Vui lòng thêm số lượng quà tặng cho các chi nhánh']);
+            }
+            foreach ($request->get('branch') as $value){
+                if (isset($value['quantity']) && $value['quantity'] > 1){
+                    $checkQuantity = true;
+                }
+            }
+            if (!$checkQuantity){
+                return back()->with(['error' => 'Vui lòng thêm số lượng quà tặng cho các chi nhánh']);
+            }
+            if (!$request->hasFile('image')){
+                return back()->with(['error' => 'Vui lòng thêm hình ảnh quà tặng']);
+            }
+            $file = $request->file('image');
+            $nameFile = 'gift-checkin'.time().Str::random(10).'.'.$file->getClientOriginalExtension();
+            $file->move('upload/gift-rotation/', $nameFile);
+            $image = 'upload/gift-rotation/'.$nameFile;
+            $gift = new GiftCheckin([
+                'title' => $request->get('title'),
+                'code' => $request->get('code'),
+                'percent' => $request->get('percent') / 100,
+                'image' => $image
+            ]);
+            $gift->save();
+            foreach ($request->get('branch') as $value){
+                if (isset($value['quantity'])){
+                    $giftQuantity = new QuantityGiftCheckin([
+                        'gift_checkin_id' => $gift['id'],
+                        'branch_id' => $value['id'],
+                        'quantity' => $value['quantity']
+                    ]);
+                    $giftQuantity->save();
+                }
+            }
+            return back()->with(['success' => 'Cấu hình quà tặng thành công']);
+        }catch (\Exception $exception){
+            return back()->with(['error' => 'Vui lòng điền đầy đủ thông tin']);
+        }
+    }
+    public function deleteGiftCheckin ($id)
+    {
+        $gift = GiftCheckin::find($id);
+        if (empty($gift)){
+            return back()->with(['error' => 'Dữ liệu không tồn tại.Vui lòng kiểm tra lại']);
+        }
+        $gift->delete();
+        return back()->with(['success' => 'Xóa dữ liệu thành công']);
+    }
+
+    public function detailGiftCheckin($id)
+    {
+        $gift = GiftCheckin::find($id);
+        if (empty($gift)){
+            return back()->with(['error' => 'Dữ liệu không tồn tại']);
+        }
+        $listBranch = Branch::all();
+        foreach ($listBranch as $value){
+            $value->quantity_gift = QuantityGiftCheckin::where('branch_id', $value->id)->where('gift_checkin_id', $id)->first()->quantity??null;
+        }
+        return view('rotation.detail_gift_checkin', compact('listBranch', 'gift'));
+    }
+
+    public function updateGiftCheckin (Request $request, $id)
+    {
+        $gift = GiftCheckin::find($id);
+        if (empty($gift)){
+            return back()->with(['error' => 'Dữ liệu không tồn tại']);
+        }
+        $checkQuantity = false;
+        if (empty($request->get('branch'))){
+            return back()->with(['error' => 'Vui lòng thêm số lượng quà tặng cho các chi nhánh']);
+        }
+        foreach ($request->get('branch') as $value){
+            if (isset($value['quantity']) && $value['quantity'] > 1){
+                $checkQuantity = true;
+            }
+        }
+        if (!$checkQuantity){
+            return back()->with(['error' => 'Vui lòng thêm số lượng quà tặng cho các chi nhánh']);
+        }
+
+        if ($request->hasFile('image')){
+            $file = $request->file('image');
+            $nameFile = 'gift-checkin'.time().Str::random(10).'.'.$file->getClientOriginalExtension();
+            $file->move('upload/gift-rotation/', $nameFile);
+            $image = 'upload/gift-rotation/'.$nameFile;
+            if (file_exists(public_path($gift->image))) {
+                unlink(public_path($gift->image));
+            }
+            $gift->image = $image;
+        }
+        $gift->title = $request->get('title');
+        $gift->code = $request->get('code');
+        $gift->percent = $request->get('percent') / 100;
+        $gift->save();
+        QuantityGiftCheckin::where('gift_checkin_id', $id)->delete();
+        foreach ($request->get('branch') as $value){
+            if (isset($value['quantity'])){
+                $giftQuantity = new QuantityGiftCheckin([
+                    'gift_checkin_id' => $gift['id'],
+                    'branch_id' => $value['id'],
+                    'quantity' => $value['quantity']
+                ]);
+                $giftQuantity->save();
+            }
+        }
+        return back()->with(['success' => 'Cập nhật quà tặng thành công']);
+    }
+
+    public function exchangeGiftCheckin (Request $request)
+    {
+        $listData = CustomerGiftCheckin::query();
+        if (isset($request->key_search)){
+            $listData = $listData->where('phone', 'like', '%'.$request->get('key_search').'%');
+        }
+        if (isset($request->branch_id)){
+            $listData = $listData->where('branch_id', $request->get('branch_id'));
+        }
+        $listData = $listData->orderBy('created_at','desc')->paginate(20);
+        $branch = Branch::all();
+        return view('rotation.history_gift_checkin', compact('listData', 'branch'));
+    }
+    /**
+     * Đăng ký và lấy danh sách quà vòng quay checkin
+    **/
+    public function listGiftCheckinAPI (Request $request)
+    {
+        $rule = [
+            'phone' => [
+                'required',
+                'regex:/^(0|\+84)[3-9][0-9]{8}$/'
+            ],
+            'image' => [
+                'required',
+                'image',
+                'mimes:jpeg,png,jpg,gif,svg|max:2048'
+            ],
+            'branch_id' => [
+                'required',
+                'exists:branches,id'
+            ]
+        ];
+
+        $message = [
+            'phone.required' => 'Vui lòng nhập số điện thoại',
+            'phone.regex' => 'Số điện thoại không hợp lệ',
+            'image.required' => 'Vui lòng chọn ảnh',
+            'image.image' => 'Tệp tải lên phải là hình ảnh',
+            'image.mimes' => 'Ảnh phải có định dạng: jpeg, png, jpg, gif, hoặc svg',
+            'image.max' => 'Kích thước ảnh tối đa là 2MB',
+            'branch_id.required' => 'Vui lòng chọn chi nhánh',
+            'branch_id.exists' => 'Chi nhánh không tồn tại',
+        ];
+        $validation = Validator::make($request->all(), $rule, $message);
+        if ($validation->fails()){
+            return \response()->json(['status' => false, 'msg' => $validation->errors()->first()], 200);
+        }
+        $rotation = RotationCheckin::where('phone', $request->get('phone'))->first();
+        $file = $request->file('image');
+        if (empty($rotation)){
+            $nameFile = 'customer-checkin'.time().Str::random(10).'.'.$file->getClientOriginalExtension();
+            $file->move('upload/gift-rotation/', $nameFile);
+            $image = 'upload/gift-rotation/'.$nameFile;
+            $rotation = new RotationCheckin([
+                'phone' => $request->get('phone'),
+                'branch_id' => $request->get('branch_id'),
+                'image' => $image
+            ]);
+            $rotation->save();
+        }else{
+            if ($rotation->use == 1){
+                return \response()->json(['status' => false, 'msg' => 'Mỗi người chỉ được đăng ký một lần và một lượt quay. Trân trọng cảm ơn'], 200);
+            }
+            $nameFile = 'customer-checkin'.time().Str::random(10).'.'.$file->getClientOriginalExtension();
+            $file->move('upload/gift-rotation/', $nameFile);
+            $image = 'upload/gift-rotation/'.$nameFile;
+            $rotation->image = $image;
+            $rotation->save();
+        }
+        $listGift = GiftCheckin::all();
+        return \response()->json(['status' => true, 'data' => $listGift], 200);
+    }
+    /**
+     * Đổi quà vòng quay checkin
+    **/
+    public function exchangeGiftCheckinAPI (Request $request)
+    {
+        $gift = GiftCheckin::find($request->get('gift_id'));
+        if (empty($gift)){
+            return \response()->json(['status' => false, 'msg' => 'Quà tặng không tồn tại'], 200);
+        }
+        $customer = RotationCheckin::where('phone', $request->get('phone'))->first();
+        if (empty($customer)){
+            return \response()->json(['status' => false, 'msg' => 'Bạn chưa đăng ký vòng quay.Vui lòng đăng ký vòng quay']);
+        }
+        if ($customer->use == 1){
+            return \response()->json(['status' => false, 'msg' => 'Mỗi người chỉ được đăng ký một lần và một lượt quay. Trân trọng cảm ơn'], 200);
+        }
+        $branch = Branch::find($request->get('branch_id'));
+        if (empty($branch)){
+            return \response()->json(['status' => false, 'msg' => 'Vui lòng chọn lại chi nhánh để tiếp tục'], 200);
+        }
+        $quantity = QuantityGiftCheckin::where('gift_checkin_id', $gift->id)->where('branch_id', $request->get('branch_id'))->first()->quantity ?? 0;
+        if ($quantity == 0){
+            return \response()->json(['status' => false, 'msg' => 'Phần quà ở chi nhánh hiện tại đã hết.Vui lòng quay để nhận quà khách'], 200);
+        }
+        $customer_gift_checkin = new CustomerGiftCheckin([
+            'phone' => $customer->phone,
+            'gift_name' => $gift->title,
+            'gift_code' => $gift->code,
+            'gift_image' => $gift->image,
+            'branch_name' => $branch->branch_name,
+            'branch_id' => $branch->id
+        ]);
+        $customer_gift_checkin->save();
+        $customer->use = 1;
+        $customer->save();
+        return \response()->json(['status' => true, 'msg' => 'Chúc mừng bạn đã nhận được phần quà: '.$gift->title], 200);
     }
 }

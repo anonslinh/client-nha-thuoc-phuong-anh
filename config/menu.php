@@ -137,7 +137,28 @@ return [
                 'name' => 'Quà tặng Như Anh',
                 'icon' => 'solar:settings-line-duotone',
                 'route' => 'rotation.sub-gift'
-            ]
+            ],
+            [
+                'name' => 'Vòng quay checkin',
+                'icon' => null,
+                'route' => null,
+                'type' => 'title'
+            ],
+            [
+                'name' => 'DS quà tặng',
+                'icon' => 'solar:settings-line-duotone',
+                'route' => 'rotation.gift_checkin.index'
+            ],
+            [
+                'name' => 'Tạo quà tặng',
+                'icon' => 'solar:settings-line-duotone',
+                'route' => 'rotation.gift_checkin.create'
+            ],
+            [
+                'name' => 'Lịch sử đổi quà',
+                'icon' => 'solar:settings-line-duotone',
+                'route' => 'rotation.gift_checkin.exchange-gift'
+            ],
         ]
     ],
     [
