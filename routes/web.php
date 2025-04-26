@@ -220,6 +220,7 @@ Route::middleware([CheckLogin::class])->group(function (){
        Route::post('update-gift/{id}', [RotationController::class, 'updateGift'])->name('update-gift');
        Route::get('delete-gift/{id}', [RotationController::class, 'deleteGift'])->name('delete-gift');
        Route::get('history-exchange-gift', [RotationController::class, 'historyExchangeGift'])->name('history-exchange-gift');
+       Route::get('export-history-exchange-gift', [RotationController::class, 'exportHistoryExchangeGift'])->name('export-history-exchange-gift');
        Route::get('sub-gift', [RotationController::class, 'subGift'])->name('sub-gift'); // Quà tặng của cô Xuyến
        Route::post('create-gift-2', [RotationController::class, 'createGift2'])->name('create-gift-2');
        Route::post('update-gift-2/{id}', [RotationController::class, 'updateGift2'])->name('update-gift-2');

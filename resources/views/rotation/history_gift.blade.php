@@ -4,8 +4,12 @@
         <div class="card card-body py-3">
             <div class="row align-items-center">
                 <div class="col-12">
-                    <div class="d-sm-flex align-items-center justify-space-between">
+                    <div class="d-flex align-items-center justify-content-between">
                         <h4 class="mb-4 mb-sm-0 card-title">Danh sách khách hàng trúng quà: {{$totalGift}}</h4>
+                        <a href="{{route('rotation.export-history-exchange-gift')}}" class="justify-content-center badge fw-medium fs-2 btn btn-rounded btn-danger d-flex align-items-center">
+                            <iconify-icon icon="solar:home-2-line-duotone" class="fs-6"></iconify-icon>
+                            Xuất excel
+                        </a>
                     </div>
                 </div>
             </div>

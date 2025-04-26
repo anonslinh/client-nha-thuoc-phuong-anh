@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\HistoryCustomerExchangeGift;
 use App\Http\Controllers\Admin\HelperAdminController;
 use App\Models\Branch;
 use App\Models\Customer;
@@ -17,13 +18,12 @@ use App\Models\QuantityGiftCheckin;
 use App\Models\RotationCheckin;
 use App\Models\RotationModel;
 use App\Models\RuleRotation;
-use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use App\Http\Controllers\API\HelperApiController;
+use Maatwebsite\Excel\Facades\Excel;
 
 class RotationController extends HelperAdminController
 {
@@ -255,6 +255,13 @@ class RotationController extends HelperAdminController
         $totalGift = $listData->total();
         $rule_rotation = RuleRotation::all();
         return view('rotation.history_gift', compact('listData', 'rule_rotation', 'totalGift'));
+    }
+    /**
+     * Xuất excel
+    **/
+    public function exportHistoryExchangeGift ()
+    {
+        return Excel::download(new HistoryCustomerExchangeGift(), 'Danh_sach_khach_hang_chung_qua.xlsx');
     }
     /**
      * API vòng quay may mắn
