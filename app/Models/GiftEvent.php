@@ -15,6 +15,8 @@ class GiftEvent extends Model
         'point',
         'quantity',
         'active',
-        'description'
+        'description',
+        'type',
+        'release_code'
     ];
 }

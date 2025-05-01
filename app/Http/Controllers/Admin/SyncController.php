@@ -307,4 +307,59 @@ class SyncController extends HelperAdminController
         $customer->save();
         return true;
     }
+    /**
+     * Lấy voucher campeign theo mã phát hành và tài khoản kiotviet
+     */
+    public function dataReleaseCode($array_release_code){
+        try{
+            $data_return = [];
+            foreach ($array_release_code as $item){
+
+                $tokens = $this->kiotVietService->getAccessTokenAllBranches($item['code']);
+                $accessToken = $tokens->access_token;
+                $retailer = $tokens->retailer;
+
+                $pageSize = 100; // Số lượng tối đa mỗi lần gọi API
+                $currentItem = 0; // Bắt đầu từ khách hàng đầu tiên
+
+                $voucher_campaign_id = null;
+                do{
+                    $response = Http::withHeaders([
+                        'Retailer'      => $retailer,
+                        'Authorization' => 'Bearer ' . $accessToken,
+                        'Content-Type'  => 'application/json',
+                    ])->get($this->urlKiotViet['url_voucher_campaign']."pageSize=$pageSize&currentItem=$currentItem");
+
+                    if ($response->failed()) {
+                        return back()->with(['error' => 'Không thể lấy dữ liệu từ KiotViet']);
+                    }
+
+                    // Kiểm tra xem có dữ liệu không
+                    $responseData = $response->json()['data'] ?? [];
+                    if (!isset($responseData) || empty($responseData)) {
+                        break; // Dừng lại nếu không còn dữ liệu
+                    }
+
+                    foreach ($responseData as $responseItem) {
+                        if ($item['release_code'] == $responseItem['code']){
+                            $voucher_campaign_id = $responseItem['id'];
+                            break;
+                        }
+                    }
+
+                    // Cập nhật chỉ số để lấy trang tiếp theo
+                    $currentItem += $pageSize;
+
+                } while (count($responseData) === $pageSize); // Lặp cho đến khi hết dữ liệu
+
+                $item['voucher_campaign_id'] = $voucher_campaign_id;
+                if (!empty($voucher_campaign_id)){
+                    array_push($data_return, $item);
+                }
+            }
+            return $data_return;
+        }catch (\Exception $exception){
+            dd($exception);
+        }
+    }
 }

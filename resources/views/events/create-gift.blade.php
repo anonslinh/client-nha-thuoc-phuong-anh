@@ -36,10 +36,41 @@
                         <input class="form-control" type="file" accept="image/*" required name="image">
                     </div>
                     <div class="mb-3">
+                        <label class="form-label">Loại quà</label>
+                        <select name="type" class="form-control" required>
+                            <option value="1">Quà tặng</option>
+                            <option value="2">Voucher</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
                         <label class="form-label">Điểm quy đổi</label>
                         <input class="form-control" name="point" type="number" min="0" required>
                     </div>
-                    <div class="mb-3">
+                    <div class="mb-3 data-account d-none">
+                        <label class="form-label">Mã phát hành voucher theo tài khoản</label>
+                        <table class="table table-bordered">
+                            <thead>
+                            <tr>
+                                <th>STT</th>
+                                <th>Tên chi nhánh</th>
+                                <th>Mã phát hành</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            @foreach($account_branches as $key => $value)
+                                <tr>
+                                    <td>{{$key + 1}}</td>
+                                    <td>{{$value->code}}</td>
+                                    <td>
+                                        <input name="voucher[{{$key}}][code]" value="{{$value->code}}" hidden>
+                                        <input name="voucher[{{$key}}][release_code]" type="text" class="form-control releaseCode">
+                                    </td>
+                                </tr>
+                            @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="mb-3 data-branch">
                         <label class="form-label">Cấu hình theo chi nhánh:</label>
                         <div class="list-branch">
                             <div class="d-flex align-items-center" style="margin-bottom: 15px">
@@ -134,6 +165,16 @@
                             }
                         }
                     })
+                }
+            });
+            $('select[name="type"]').change(function () {
+                var type = $(this).val();
+                if (parseInt(type) == 2){
+                    $(".data-account").removeClass('d-none');
+                    $(".data-branch").addClass('d-none');
+                }else{
+                    $(".data-account").addClass('d-none');
+                    $(".data-branch").removeClass('d-none');
                 }
             });
         });

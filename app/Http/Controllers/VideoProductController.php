@@ -21,6 +21,7 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 
 class VideoProductController extends SyncController
@@ -554,10 +555,28 @@ class VideoProductController extends SyncController
             if (empty($branch)){
                 return \response()->json(['status' => false, 'msg' => 'Chi nhánh không tồn tại.Vui lòng kiểm tra lại'], Response::HTTP_BAD_REQUEST);
             }
-            $quantityGift = QuantityGiftEvents::where('gift_events_id', $request->get('gift_id'))->where('branch_id', $request->get('branch_id'))->first();
-            $quantity = $quantityGift->quantity??0;
-            if ($quantity < 1){
-                return \response()->json(['status' => false, 'msg' => 'Phần quà này ở chi nhánh '.$branch->branch_name.' đã hết. Vui lòng đổi phần quà khác'], Response::HTTP_BAD_REQUEST);
+            if ($gift->type == 1){
+                $quantityGift = QuantityGiftEvents::where('gift_events_id', $request->get('gift_id'))->where('branch_id', $request->get('branch_id'))->first();
+                $quantity = $quantityGift->quantity??0;
+                if ($quantity < 1){
+                    return \response()->json(['status' => false, 'msg' => 'Phần quà này ở chi nhánh '.$branch->branch_name.' đã hết. Vui lòng đổi phần quà khác'], Response::HTTP_BAD_REQUEST);
+                }
+                $codeGift = $gift->code;
+            }else{
+                $result = json_decode($gift->release_code, true);
+                $release_code = $result[0];
+                // Tạo mã đổi voucher lấy từ kiotviet
+                $codeGift = 'WIN' . strtoupper(Str::random(10));
+
+                $_dataPost = [
+                    'account_code' => $release_code['code'],
+                    'voucher_campaign_id' => $release_code['voucher_campaign_id'],
+                    'exchange_code' => $codeGift
+                ];
+                $_check_created_voucher = $this->createdVoucherKiotviet($_dataPost);
+                if (empty($_check_created_voucher)){
+                    return response()->json(['status' => false, 'message' => 'Chúng tôi đang cập nhật hệ thống! Vui lòng thử lại sau.'], Response::HTTP_BAD_REQUEST);
+                }
             }
             $pointGift = $gift->point;
             //Lịch sử trừ điểm đổi quà
@@ -579,7 +598,7 @@ class VideoProductController extends SyncController
                 'gift_id' => $gift->id,
                 'name_gift' => $gift->name,
                 'image_gift' => $gift->image,
-                'code_gift' => $gift->code,
+                'code_gift' => $codeGift,
                 'barcode_gift' => $gift->barcode ?? null,
                 'point' => $gift->point,
                 'quantity' => 1,
@@ -589,10 +608,12 @@ class VideoProductController extends SyncController
             $exchange->save();
             $customer->used_point_event += $gift->point;
             $customer->save();
-            $quantityGift->quantity -= 1;
-            $quantityGift->save();
+            if ($gift->type == 1){
+                $quantityGift->quantity -= 1;
+                $quantityGift->save();
+            }
             DB::commit();
-            return \response()->json(['status' => true, 'msg' => 'Đổi quà thành công', 'exchange_id' => $exchange['id'], 'code' => $gift->code], Response::HTTP_OK);
+            return \response()->json(['status' => true, 'msg' => 'Đổi quà thành công', 'exchange_id' => $exchange['id'], 'code' => $codeGift], Response::HTTP_OK);
         }catch (\Exception $exception){
             DB::rollBack();
             dd($exception->getMessage());
@@ -626,5 +647,53 @@ class VideoProductController extends SyncController
         $exchangeGift->status = 2;
         $exchangeGift->save();
         return \response()->json(['status' => true, 'msg' => 'Cập nhật trạng thái thành công'], Response::HTTP_OK);
+    }
+
+    /**
+     * Tạo voucher dựa trên bản phát hành của
+     * Phát hành voucher ngay sau khi tạo voucher
+     * param account_code, voucher_campaign_id, exchange_code
+     */
+    public function createdVoucherKiotviet($dataPost){
+        try{
+            //Tạo voucher trên kiotviet
+            $tokens = $this->kiotVietService->getAccessTokenAllBranches($dataPost['account_code']);
+            $accessToken = $tokens->access_token;
+            $retailer = $tokens->retailer;
+            $response = Http::withHeaders([
+                'Retailer'      => $retailer,
+                'Authorization' => 'Bearer ' . $accessToken,
+                'Content-Type'  => 'application/json',
+            ])->post($this->urlKiotViet['url_voucher_created'], [
+                'voucherCampaignId' => $dataPost['voucher_campaign_id'],
+                'data' => [
+                    ['code' => $dataPost['exchange_code']]
+                ]
+            ]);
+
+            if ($response->failed()) {
+                return false;
+            }
+
+            //Phát hành voucher
+            $response_release = Http::withHeaders([
+                'Retailer'      => $retailer,
+                'Authorization' => 'Bearer ' . $accessToken,
+                'Content-Type'  => 'application/json',
+            ])->post($this->urlKiotViet['url_voucher_release'], [
+                'CampaignId' => $dataPost['voucher_campaign_id'],
+                'Vouchers' => [
+                    ['Code' => $dataPost['exchange_code']]
+                ],
+                'ReleaseDate' => now(),
+            ]);
+            if ($response_release->failed()) {
+                return false;
+            }
+
+            return true;
+        }catch (\Exception $exception){
+            return false;
+        }
     }
 }
