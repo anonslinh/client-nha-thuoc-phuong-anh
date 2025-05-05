@@ -9,6 +9,7 @@ use App\Models\Customer;
 use App\Models\CustomerRank;
 use App\Models\Gift;
 use App\Models\GiftExchanges;
+use App\Models\GiftInventories;
 use App\Models\MembershipLevel;
 use App\Models\RankModel;
 use App\Models\TypeRankModel;
@@ -361,5 +362,30 @@ class HomeController
         $listData = $listData->paginate(20);
 
         return view('customer.index', compact('listData'));
+    }
+
+    /**
+     * Hoàn điểm cho khách hàng
+    **/
+    public function customerExchangeGiftReturn ($id)
+    {
+        $giftExchange = GiftExchanges::find($id);
+        if (empty($giftExchange)){
+            return back()->with(['error' => 'Dữ liệu không tồn tại.Vui lòng kiểm tra lại']);
+        }
+        if ($giftExchange->status != 'pending'){
+            return back()->with(['error' => 'Không thể hoàn điểm cho khách hàng khi trạng thái không phải là chưa sử dụng']);
+        }
+        $quantity = GiftInventories::where('gift_id', $id)->where('branch_id', $giftExchange->branch_id)->first();
+        if (isset($quantity)){
+            $quantity->quantity += 1;
+            $quantity->save();
+        }
+        $giftExchange->status = 'cancelled';
+        $giftExchange->save();
+        $customer = Customer::where('kiotviet_id', $giftExchange->customer_id)->first();
+        $customer->reward_point += $giftExchange->points_used;
+        $customer->save();
+        return back()->with(['success' => 'Hoàn điểm cho khách hàng thành công']);
     }
 }
