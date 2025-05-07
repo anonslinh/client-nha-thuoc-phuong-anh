@@ -1,3 +1,7 @@
+<?php
+    use App\Models\GeneralSettings;
+    $type_point = GeneralSettings::where('code', 'type_point')->first()->value ?? 1;
+?>
 <!-- Sidebar Start -->
 <aside class="side-mini-panel with-vertical">
     <!-- ---------------------------------- -->
@@ -41,22 +45,52 @@
                                     <li class="nav-small-cap">
                                         <span class="hide-menu">{{$item['name']}}</span>
                                     </li>
+                                    @elseif(isset($item['type']) && $item['type'] == 'type_point')
+{{--                                    Kiểm tra ẩn hiện menu Tích điểm theo từng sản phẩm--}}
+                                    @if($type_point == 2)
+                                    <li>
+                                        <span class="sidebar-divider lg"></span>
+                                    </li>
+                                    <li class="nav-small-cap">
+                                        <span class="hide-menu">{{$item['name']}}</span>
+                                    </li>
+                                    @endif
                                     @else
-                                    @if($key == 0)
-                                        <li class="sidebar-item">
-                                            <a class="sidebar-link" href="{{route($item['route'])}}" @if($k == 0) id="get-url" @endif aria-expanded="false">
-                                                <iconify-icon icon="{{$item['icon']}}"></iconify-icon>
-                                                <span class="hide-menu">{{$item['name']}}</span>
-                                            </a>
-                                        </li>
-                                    @else
-                                        <li class="sidebar-item">
-                                            <a href="{{route($item['route'])}}" class="sidebar-link">
-                                                <iconify-icon icon="{{$item['icon']}}"></iconify-icon>
-                                                <span class="hide-menu">{{$item['name']}}</span>
-                                            </a>
-                                        </li>
-                                @endif
+                                    @if($type_point == 1)
+                                        @if(empty($item['type_point']))
+                                            @if($key == 0)
+                                                <li class="sidebar-item">
+                                                    <a class="sidebar-link" href="{{route($item['route'])}}" @if($k == 0) id="get-url" @endif aria-expanded="false">
+                                                        <iconify-icon icon="{{$item['icon']}}"></iconify-icon>
+                                                        <span class="hide-menu">{{$item['name']}}</span>
+                                                    </a>
+                                                </li>
+                                            @else
+                                                <li class="sidebar-item">
+                                                    <a href="{{route($item['route'])}}" class="sidebar-link">
+                                                        <iconify-icon icon="{{$item['icon']}}"></iconify-icon>
+                                                        <span class="hide-menu">{{$item['name']}}</span>
+                                                    </a>
+                                                </li>
+                                            @endif
+                                        @endif
+                                        @else
+                                        @if($key == 0)
+                                            <li class="sidebar-item">
+                                                <a class="sidebar-link" href="{{route($item['route'])}}" @if($k == 0) id="get-url" @endif aria-expanded="false">
+                                                    <iconify-icon icon="{{$item['icon']}}"></iconify-icon>
+                                                    <span class="hide-menu">{{$item['name']}}</span>
+                                                </a>
+                                            </li>
+                                        @else
+                                            <li class="sidebar-item">
+                                                <a href="{{route($item['route'])}}" class="sidebar-link">
+                                                    <iconify-icon icon="{{$item['icon']}}"></iconify-icon>
+                                                    <span class="hide-menu">{{$item['name']}}</span>
+                                                </a>
+                                            </li>
+                                        @endif
+                                    @endif
                                 @endif
                             @endforeach
                         </ul>

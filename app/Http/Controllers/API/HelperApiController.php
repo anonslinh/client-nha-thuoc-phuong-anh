@@ -70,16 +70,6 @@ class HelperApiController extends Controller
             $totalPoint = 0;
             $rewardPoint = 0;
             foreach ($personalAccessTokens as $personalAccessToken){
-
-//                //Hard code du lieu test
-//                if ($personalAccessToken->access_token_code == 'hmvietnam'){
-//                    $phone = '0963119570';
-//                }elseif ($personalAccessToken->access_token_code == 'hethongbabychipchip'){
-//                    $phone = '0982375649';
-//                }
-//                else{
-//                    $phone = '0981163959';
-//                }
                 $tokens = $this->kiotVietService->getAccessTokenAllBranches($personalAccessToken->access_token_code);
                 $accessToken = $tokens->access_token;
                 $retailer = $tokens->retailer;

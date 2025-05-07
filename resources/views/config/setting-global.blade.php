@@ -1,4 +1,67 @@
 @extends('Layout.index')
+@section('style')
+    <style>
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            -webkit-transition: .4s;
+            transition: .4s;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            -webkit-transition: .4s;
+            transition: .4s;
+        }
+
+        input:checked + .slider {
+            background-color: #2196F3;
+        }
+
+        input:focus + .slider {
+            box-shadow: 0 0 1px #2196F3;
+        }
+
+        input:checked + .slider:before {
+            -webkit-transform: translateX(26px);
+            -ms-transform: translateX(26px);
+            transform: translateX(26px);
+        }
+
+        /* Rounded sliders */
+        .slider.round2 {
+            border-radius: 34px;
+        }
+
+        .slider.round2:before {
+            border-radius: 50%;
+        }
+    </style>
+@endsection
 @section('content')
     <div class="container-fluid">
         <div class="card card-body py-3">
@@ -73,5 +136,87 @@
                 </table>
             </div>
         </div>
+        <div class="card card-body py-3">
+            <div class="row align-items-center">
+                <div class="col-12">
+                    <div class="d-sm-flex align-items-center justify-space-between">
+                        <h4 class="mb-4 mb-sm-0 card-title">Hình thức tích điểm</h4>
+                        <nav aria-label="breadcrumb" class="ms-auto">
+                            <ol class="breadcrumb">
+                                <li class="breadcrumb-item d-flex align-items-center">
+                                    <a class="text-muted text-decoration-none d-flex">
+                                        <iconify-icon icon="solar:home-2-line-duotone" class="fs-6"></iconify-icon>
+                                    </a>
+                                </li>
+                            </ol>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-body">
+                <table class="table table-bordered">
+                    <thead>
+                    <tr>
+                        <th>STT</th>
+                        <th>Hình thức</th>
+                        <th>Mô tả</th>
+                        <th>Ví dụ</th>
+                        <th>***</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="align-middle">1</td>
+                            <td class="align-middle">Tích điểm theo hóa đơn</td>
+                            <td class="align-middle">Cộng điểm dựa trên tổng giá trị đơn hàng . Tỷ lệ điểm do shop cài đặt (vd: 1% hoặc 1.000đ = 1 điểm).</td>
+                            <td class="align-middle">Khách mua đơn 500.000đ → Tích 1% → Nhận 5 điểm.</td>
+                            <td class="align-middle">
+                                <label class="switch">
+                                    <input type="checkbox" name="type_point" @if($type_point == 1) checked @endif value="1">
+                                    <span class="slider round2"></span>
+                                </label>
+                            </td>
+                        </tr>
+                    <tr>
+                        <td class="align-middle">2</td>
+                        <td class="align-middle">Tích điểm theo từng sản phẩm</td>
+                        <td class="align-middle">Cộng điểm theo từng sản phẩm. Shop cài đặt số điểm riêng cho mỗi sản phẩm, khách mua sản phẩm nào nhận điểm sản phẩm đó.</td>
+                        <td class="align-middle">
+                            <p class="m-0">- Sản phẩm A: 10 điểm.</p>
+                            <p class="m-0">- Sản phẩm B: 5 điểm.</p>
+                            <p class="m-0">Khách mua 2 A + 1 B → Nhận 25 điểm.</p>
+                        </td>
+                        <td class="align-middle">
+                            <label class="switch">
+                                <input type="checkbox" name="type_point" @if($type_point == 2) checked @endif value="2">
+                                <span class="slider round2"></span>
+                            </label>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
+@endsection
+@section('script')
+    <script>
+        $('input[name="type_point"]').click(function () {
+            $('input[name="type_point"]').prop('checked', false);
+            $(this).prop('checked', true);
+            $.ajax({
+                url: "{{route('config.change-type-point')}}",
+                type: "post",
+                data: {"value" : $(this).val()},
+                dataType: "json",
+                success: function (data) {
+                    setTimeout(function () {
+                        location.reload();
+                    }, 300);
+                }
+            })
+        });
+    </script>
 @endsection

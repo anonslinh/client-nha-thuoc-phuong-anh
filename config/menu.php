@@ -214,7 +214,25 @@ return [
                 'name' => 'KIOTVIET',
                 'icon' => 'solar:settings-linear',
                 'route' => 'config.index-account-branches'
-            ]
+            ],
+            [
+                'name' => 'Tích điểm theo sản phẩm',
+                'icon' => null,
+                'route' => null,
+                'type' => 'type_point',
+            ],
+            [
+                'name' => 'Sản phẩm',
+                'icon' => 'solar:settings-line-duotone',
+                'route' => 'config.list-product',
+                'type_point' => 1
+            ],
+            [
+                'name' => 'Lịch sử tích điểm',
+                'icon' => 'solar:settings-line-duotone',
+                'route' => 'config.history-point',
+                'type_point' => 1
+            ],
         ]
     ]
 ];

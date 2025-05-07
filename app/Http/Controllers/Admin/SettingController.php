@@ -4,11 +4,17 @@
 namespace App\Http\Controllers\Admin;
 
 
+use App\Exports\ProductCertificateExport;
+use App\Exports\ProductPointExport;
+use App\Imports\ProductCertificateImport;
+use App\Imports\ProductPointImport;
 use App\Models\AccountBranches;
 use App\Models\Branch;
 use App\Models\Contacts;
 use App\Models\Employee;
+use App\Models\GeneralSettings;
 use App\Models\KpiSetting;
+use App\Models\ProductPoint;
 use App\Models\SettingGlobal;
 use App\Models\Slogan;
 use Illuminate\Http\Request;
@@ -16,6 +22,7 @@ use Illuminate\Support\Str;
 use App\Services\KiotVietService;
 
 use App\Models\PersonalAccessTokens;
+use Maatwebsite\Excel\Facades\Excel;
 
 class SettingController extends SyncController
 {
@@ -153,8 +160,8 @@ class SettingController extends SyncController
         if (empty($listData)){
             return back()->with(['error' => 'Lỗi liên hệ với bộ phận CSKH']);
         }
-
-        return view('config.setting-global', compact('listData'));
+        $type_point = GeneralSettings::where('code', 'type_point')->first()->value??1;
+        return view('config.setting-global', compact('listData', 'type_point'));
     }
 
     /**
@@ -281,5 +288,59 @@ class SettingController extends SyncController
         $accountBranch->delete();
 
         return back()->with(['success' => 'Xóa thành công!']);
+    }
+
+    /**
+     * Thay đổi hình thức tích điểm
+    **/
+    public function changeTypePoint (Request $request)
+    {
+        $setting = GeneralSettings::where('code', 'type_point')->first();
+        $setting->value = $request->get('value')??1;
+        $setting->save();
+        return response()->json(['status' => true, 'msg' => 'Thay đổi hình thức tích điểm thành công'], 200);
+    }
+
+    /**
+     * Danh sách sản phẩm
+    **/
+    public function listProduct (Request $request)
+    {
+        $listProduct = ProductPoint::query();
+        if (isset($request->key_search)){
+            $listProduct = $listProduct->where(function ($query) use ($request){
+                $query->where('code', 'like', '%'.$request->get('key_search').'%')->orWhere('name', 'like', '%'.$request->get('key_search').'%');
+            });
+        }
+        $listProduct = $listProduct->orderBy('created_at', 'desc')->paginate(20);
+        return view('config.list-product', compact('listProduct'));
+    }
+
+    public function excelProduct ()
+    {
+        $month = now()->month;
+        $year = now()->year;
+        return Excel::download(new ProductPointExport(), "list-product-$month-$year.xlsx");
+    }
+
+    public function importProduct (Request $request)
+    {
+        $request->validate([
+            'file' => 'required|mimes:xlsx,xls',
+        ]);
+
+        Excel::import(new ProductPointImport(), $request->file('file'));
+
+        return back()->with('success', 'Import thành công!');
+    }
+
+    public function deleteProduct($id)
+    {
+        $product = ProductPoint::find($id);
+        if (empty($product)){
+            return back()->with(['error' => 'Dữ liệu không tồn tịa']);
+        }
+        $product->delete();
+        return back()->with(['success' => 'Xóa dữ liệu thành công']);
     }
 }

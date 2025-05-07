@@ -140,12 +140,18 @@ Route::middleware([CheckLogin::class])->group(function (){
         //Cài đặt chung
         Route::get('setting-global', [SettingController::class, 'settingGlobal'])->name('setting-global');
         Route::post('update-setting-global/{id}', [SettingController::class, 'updateSettingGlobal'])->name('update-setting-global');
-
+        Route::post('change-type-point', [SettingController::class, 'changeTypePoint'])->name('change-type-point');
         //Cài đặt nhiều tài khoản kiotviet
         Route::get('index-account-branches', [SettingController::class, 'indexAccountBranches'])->name('index-account-branches');
         Route::post('store-account-branches', [SettingController::class, 'storeAccountBranch'])->name('store-account-branches');
         Route::post('update-account-branches/{id}', [SettingController::class, 'updateAccountBranch'])->name('update-account-branches');
         Route::get('delete-account-branches/{id}', [SettingController::class, 'deleteAccountBranch'])->name('delete-account-branches');
+
+        Route::get('list-product', [SettingController::class, 'listProduct'])->name('list-product');
+        Route::get('history-point', [SettingController::class, 'historyPoint'])->name('history-point');
+        Route::get('excel-product', [SettingController::class, 'excelProduct'])->name('excel-product');
+        Route::post('import-product', [SettingController::class, 'importProduct'])->name('import-product');
+        Route::get('delete-product/{id}', [SettingController::class, 'deleteProduct'])->name('delete-product');
     });
 
     //Loyalty
