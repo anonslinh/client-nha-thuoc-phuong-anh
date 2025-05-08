@@ -10,6 +10,7 @@ use App\Http\Controllers\API\SettingGlobalController;
 use App\Http\Controllers\VideoProductController;
 use App\Http\Controllers\RotationController;
 use App\Http\Controllers\API\PharmacyController;
+use App\Http\Controllers\API\WebhookController;
 
 Route::post('reward-point', [HomeController::class, 'rewardPointCustomer']);
 Route::get('banners', [HomeController::class, 'getBanners']);
@@ -89,3 +90,6 @@ Route::prefix('rotation-checkin')->group(function (){
 Route::prefix('pharmacy')->group(function (){
     Route::post('prescriptions', [PharmacyController::class, 'submitPrescription']);
 });
+//WebhookKiotviet
+Route::post('kiotviet-register-webhook', [WebhookController::class, 'registerWebhook']);
+Route::post('kiotviet-invoices-webhook', [WebhookController::class, 'invoiceUpdate']);
