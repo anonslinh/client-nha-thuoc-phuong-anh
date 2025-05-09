@@ -4,6 +4,7 @@
 namespace App\Services;
 
 use App\Models\AccountBranches;
+use App\Models\Customer;
 use App\Models\PersonalAccessTokens;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Http;
@@ -181,22 +182,35 @@ class KiotVietService
             }
         }
         if (empty($customer)){
-            $branch = $response = Http::withHeaders([
-                'Retailer'      => $retailer,
-                'Authorization' => 'Bearer ' . $accessToken,
-                'Content-Type'  => 'application/json',
-            ])->get($this->urlKiotviet()['url_branches']);
-            $branch = $branch->json()['data'][0];
-            $response = Http::withHeaders([
-                'Retailer'      => $retailer,
-                'Authorization' => 'Bearer ' . $accessToken,
-                'Content-Type'  => 'application/json',
-            ])->post($this->urlKiotviet()['url_customers'], [
-                'contactNumber' => $phone,
-                'name' => $name??$phone,
-                'branchId' =>$branch['id']
-            ]);
-            $customer = $response->json()['data'] ?? [];
+            if (empty($retailer)){
+                $number = 10000 + Customer::max('id') + 1;
+                $customer = [
+                    'id' => $number,
+                    'code' => 'KH'.$number,
+                    'name' => $name??$phone,
+                    'contactNumber' => $phone,
+                    'address' => null,
+                    'retailer_id' => 1,
+                    'branchId' => 1
+                ];
+            }else{
+                $branch = $response = Http::withHeaders([
+                    'Retailer'      => $retailer,
+                    'Authorization' => 'Bearer ' . $accessToken,
+                    'Content-Type'  => 'application/json',
+                ])->get($this->urlKiotviet()['url_branches']);
+                $branch = $branch->json()['data'][0];
+                $response = Http::withHeaders([
+                    'Retailer'      => $retailer,
+                    'Authorization' => 'Bearer ' . $accessToken,
+                    'Content-Type'  => 'application/json',
+                ])->post($this->urlKiotviet()['url_customers'], [
+                    'contactNumber' => $phone,
+                    'name' => $name??$phone,
+                    'branchId' =>$branch['id']
+                ]);
+                $customer = $response->json()['data'] ?? [];
+            }
         }
         return $customer;
     }
