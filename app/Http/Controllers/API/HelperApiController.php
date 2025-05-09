@@ -244,8 +244,10 @@ class HelperApiController extends Controller
     */
     public function getInvoicesDataKiotViet($customerSyncLog){
         try{
+            $timeSetting = GeneralSettings::where('code', 'time_point')->first();
+            $firstDayOfYear = $timeSetting->value??Carbon::now()->subYear()->addDay()->toDateString();
             $lastDayOfYear = Carbon::now()->addDay()->toDateString(); // Ngày hôm nay + 1 ngày
-            $firstDayOfYear = Carbon::now()->subYear()->addDay()->toDateString(); // Ngày hôm nay - 1 năm + 1 ngày
+//            $firstDayOfYear = Carbon::now()->subYear()->addDay()->toDateString(); // Ngày hôm nay - 1 năm + 1 ngày
 
             $pageSize = 100;
             $currentItem = 0;

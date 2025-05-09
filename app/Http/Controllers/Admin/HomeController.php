@@ -398,13 +398,12 @@ class HomeController
     {
         $rule = [
             'phone' => ['required', 'regex:/^(0[1-9][0-9]{8,9}|84[1-9][0-9]{8,9})$/'],
-            'point' => ['required', 'min: 1']
+            'point' => ['required']
         ];
         $message = [
             'phone.required' => 'Vui lòng thêm số điện thoại khách hàng',
             'phone.regex' => 'Số điện thoại không đúng',
             'point.required' => 'Vui lòng điền số điểm muốn cộng',
-            'point.min' => 'Điểm cộng nhỏ nhất phải là 1'
         ];
         $validator = Validator::make($request->all(), $rule, $message);
         if ($validator->fails()){

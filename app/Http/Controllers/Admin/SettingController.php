@@ -163,7 +163,16 @@ class SettingController extends SyncController
             return back()->with(['error' => 'Lỗi liên hệ với bộ phận CSKH']);
         }
         $type_point = GeneralSettings::where('code', 'type_point')->first()->value??1;
-        return view('config.setting-global', compact('listData', 'type_point'));
+        $time = GeneralSettings::where('code', 'time_point')->first();
+        if (empty($time)){
+            $time = new GeneralSettings([
+                'code' => 'time_point',
+                'value' => Carbon::now('Asia/Ho_Chi_Minh')
+            ]);
+            $time->save();
+        }
+        $timePoint = $time->value;
+        return view('config.setting-global', compact('listData', 'type_point', 'timePoint'));
     }
 
     /**
@@ -303,6 +312,16 @@ class SettingController extends SyncController
         return response()->json(['status' => true, 'msg' => 'Thay đổi hình thức tích điểm thành công'], 200);
     }
 
+    /**
+     * Cài đặt thời gian lên đơn
+    **/
+    public function setTimePoint (Request $request)
+    {
+        $setting = GeneralSettings::where('code', 'time_point')->first();
+        $setting->value = $request->get('value')??$setting->time_point;
+        $setting->save();
+        return response()->json(['status' => true, 'msg' => 'Cấu hình thời gian tích điểm thành công'], 200);
+    }
     /**
      * Danh sách sản phẩm
     **/

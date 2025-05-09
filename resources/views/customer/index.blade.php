@@ -105,7 +105,7 @@
                 <div class="modal-body">
                     <div class="form-group">
                         <label class="mb-2">Số điểm được cộng</label>
-                        <input name="point" value="1" required min="1" type="number" class="form-control">
+                        <input name="point" required type="number" class="form-control">
                     </div>
                 </div>
                 <div class="modal-body">

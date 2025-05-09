@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('general_setting', function (Blueprint $table) {
             $table->id();
             $table->string('code');
-            $table->tinyInteger('value');
+            $table->string('value');
             $table->timestamps();
         });
         \Illuminate\Support\Facades\DB::table('general_setting')->insert([
@@ -25,6 +25,10 @@ return new class extends Migration
             [
                 'code' => 'product_gift',
                 'value' => 0
+            ],
+            [
+                'code' => 'time_point',
+                'value' => \Carbon\Carbon::now()->subYear()->addDay()->toDateString()
             ]
         ]);
     }

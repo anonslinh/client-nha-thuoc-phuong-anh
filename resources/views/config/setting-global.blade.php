@@ -144,8 +144,9 @@
                         <nav aria-label="breadcrumb" class="ms-auto">
                             <ol class="breadcrumb">
                                 <li class="breadcrumb-item d-flex align-items-center">
-                                    <a class="text-muted text-decoration-none d-flex">
-                                        <iconify-icon icon="solar:home-2-line-duotone" class="fs-6"></iconify-icon>
+                                    <a class="text-muted text-decoration-none d-flex align-items-center">
+                                        Thời gian tích điểm:
+                                        <input name="time_point" class="form-control" style="max-width: 200px" value="{{date_format(date_create($timePoint), 'Y-m-d H:i:s')}}" type="datetime-local">
                                     </a>
                                 </li>
                             </ol>
@@ -215,6 +216,17 @@
                     setTimeout(function () {
                         location.reload();
                     }, 300);
+                }
+            })
+        });
+        $('input[name="time_point"]').change(function () {
+            $.ajax({
+                url: "{{route('config.set-time-point')}}",
+                type: "post",
+                data: {"value" : $(this).val()},
+                dataType: "json",
+                success: function (data) {
+                    console.log('data');
                 }
             })
         });
