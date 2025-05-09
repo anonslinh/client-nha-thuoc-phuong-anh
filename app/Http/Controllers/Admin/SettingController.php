@@ -4,20 +4,22 @@
 namespace App\Http\Controllers\Admin;
 
 
-use App\Exports\ProductCertificateExport;
 use App\Exports\ProductPointExport;
-use App\Imports\ProductCertificateImport;
 use App\Imports\ProductPointImport;
 use App\Models\AccountBranches;
 use App\Models\Branch;
 use App\Models\Contacts;
 use App\Models\Employee;
 use App\Models\GeneralSettings;
+use App\Models\HistoryPointCustomer;
 use App\Models\KpiSetting;
 use App\Models\ProductPoint;
 use App\Models\SettingGlobal;
 use App\Models\Slogan;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 use App\Services\KiotVietService;
 
@@ -312,8 +314,12 @@ class SettingController extends SyncController
                 $query->where('code', 'like', '%'.$request->get('key_search').'%')->orWhere('name', 'like', '%'.$request->get('key_search').'%');
             });
         }
-        $listProduct = $listProduct->orderBy('created_at', 'desc')->paginate(20);
-        return view('config.list-product', compact('listProduct'));
+        if (isset($request->category_id)){
+            $listProduct = $listProduct->where('category_id', $request->get('category_id'));
+        }
+        $listProduct = $listProduct->orderBy('created_at', 'desc')->paginate(40);
+        $category = $this->listCategories();
+        return view('config.list-product', compact('listProduct', 'category'));
     }
 
     public function excelProduct ()
@@ -342,5 +348,67 @@ class SettingController extends SyncController
         }
         $product->delete();
         return back()->with(['success' => 'Xóa dữ liệu thành công']);
+    }
+
+    public function addProduct (Request $request)
+    {
+        $category = $request->get('category');
+        $category = explode(',', $category);
+        $categoryID = $category[0];
+        $retailer = $category[1];
+        $listProduct = [];
+        $account = AccountBranches::where('retailer', $retailer)->first();
+        $token = $this->kiotVietService->refreshTokenAllBranches($account->client_id,$account->client_secret,$account->code,$retailer);
+        $dataToken = $token->access_token;
+        $pageSize = 100; // Số lượng tối đa mỗi lần gọi API
+        $currentItem = 0; // Bắt đầu từ khách hàng đầu tiên
+        do{
+            $response = Http::withHeaders([
+                'Retailer'      => $retailer,
+                'Authorization' => 'Bearer ' . $dataToken,
+                'Content-Type'  => 'application/json',
+            ])->get($this->urlKiotViet['url_list_product']."pageSize=$pageSize&currentItem=$currentItem&categoryId=$categoryID");
+
+            if ($response->failed()) {
+                break;
+            }
+            $responseData = $response->json()['data'] ?? [];
+            if (!isset($responseData) || empty($responseData)) {
+                break; // Dừng lại nếu không còn dữ liệu
+            }
+            foreach ($responseData as $item){
+                $productItem = [
+                    'code' => $item['code'],
+                    'name' => $item['name'],
+                    'category_id' => $item['categoryId'],
+                    'point' => $request->get('point'),
+                    'created_at' => Carbon::now('Asia/Ho_Chi_Minh'),
+                    'updated_at' => Carbon::now('Asia/Ho_Chi_Minh'),
+                ];
+                $listProduct[] = $productItem;
+            }
+            $currentItem += $pageSize;
+        }while (count($responseData) === $pageSize);
+        DB::table('product_point')->upsert(
+            $listProduct,
+            ['code'],
+            ['name', 'category_id', 'point']
+        );
+        return back()->with(['success' => 'Cấu cài đặt sản phẩm thành công']);
+    }
+
+    public function historyPoint (Request $request)
+    {
+        $listData = HistoryPointCustomer::query();
+        if (isset($request->key_search)){
+            $listData = $listData->where(function ($query) use ($request){
+                $query->where('phone_customer', 'like', '%'.$request->get('key_search').'%')
+                    ->orWhere('name_customer', 'like', '%'.$request->get('key_search').'%')
+                    ->orWhere('order_code', 'like', '%'.$request->get('key_search').'%')
+                    ->orWhere('title', 'like', '%'.$request->get('key_search').'%');
+            });
+        }
+        $listData = $listData->orderBy('created_at', 'desc')->paginate(40);
+        return view('config.history_point', compact('listData'));
     }
 }

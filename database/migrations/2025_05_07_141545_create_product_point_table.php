@@ -13,8 +13,9 @@ return new class extends Migration
     {
         Schema::create('product_point', function (Blueprint $table) {
             $table->id();
-            $table->string('code')->index();
+            $table->string('code')->unique()->index();
             $table->string('name');
+            $table->string('category_id')->nullable()->index();
             $table->tinyInteger('point')->default(0);
             $table->timestamps();
         });

@@ -47,6 +47,7 @@ Route::middleware([CheckLogin::class])->group(function (){
     Route::get('customer-exchange-gift/{id}', [HomeController::class, 'customerExchangeGiftReturn'])->name('customer.exchange-gift-return');
     Route::get('customer-exchange-voucher', [HomeController::class, 'customerVoucher'])->name('customer.exchange-voucher');
     Route::get('customer', [HomeController::class, 'customer'])->name('customer');
+    Route::post('customer/plus-points', [HomeController::class, 'plusPointCustomer'])->name('customer.plus-point');
     Route::get('logout', [HomeController::class, 'logout'])->name('logout');
     Route::prefix('gift')->name('gift.')->group(function (){
         Route::get('index', [GiftController::class, 'index'])->name('index');
@@ -152,6 +153,7 @@ Route::middleware([CheckLogin::class])->group(function (){
         Route::get('excel-product', [SettingController::class, 'excelProduct'])->name('excel-product');
         Route::post('import-product', [SettingController::class, 'importProduct'])->name('import-product');
         Route::get('delete-product/{id}', [SettingController::class, 'deleteProduct'])->name('delete-product');
+        Route::post('add-product', [SettingController::class, 'addProduct'])->name('add-product');
     });
 
     //Loyalty

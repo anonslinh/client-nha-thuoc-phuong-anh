@@ -9,9 +9,10 @@
                         <nav aria-label="breadcrumb" class="ms-auto">
                             <ol class="breadcrumb">
                                 <li class="breadcrumb-item d-flex align-items-center">
-                                    <a class="text-muted text-decoration-none d-flex">
-                                        <iconify-icon icon="solar:home-2-line-duotone" class="fs-6"></iconify-icon>
-                                    </a>
+                                    <button class="justify-content-center badge fw-medium fs-2 btn btn-rounded btn-danger d-flex align-items-center" data-bs-toggle="modal" data-bs-target="#vertical-center-scroll-modal">
+                                        <i class="ti ti-send fs-4 me-2"></i>
+                                        Cộng điểm cho khách hàng
+                                    </button>
                                 </li>
                             </ol>
                         </nav>
@@ -65,7 +66,7 @@
                                     <p class="m-0">{{$value->total_orders}}</p>
                                 </td>
                                 <td class="align-middle">{{$value->kiotviet_reward_point}}</td>
-                                <td class="align-middle">{{$value->kiotviet_reward_point - $value->used_points}}</td>
+                                <td class="align-middle">{{$value->reward_point}}</td>
                             </tr>
                         @endforeach
                     @else
@@ -79,6 +80,49 @@
                 </table>
             </div>
             <div class="d-flex justify-content-center">{{$listData->appends(request()->all())->links('pagination')}}</div>
+        </div>
+    </div>
+    <div class="modal fade" id="vertical-center-scroll-modal" tabindex="-1" aria-labelledby="vertical-center-modal" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+            <form action="{{route('customer.plus-point')}}" method="post" class="modal-content">
+                @csrf
+                <div class="modal-header d-flex align-items-center">
+                    <h4 class="modal-title" id="myLargeModalLabel">Cộng điểm cho khách hàng</h4>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label class="mb-2">Số điện thoại khách hàng</label>
+                        <input name="phone" required class="form-control">
+                    </div>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label class="mb-2">Tên khách hàng (Bỏ qua nếu đã có trên hệ thống)</label>
+                        <input name="name" class="form-control">
+                    </div>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label class="mb-2">Số điểm được cộng</label>
+                        <input name="point" value="1" required min="1" type="number" class="form-control">
+                    </div>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label class="mb-2">Ghi chú (Nếu có)</label>
+                        <textarea name="note" rows="4" class="form-control"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn bg-danger-subtle text-danger  waves-effect text-start" data-bs-dismiss="modal">
+                        Close
+                    </button>
+                    <button class="btn bg-success text-white  waves-effect text-start">
+                        Cộng điểm
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 @endsection

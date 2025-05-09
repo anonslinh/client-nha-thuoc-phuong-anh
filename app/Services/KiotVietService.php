@@ -96,7 +96,9 @@ class KiotVietService
             'url_voucher_cancel' => 'https://public.kiotapi.com/voucher/cancel', // Huỷ voucher đã phát hành trên kiotviet
             'url_voucher_release' => 'https://public.kiotapi.com/voucher/release/give', // Phát hành voucher trên kiotviet
             'url_create_invoice' => 'https://public.kiotapi.com/orders', // Tạo hóa đơn
-            'url_detail_product' => 'https://public.kiotapi.com/products/code/'
+            'url_detail_product' => 'https://public.kiotapi.com/products/code/', //  Chi tiết sản phẩm theo mã
+            'url_category' => 'https://public.kiotapi.com/categories?', // Danh sách danh mục
+            'url_list_product' => 'https://public.kiotapi.com/products?', // Danh sách sản phẩm
         ];
 
         return $data_return;
@@ -151,5 +153,51 @@ class KiotVietService
         );
 
         return $personalAccessTokens;
+    }
+
+    /**
+     * Lấy thông tin khách hàng
+    **/
+    public function getDataCustomer ($phone, $name)
+    {
+        $personalAccessTokens = PersonalAccessTokens::whereNotNull('retailer')->get();
+        $customer = null;
+        $accessToken = null;
+        $retailer = null;
+        foreach ($personalAccessTokens as $personalAccessToken){
+            $tokens = $this->getAccessTokenAllBranches($personalAccessToken->access_token_code);
+            $accessToken = $tokens->access_token;
+            $retailer = $tokens->retailer;
+            $response = Http::withHeaders([
+                'Retailer'      => $retailer,
+                'Authorization' => 'Bearer ' . $accessToken,
+                'Content-Type'  => 'application/json',
+            ])->get($this->urlKiotviet()['url_customers']."orderDirection=Desc&includeTotal=true&contactNumber=$phone");
+
+            $data = $response->json()['data'] ?? [];
+            if (!empty($data)){
+                $customer = $data[0];
+                break;
+            }
+        }
+        if (empty($customer)){
+            $branch = $response = Http::withHeaders([
+                'Retailer'      => $retailer,
+                'Authorization' => 'Bearer ' . $accessToken,
+                'Content-Type'  => 'application/json',
+            ])->get($this->urlKiotviet()['url_branches']);
+            $branch = $branch->json()['data'][0];
+            $response = Http::withHeaders([
+                'Retailer'      => $retailer,
+                'Authorization' => 'Bearer ' . $accessToken,
+                'Content-Type'  => 'application/json',
+            ])->post($this->urlKiotviet()['url_customers'], [
+                'contactNumber' => $phone,
+                'name' => $name??$phone,
+                'branchId' =>$branch['id']
+            ]);
+            $customer = $response->json()['data'] ?? [];
+        }
+        return $customer;
     }
 }

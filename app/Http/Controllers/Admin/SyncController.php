@@ -362,4 +362,45 @@ class SyncController extends HelperAdminController
             dd($exception);
         }
     }
+
+    /**
+     * Lấy danh sách danh mục sản phẩm kiotviet
+    **/
+    public function listCategories ()
+    {
+        $listData = [];
+        $personalAccessTokens = PersonalAccessTokens::whereNotNull('retailer')->get();
+        foreach ($personalAccessTokens as $personalAccessToken){
+            $tokens = $this->kiotVietService->getAccessTokenAllBranches($personalAccessToken->access_token_code);
+            $accessToken = $tokens->access_token;
+            $retailer = $tokens->retailer;
+            $pageSize = 100; // Số lượng tối đa mỗi lần gọi API
+            $currentItem = 0; // Bắt đầu từ khách hàng đầu tiên
+            do{
+                $response = Http::withHeaders([
+                    'Retailer'      => $retailer,
+                    'Authorization' => 'Bearer ' . $accessToken,
+                    'Content-Type'  => 'application/json',
+                ])->get($this->urlKiotViet['url_category']."pageSize=$pageSize&currentItem=$currentItem");
+
+                if ($response->failed()) {
+                    break;
+                }
+                $responseData = $response->json()['data'] ?? [];
+                if (!isset($responseData) || empty($responseData)) {
+                    break; // Dừng lại nếu không còn dữ liệu
+                }
+                foreach ($responseData as $item){
+                    $dataItem = [
+                        'name' => $item['categoryName'],
+                        'id' => $item['categoryId'],
+                        'retailer' => $retailer
+                    ];
+                    $listData[] = $dataItem;
+                }
+                $currentItem += $pageSize;
+            }while (count($responseData) === $pageSize);
+        }
+        return $listData;
+    }
 }

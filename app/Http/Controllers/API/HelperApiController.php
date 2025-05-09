@@ -7,9 +7,12 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use App\Models\Customer;
 use App\Models\CustomerSyncLog;
+use App\Models\GeneralSettings;
+use App\Models\HistoryPointCustomer;
 use App\Models\Invoice;
 use App\Models\InvoiceDetail;
 use App\Models\PersonalAccessTokens;
+use App\Models\ProductPoint;
 use Illuminate\Support\Facades\Http;
 use App\Services\KiotVietService;
 use App\Models\CustomerRank;
@@ -63,6 +66,7 @@ class HelperApiController extends Controller
             return response()->json(['status' => false, 'data' => []], 400);
         }
         try {
+            $type_point = GeneralSettings::where('code', 'type_point')->first()->value??1;
             $personalAccessTokens = PersonalAccessTokens::whereNotNull('retailer')->get();
             $firstCustomer = null;
             $totalInvoiced = 0;
@@ -89,9 +93,9 @@ class HelperApiController extends Controller
                 }
             }
             if (!empty($firstCustomer)) {
-                \DB::transaction(function () use ($firstCustomer, $totalInvoiced, $totalRevenue, $totalPoint, $rewardPoint, $phone) {
-                    $this->syncCustomerData($firstCustomer, $totalInvoiced, $totalRevenue, $totalPoint, $rewardPoint);
+                \DB::transaction(function () use ($firstCustomer, $totalInvoiced, $totalRevenue, $totalPoint, $rewardPoint, $phone, $type_point) {
                     $this->syncCustomerInvoicesData($phone, $firstCustomer);
+                    $this->syncCustomerData($firstCustomer, $totalInvoiced, $totalRevenue, $totalPoint, $rewardPoint, $type_point);
                 });
             }
             return response()->json(['status' => true, 'message' => 'Sync successful']);
@@ -139,18 +143,43 @@ class HelperApiController extends Controller
     /**
      * Đồng bộ thông tin khách hàng vào database
      */
-    private function syncCustomerData($customer, $totalInvoiced, $totalRevenue, $totalPoint, $rewardPoint)
+    private function syncCustomerData($customer, $totalInvoiced, $totalRevenue, $totalPoint, $rewardPoint, $type_point)
     {
         try{
             $existingCustomer = Customer::where('kiotviet_id', $customer['id'])->first();
-
             // Tính toán điểm thực tế
             $usedPoints = $existingCustomer->used_points ?? 0;
+            if ($type_point == 1){
+                // Điểm thực tế = điểm từ KiotViet - điểm đã dùng + điểm thưởng từ đánh giá
+                $actualRewardPoint = max($rewardPoint - $usedPoints , 0);
+            }else{
+                $pointCustomer = 0;
+                $orderIDCustomer = HistoryPointCustomer::where('phone_customer', $customer['contactNumber'])->pluck('order_id');
+                $invoice = Invoice::whereNotIn('kiotviet_id', $orderIDCustomer)->where('contact_number', $customer['contactNumber'])->get();
+                foreach ($invoice as $value){
+                    $invoiceDetail = InvoiceDetail::where('invoice_id', $value->id)->get();
+                    foreach ($invoiceDetail as $detail){
+                        $productPoint = ProductPoint::where('code', $detail->product_code)->first();
+                        if (isset($productPoint)){
+                            $title = 'Tích điểm sản phẩm '.$detail->product_code.'-'.$detail->product_name;
+                            $history = new HistoryPointCustomer([
+                                'order_id' => $value->kiotviet_id,
+                                'phone_customer' => $customer['contactNumber'],
+                                'name_customer' => $customer['name'],
+                                'order_code' => $value->code,
+                                'title' => $title,
+                                'point' => $productPoint->point,
+                                'created_at' => $value->purchase_date
+                            ]);
+                            $history->save();
+                            $pointCustomer += $productPoint->point * $detail->quantity;
+                        }
+                    }
+                }
+                $point = $existingCustomer->reward_point??0;
+                $actualRewardPoint = $pointCustomer + $point;
+            }
 
-            // Điểm thực tế = điểm từ KiotViet - điểm đã dùng + điểm thưởng từ đánh giá
-            $actualRewardPoint = max($rewardPoint - $usedPoints , 0);
-
-//            $customer['contactNumber'] = '0981163959'; //Hard code du lieu test
             Customer::updateOrCreate(
                 ['kiotviet_id' => $customer['id']],
                 [
