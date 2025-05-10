@@ -153,26 +153,48 @@ class HelperApiController extends Controller
                 // Điểm thực tế = điểm từ KiotViet - điểm đã dùng + điểm thưởng từ đánh giá
                 $actualRewardPoint = max($rewardPoint - $usedPoints , 0);
             }else{
+                $calculatorPoint = GeneralSettings::where('code', 'calculator_point')->first()->value?? 0;
                 $pointCustomer = 0;
                 $orderIDCustomer = HistoryPointCustomer::where('phone_customer', $customer['contactNumber'])->pluck('order_id');
                 $invoice = Invoice::whereNotIn('kiotviet_id', $orderIDCustomer)->where('contact_number', $customer['contactNumber'])->get();
                 foreach ($invoice as $value){
                     $invoiceDetail = InvoiceDetail::where('invoice_id', $value->id)->get();
                     foreach ($invoiceDetail as $detail){
-                        $productPoint = ProductPoint::where('code', $detail->product_code)->first();
-                        if (isset($productPoint)){
-                            $title = 'Tích điểm sản phẩm '.$detail->product_code.'-'.$detail->product_name;
-                            $history = new HistoryPointCustomer([
-                                'order_id' => $value->kiotviet_id,
-                                'phone_customer' => $customer['contactNumber'],
-                                'name_customer' => $customer['name'],
-                                'order_code' => $value->code,
-                                'title' => $title,
-                                'point' => $productPoint->point,
-                                'created_at' => $value->purchase_date
-                            ]);
-                            $history->save();
-                            $pointCustomer += $productPoint->point * $detail->quantity;
+                        if ($calculatorPoint == 1){
+                            if ($value->discount == 0 || $detail->discount == 0){
+                                continue;
+                            }
+                            $productPoint = ProductPoint::where('code', $detail->product_code)->first();
+                            if (isset($productPoint)){
+                                $title = 'Tích điểm sản phẩm '.$detail->product_code.'-'.$detail->product_name;
+                                $history = new HistoryPointCustomer([
+                                    'order_id' => $value->kiotviet_id,
+                                    'phone_customer' => $customer['contactNumber'],
+                                    'name_customer' => $customer['name'],
+                                    'order_code' => $value->code,
+                                    'title' => $title,
+                                    'point' => $productPoint->point,
+                                    'created_at' => $value->purchase_date
+                                ]);
+                                $history->save();
+                                $pointCustomer += $productPoint->point * $detail->quantity;
+                            }
+                        }else{
+                            $productPoint = ProductPoint::where('code', $detail->product_code)->first();
+                            if (isset($productPoint)){
+                                $title = 'Tích điểm sản phẩm '.$detail->product_code.'-'.$detail->product_name;
+                                $history = new HistoryPointCustomer([
+                                    'order_id' => $value->kiotviet_id,
+                                    'phone_customer' => $customer['contactNumber'],
+                                    'name_customer' => $customer['name'],
+                                    'order_code' => $value->code,
+                                    'title' => $title,
+                                    'point' => $productPoint->point,
+                                    'created_at' => $value->purchase_date
+                                ]);
+                                $history->save();
+                                $pointCustomer += $productPoint->point * $detail->quantity;
+                            }
                         }
                     }
                 }

@@ -145,6 +145,18 @@
                             </label>
                         </td>
                     </tr>
+                    <tr>
+                        <td>{{$index + 1}}</td>
+                        <td>Hình thức tính điểm</td>
+                        <td>Tính năng không tính điểm cho khách hàng khi mua hàng có sử dụng mã
+                            voucher hoặc giảm giá sản phẩm (Lưu ý: Hình thức này chỉ hoạt động khi ápp dụng <span class="fw-bolder">Tích điểm theo từng sản phẩm</span> )</td>
+                        <td>
+                            <label class="switch">
+                                <input type="checkbox" name="calculator_point" @if($calculator_point == 1) checked @endif>
+                                <span class="slider round2"></span>
+                            </label>
+                        </td>
+                    </tr>
                     </tbody>
                 </table>
             </div>
@@ -244,15 +256,25 @@
             })
         });
         $('input[name="type_invoice"]').click(function () {
+            var data = {};
+            data['type'] = 'invoice';
+            setTypeSetting(data);
+        });
+        $('input[name="calculator_point"]').click(function () {
+            var data = {};
+            data['type'] = 'calculator_point';
+            setTypeSetting(data);
+        });
+        function setTypeSetting(data) {
             $.ajax({
                 url: "{{route('config.set-type-invoice')}}",
                 type: "post",
-                data: null,
+                data: data,
                 dataType: "json",
                 success: function (data) {
                     console.log(data);
                 }
-            })
-        });
+            });
+        }
     </script>
 @endsection

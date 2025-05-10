@@ -33,6 +33,10 @@ return new class extends Migration
             [
                 'code' => 'invoice',
                 'value' => 1
+            ],
+            [
+                'code' => 'calculator_point',
+                'value' => 0
             ]
         ]);
     }

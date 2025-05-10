@@ -181,7 +181,16 @@ class SettingController extends SyncController
             $settingInvoice->save();
         }
         $type_invoice = $settingInvoice->value;
-        return view('config.setting-global', compact('listData', 'type_point', 'timePoint', 'type_invoice'));
+        $settingCalculatorPoint = GeneralSettings::where('code', 'calculator_point')->first();
+        if (empty($settingCalculatorPoint)){
+            $settingCalculatorPoint = new GeneralSettings([
+                'code' => 'calculator_point',
+                'value' => 0
+            ]);
+            $settingCalculatorPoint->save();
+        }
+        $calculator_point = $settingCalculatorPoint->value;
+        return view('config.setting-global', compact('listData', 'type_point', 'timePoint', 'type_invoice', 'calculator_point'));
     }
 
     /**
@@ -334,7 +343,7 @@ class SettingController extends SyncController
 
     public function typeInvoice (Request $request)
     {
-        $setting = GeneralSettings::where('code', 'invoice')->first();
+        $setting = GeneralSettings::where('code', $request->get('type'))->first();
         if ($setting->value == 1){
             $setting->value = 2;
         }else{
