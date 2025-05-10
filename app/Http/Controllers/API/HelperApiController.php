@@ -161,7 +161,7 @@ class HelperApiController extends Controller
                     $invoiceDetail = InvoiceDetail::where('invoice_id', $value->id)->get();
                     foreach ($invoiceDetail as $detail){
                         if ($calculatorPoint == 1){
-                            if ($value->discount == 0 || $detail->discount == 0){
+                            if ($value->discount > 0 || $detail->discount > 0){
                                 continue;
                             }
                             $productPoint = ProductPoint::where('code', $detail->product_code)->first();
