@@ -143,6 +143,7 @@ Route::middleware([CheckLogin::class])->group(function (){
         Route::post('update-setting-global/{id}', [SettingController::class, 'updateSettingGlobal'])->name('update-setting-global');
         Route::post('change-type-point', [SettingController::class, 'changeTypePoint'])->name('change-type-point');
         Route::post('set-time-point', [SettingController::class, 'setTimePoint'])->name('set-time-point');
+        Route::post('set-type-invoice', [SettingController::class, 'typeInvoice'])->name('set-type-invoice');
         //Cài đặt nhiều tài khoản kiotviet
         Route::get('index-account-branches', [SettingController::class, 'indexAccountBranches'])->name('index-account-branches');
         Route::post('store-account-branches', [SettingController::class, 'storeAccountBranch'])->name('store-account-branches');

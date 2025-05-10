@@ -172,7 +172,16 @@ class SettingController extends SyncController
             $time->save();
         }
         $timePoint = $time->value;
-        return view('config.setting-global', compact('listData', 'type_point', 'timePoint'));
+        $settingInvoice = GeneralSettings::where('code', 'invoice')->first();
+        if (empty($settingInvoice)){
+            $settingInvoice = new GeneralSettings([
+                'code' => 'invoice',
+                'value' => 1
+            ]);
+            $settingInvoice->save();
+        }
+        $type_invoice = $settingInvoice->value;
+        return view('config.setting-global', compact('listData', 'type_point', 'timePoint', 'type_invoice'));
     }
 
     /**
@@ -321,6 +330,18 @@ class SettingController extends SyncController
         $setting->value = $request->get('value')??$setting->time_point;
         $setting->save();
         return response()->json(['status' => true, 'msg' => 'Cấu hình thời gian tích điểm thành công'], 200);
+    }
+
+    public function typeInvoice (Request $request)
+    {
+        $setting = GeneralSettings::where('code', 'invoice')->first();
+        if ($setting->value == 1){
+            $setting->value = 2;
+        }else{
+            $setting->value = 1;
+        }
+        $setting->save();
+        return response()->json(['status' => true, 'msg' => 'Cấu hình  thành công'], 200);
     }
     /**
      * Danh sách sản phẩm

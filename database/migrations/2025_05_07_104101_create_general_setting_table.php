@@ -29,6 +29,10 @@ return new class extends Migration
             [
                 'code' => 'time_point',
                 'value' => \Carbon\Carbon::now()->subYear()->addDay()->toDateString()
+            ],
+            [
+                'code' => 'invoice',
+                'value' => 1
             ]
         ]);
     }

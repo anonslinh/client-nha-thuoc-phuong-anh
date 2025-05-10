@@ -95,7 +95,9 @@
                     </tr>
                     </thead>
                     <tbody>
+                    @php $index = 1; @endphp
                     @foreach($listData as $key => $item)
+                        @php $index += 1; @endphp
                         <tr>
                             <td>{{$key+1}}</td>
                             <td>{{$item->title}}</td>
@@ -132,6 +134,17 @@
                             </td>
                         </tr>
                     @endforeach
+                    <tr>
+                        <td>{{$index}}</td>
+                        <td>Trả dữ liệu đơn hàng</td>
+                        <td>Hệ thống sẽ trả dữ liệu đơn hàng cho khách hàng khi bạn bật tính năng và tự động trả rỗng khi bạn tắt tính năng</td>
+                        <td>
+                            <label class="switch">
+                                <input type="checkbox" name="type_invoice" @if($type_invoice == 1) checked @endif value="2">
+                                <span class="slider round2"></span>
+                            </label>
+                        </td>
+                    </tr>
                     </tbody>
                 </table>
             </div>
@@ -226,7 +239,18 @@
                 data: {"value" : $(this).val()},
                 dataType: "json",
                 success: function (data) {
-                    console.log('data');
+                    console.log(data);
+                }
+            })
+        });
+        $('input[name="type_invoice"]').click(function () {
+            $.ajax({
+                url: "{{route('config.set-type-invoice')}}",
+                type: "post",
+                data: null,
+                dataType: "json",
+                success: function (data) {
+                    console.log(data);
                 }
             })
         });
