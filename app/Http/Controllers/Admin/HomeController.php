@@ -4,6 +4,7 @@
 namespace App\Http\Controllers\Admin;
 
 
+use App\Exports\CustomerExchangeGiftExport;
 use App\Exports\CustomerExport;
 use App\Models\AccountBranches;
 use App\Models\Customer;
@@ -375,7 +376,10 @@ class HomeController
     {
         return Excel::download(new CustomerExport($request), 'Danh-sach-khach-hang.xlsx');
     }
-
+    public function exportCustomerExchangeGift (Request $request)
+    {
+        return Excel::download(new CustomerExchangeGiftExport($request), 'Danh-sach-khach-hang-doi-qua.xlsx');
+    }
     /**
      * Hoàn điểm cho khách hàng
     **/

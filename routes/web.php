@@ -44,6 +44,7 @@ Route::middleware([CheckLogin::class])->group(function (){
 
     });
     Route::get('customer-exchange-gift', [HomeController::class, 'customerExchangeGift'])->name('customer.exchange-gift');
+    Route::get('export-customer-exchange-gift', [HomeController::class, 'exportCustomerExchangeGift'])->name('customer.export-exchange-gift');
     Route::get('customer-exchange-gift/{id}', [HomeController::class, 'customerExchangeGiftReturn'])->name('customer.exchange-gift-return');
     Route::get('customer-exchange-voucher', [HomeController::class, 'customerVoucher'])->name('customer.exchange-voucher');
     Route::get('customer', [HomeController::class, 'customer'])->name('customer');
