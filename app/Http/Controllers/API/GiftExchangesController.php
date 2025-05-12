@@ -95,10 +95,12 @@ class GiftExchangesController extends HelperApiController
                 'contact_phone' => $customer->contact_number,
                 'gift_id' => $gift->id,
                 'branch_id' => $validatedData['branch_id'] ?? null,
-                'exchange_code' => $gift->code,
+                'exchange_code' => Str::random(5).time(),
                 'points_used' => $pointsRequired,
                 'exchange_date' => now(),
                 'status' => 'pending',
+                'gift_name' => $gift->name,
+                'gift_code' => $gift->code
             ]);
 
             DB::commit();
@@ -135,8 +137,21 @@ class GiftExchangesController extends HelperApiController
         $giftExchanges = GiftExchanges::where('customer_id', $customer->kiotviet_id)
             ->orderByRaw("CASE WHEN status = 'pending' THEN 1 ELSE 2 END")
             ->orderBy('exchange_date', 'desc')
-            ->with('gift', 'branch')
+            ->with('branch')
             ->paginate($perPage);
+
+        foreach ($giftExchanges as $value){
+            $gift = Gift::find($value->gift_id);
+            if (empty($gift)){
+                $gift = [
+                    'name' => $value->gift_name,
+                    'code' => $value->gift_code
+                ];
+                $value->gift = $gift;
+            }else{
+                $value->gift = $gift;
+            }
+        }
 
         return response()->json(['status' => true, 'data' => $giftExchanges], 200);
     }
