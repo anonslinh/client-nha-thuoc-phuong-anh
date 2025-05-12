@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\Controller;
+use App\Exports\EventHistoryExchangeGiftExport;
 use App\Models\AccountBranches;
 use App\Models\Branch;
 use App\Models\Customer;
@@ -20,6 +20,8 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
+use App\Exports\EventHistoryPointExport;
+use Maatwebsite\Excel\Facades\Excel;
 
 class EventsController extends SyncController
 {
@@ -196,12 +198,6 @@ class EventsController extends SyncController
             });
         }
         $listData = $listData->orderBy('created_at', 'desc')->paginate(20);
-//        foreach ($listData as $value){
-//            $customer = Customer::where('kiotviet_id', $value->customer_id)->first();
-//            $value['name_customer'] = $customer->name??'';
-//            $value['code_customer'] = $customer->code??'';
-//            $value['phone_customer'] = $customer->contact_number??'';
-//        }
         return view('events.history-point', compact('listData'));
     }
     /**
@@ -560,5 +556,19 @@ class EventsController extends SyncController
         }catch (\Exception $exception){
             return \response()->json(['status' => false, 'msg' => 'Thêm sản phẩm thất bại.Vui lòng kiểm tra lại'], Response::HTTP_BAD_REQUEST);
         }
+    }
+    /**
+     * Xuẩt file excel cập nhật đơn hàng
+    **/
+    public function exportHistoryPoint (Request $request)
+    {
+        return Excel::download(new EventHistoryPointExport($request), 'Lich-su-xu.xlsx');
+    }
+    /**
+     * Xuẩt file excel lịch sử đổi quà
+    **/
+    public function exportHistoryExchangeGift (Request $request)
+    {
+        return Excel::download(new EventHistoryExchangeGiftExport($request), 'Lich-su-doi-qua.xlsx');
     }
 }

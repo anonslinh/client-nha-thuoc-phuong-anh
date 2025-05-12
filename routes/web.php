@@ -47,6 +47,7 @@ Route::middleware([CheckLogin::class])->group(function (){
     Route::get('customer-exchange-gift/{id}', [HomeController::class, 'customerExchangeGiftReturn'])->name('customer.exchange-gift-return');
     Route::get('customer-exchange-voucher', [HomeController::class, 'customerVoucher'])->name('customer.exchange-voucher');
     Route::get('customer', [HomeController::class, 'customer'])->name('customer');
+    Route::get('export-customer', [HomeController::class, 'exportCustomer'])->name('customer.export');
     Route::post('customer/plus-points', [HomeController::class, 'plusPointCustomer'])->name('customer.plus-point');
     Route::get('logout', [HomeController::class, 'logout'])->name('logout');
     Route::prefix('gift')->name('gift.')->group(function (){
@@ -85,6 +86,7 @@ Route::middleware([CheckLogin::class])->group(function (){
        Route::get('delete-product/{id}', [EventsController::class, 'deleteProduct'])->name('product.delete');
        Route::get('list-customer', [EventsController::class, 'listCustomer'])->name('list-customer');
        Route::get('history-point', [EventsController::class, 'historyPoint'])->name('history-point');
+       Route::get('export-history-point', [EventsController::class, 'exportHistoryPoint'])->name('export-history-point');
        Route::post('customer-update-point', [EventsController::class, 'customerUpdatePoint'])->name('customer.update-point');
        Route::get('list-gift', [EventsController::class, 'listGift'])->name('list-gift');
        Route::get('view-create-gift', [EventsController::class, 'viewCreateGift'])->name('gift.create');
@@ -93,6 +95,7 @@ Route::middleware([CheckLogin::class])->group(function (){
        Route::post('update-gift/{id}', [EventsController::class, 'updateGift'])->name('gift.update');
        Route::get('delete-gift/{id}', [EventsController::class, 'deleteGift'])->name('gift.delete');
        Route::get('history-exchange-gift', [EventsController::class, 'historyExchangeGift'])->name('history-exchange-gift');
+       Route::get('export-history-exchange-gift', [EventsController::class, 'exportHistoryExchangeGift'])->name('export-history-exchange-gift');
        Route::post('create-product-with-category', [EventsController::class, 'createProductWithCategory'])->name('create-product-with-category');
        Route::get('product/create', [VideoProductController::class, 'createProduct'])->name('product.create');
        Route::get('list-gift/{id}', [VideoProductController::class, 'listGift'])->name('list-gift-product');
@@ -244,6 +247,7 @@ Route::middleware([CheckLogin::class])->group(function (){
           Route::get('detail/{id}', [RotationController::class, 'detailGiftCheckin'])->name('detail');
           Route::post('update/{id}', [RotationController::class, 'updateGiftCheckin'])->name('update');
           Route::get('exchange-gift', [RotationController::class, 'exchangeGiftCheckin'])->name('exchange-gift');
+          Route::get('export-exchange-gift', [RotationController::class, 'exportExchangeGiftCheckin'])->name('export-exchange-gift');
        });
     });
     //Giấy chứng nhận sản phẩm

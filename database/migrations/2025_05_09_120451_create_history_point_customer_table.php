@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('phone_customer')->index();
             $table->string('name_customer')->nullable();
             $table->string('order_code')->index()->nullable();
-            $table->string('order_id')->unique()->nullable();
+            $table->string('order_id')->nullable();
             $table->string('title')->index();
             $table->tinyInteger('point');
             $table->timestamps();

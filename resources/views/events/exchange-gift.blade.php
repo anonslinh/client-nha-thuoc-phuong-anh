@@ -5,12 +5,13 @@
             <div class="card-header">
                 <div class="d-flex justify-content-between align-items-center">
                     <h5 class="m-0">Danh sách khách hàng đổi quà</h5>
-                    <form class="w-50 d-flex justify-content-end align-items-center" action="{{route('events.history-exchange-gift')}}">
+                    <form class="w-75 d-flex justify-content-end align-items-center" action="{{route('events.history-exchange-gift')}}">
                         <input name="key_search" value="{{request()->get('key_search')}}"
                                placeholder="Tìm kiếm theo tên, sđt, mã khách hàng hoặc quà tặng"
                                class="form-control" style="max-width: 250px;margin-right: 15px">
                         <button class="btn btn-primary" style="margin-right: 15px;">Tìm kiếm</button>
-                        <a href="{{route('events.history-exchange-gift')}}" class="btn btn-danger">Hủy</a>
+                        <a href="{{route('events.history-exchange-gift')}}" style="margin-right: 15px" class="btn btn-danger">Hủy</a>
+                        <a href="{{route('events.export-history-exchange-gift')}}" class="btn btn-warning">Xuất Excel</a>
                     </form>
                 </div>
             </div>

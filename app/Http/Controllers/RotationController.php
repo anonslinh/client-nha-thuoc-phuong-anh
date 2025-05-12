@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Exports\HistoryCustomerExchangeGift;
+use App\Exports\RotationExchangeGiftCheckinExport;
 use App\Http\Controllers\Admin\HelperAdminController;
 use App\Models\Branch;
 use App\Models\Customer;
@@ -776,5 +777,12 @@ class RotationController extends HelperAdminController
         $customer->use = 1;
         $customer->save();
         return \response()->json(['status' => true, 'msg' => 'Chúc mừng bạn đã nhận được phần quà: '.$gift->title], 200);
+    }
+    /**
+     * Xuất excel
+    **/
+    public function exportExchangeGiftCheckin (Request $request)
+    {
+        return Excel::download(new RotationExchangeGiftCheckinExport($request), 'Lich-su-doi-qua-vong-quay-checkin.xlsx');
     }
 }

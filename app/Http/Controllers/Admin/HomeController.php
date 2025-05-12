@@ -4,6 +4,7 @@
 namespace App\Http\Controllers\Admin;
 
 
+use App\Exports\CustomerExport;
 use App\Models\AccountBranches;
 use App\Models\Customer;
 use App\Models\CustomerRank;
@@ -23,6 +24,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
+use Maatwebsite\Excel\Facades\Excel;
 
 class HomeController
 {
@@ -364,6 +366,14 @@ class HomeController
         $listData = $listData->paginate(20);
 
         return view('customer.index', compact('listData'));
+    }
+
+    /**
+     * Xuất excel
+    **/
+    public function exportCustomer (Request $request)
+    {
+        return Excel::download(new CustomerExport($request), 'Danh-sach-khach-hang.xlsx');
     }
 
     /**

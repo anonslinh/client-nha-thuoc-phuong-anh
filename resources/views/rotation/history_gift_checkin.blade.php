@@ -21,7 +21,8 @@
                     </select>
                     <input name="key_search" value="{{request()->get('key_search')}}" class="form-control" style="max-width: 300px;margin-right: 15px" placeholder="Tìm theo tên, sđt khách hàng, tên - mã phần quà">
                     <button class="btn btn-success" style="margin-right: 15px">Tìm kiếm</button>
-                    <a href="{{route('rotation.gift_checkin.exchange-gift')}}" class="btn btn-danger">Hủy</a>
+                    <a href="{{route('rotation.gift_checkin.exchange-gift')}}" style="margin-right: 15px" class="btn btn-danger">Hủy</a>
+                    <a href="{{route('rotation.gift_checkin.export-exchange-gift')}}" class="btn btn-warning">Xuất Excel</a>
                 </form>
                 <div class="mt-4">
                     <table class="table table-bordered">

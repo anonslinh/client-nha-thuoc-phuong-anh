@@ -37,7 +37,8 @@
                         </select>
                     </div>
                     <button class="btn btn-primary" style="margin-right: 15px">Tìm kiếm</button>
-                    <a href="{{route('customer')}}" class="btn btn-danger">Hủy</a>
+                    <a href="{{route('customer')}}" style="margin-right: 15px" class="btn btn-danger">Hủy</a>
+                    <a href="{{route('customer.export')}}" class="btn btn-warning">Xuất Excel</a>
                 </form>
                 <table class="table table-bordered mt-4">
                     <thead>
