@@ -4,18 +4,27 @@
 namespace App\Http\Controllers\Admin;
 
 
+use App\Exports\ProductPointExport;
+use App\Imports\ProductPointImport;
 use App\Models\AccountBranches;
 use App\Models\Branch;
 use App\Models\Contacts;
 use App\Models\Employee;
+use App\Models\GeneralSettings;
+use App\Models\HistoryPointCustomer;
 use App\Models\KpiSetting;
+use App\Models\ProductPoint;
 use App\Models\SettingGlobal;
 use App\Models\Slogan;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 use App\Services\KiotVietService;
 
 use App\Models\PersonalAccessTokens;
+use Maatwebsite\Excel\Facades\Excel;
 
 class SettingController extends SyncController
 {
@@ -153,8 +162,35 @@ class SettingController extends SyncController
         if (empty($listData)){
             return back()->with(['error' => 'Lỗi liên hệ với bộ phận CSKH']);
         }
-
-        return view('config.setting-global', compact('listData'));
+        $type_point = GeneralSettings::where('code', 'type_point')->first()->value??1;
+        $time = GeneralSettings::where('code', 'time_point')->first();
+        if (empty($time)){
+            $time = new GeneralSettings([
+                'code' => 'time_point',
+                'value' => Carbon::now('Asia/Ho_Chi_Minh')
+            ]);
+            $time->save();
+        }
+        $timePoint = $time->value;
+        $settingInvoice = GeneralSettings::where('code', 'invoice')->first();
+        if (empty($settingInvoice)){
+            $settingInvoice = new GeneralSettings([
+                'code' => 'invoice',
+                'value' => 1
+            ]);
+            $settingInvoice->save();
+        }
+        $type_invoice = $settingInvoice->value;
+        $settingCalculatorPoint = GeneralSettings::where('code', 'calculator_point')->first();
+        if (empty($settingCalculatorPoint)){
+            $settingCalculatorPoint = new GeneralSettings([
+                'code' => 'calculator_point',
+                'value' => 0
+            ]);
+            $settingCalculatorPoint->save();
+        }
+        $calculator_point = $settingCalculatorPoint->value;
+        return view('config.setting-global', compact('listData', 'type_point', 'timePoint', 'type_invoice', 'calculator_point'));
     }
 
     /**
@@ -281,5 +317,147 @@ class SettingController extends SyncController
         $accountBranch->delete();
 
         return back()->with(['success' => 'Xóa thành công!']);
+    }
+
+    /**
+     * Thay đổi hình thức tích điểm
+    **/
+    public function changeTypePoint (Request $request)
+    {
+        $setting = GeneralSettings::where('code', 'type_point')->first();
+        $setting->value = $request->get('value')??1;
+        $setting->save();
+        return response()->json(['status' => true, 'msg' => 'Thay đổi hình thức tích điểm thành công'], 200);
+    }
+
+    /**
+     * Cài đặt thời gian lên đơn
+    **/
+    public function setTimePoint (Request $request)
+    {
+        $setting = GeneralSettings::where('code', 'time_point')->first();
+        $setting->value = $request->get('value')??$setting->time_point;
+        $setting->save();
+        return response()->json(['status' => true, 'msg' => 'Cấu hình thời gian tích điểm thành công'], 200);
+    }
+
+    public function typeInvoice (Request $request)
+    {
+        $setting = GeneralSettings::where('code', $request->get('type'))->first();
+        if ($setting->value == 1){
+            $setting->value = 2;
+        }else{
+            $setting->value = 1;
+        }
+        $setting->save();
+        return response()->json(['status' => true, 'msg' => 'Cấu hình  thành công'], 200);
+    }
+    /**
+     * Danh sách sản phẩm
+    **/
+    public function listProduct (Request $request)
+    {
+        $listProduct = ProductPoint::query();
+        if (isset($request->key_search)){
+            $listProduct = $listProduct->where(function ($query) use ($request){
+                $query->where('code', 'like', '%'.$request->get('key_search').'%')->orWhere('name', 'like', '%'.$request->get('key_search').'%');
+            });
+        }
+        if (isset($request->category_id)){
+            $listProduct = $listProduct->where('category_id', $request->get('category_id'));
+        }
+        $listProduct = $listProduct->orderBy('created_at', 'desc')->paginate(40);
+        $category = $this->listCategories();
+        return view('config.list-product', compact('listProduct', 'category'));
+    }
+
+    public function excelProduct ()
+    {
+        $month = now()->month;
+        $year = now()->year;
+        return Excel::download(new ProductPointExport(), "list-product-$month-$year.xlsx");
+    }
+
+    public function importProduct (Request $request)
+    {
+        $request->validate([
+            'file' => 'required|mimes:xlsx,xls',
+        ]);
+
+        Excel::import(new ProductPointImport(), $request->file('file'));
+
+        return back()->with('success', 'Import thành công!');
+    }
+
+    public function deleteProduct($id)
+    {
+        $product = ProductPoint::find($id);
+        if (empty($product)){
+            return back()->with(['error' => 'Dữ liệu không tồn tịa']);
+        }
+        $product->delete();
+        return back()->with(['success' => 'Xóa dữ liệu thành công']);
+    }
+
+    public function addProduct (Request $request)
+    {
+        $category = $request->get('category');
+        $category = explode(',', $category);
+        $categoryID = $category[0];
+        $retailer = $category[1];
+        $listProduct = [];
+        $account = AccountBranches::where('retailer', $retailer)->first();
+        $token = $this->kiotVietService->refreshTokenAllBranches($account->client_id,$account->client_secret,$account->code,$retailer);
+        $dataToken = $token->access_token;
+        $pageSize = 100; // Số lượng tối đa mỗi lần gọi API
+        $currentItem = 0; // Bắt đầu từ khách hàng đầu tiên
+        do{
+            $response = Http::withHeaders([
+                'Retailer'      => $retailer,
+                'Authorization' => 'Bearer ' . $dataToken,
+                'Content-Type'  => 'application/json',
+            ])->get($this->urlKiotViet['url_list_product']."pageSize=$pageSize&currentItem=$currentItem&categoryId=$categoryID");
+
+            if ($response->failed()) {
+                break;
+            }
+            $responseData = $response->json()['data'] ?? [];
+            if (!isset($responseData) || empty($responseData)) {
+                break; // Dừng lại nếu không còn dữ liệu
+            }
+            foreach ($responseData as $item){
+                $productItem = [
+                    'code' => $item['code'],
+                    'name' => $item['name'],
+                    'category_id' => $item['categoryId'],
+                    'point' => $request->get('point'),
+                    'created_at' => Carbon::now('Asia/Ho_Chi_Minh'),
+                    'updated_at' => Carbon::now('Asia/Ho_Chi_Minh'),
+                ];
+                $listProduct[] = $productItem;
+            }
+            $currentItem += $pageSize;
+        }while (count($responseData) === $pageSize);
+        DB::table('product_point')->upsert(
+            $listProduct,
+            ['code'],
+            ['name', 'category_id', 'point']
+        );
+        return back()->with(['success' => 'Cấu cài đặt sản phẩm thành công']);
+    }
+
+    public function historyPoint (Request $request)
+    {
+        $listData = HistoryPointCustomer::query();
+        if (isset($request->key_search)){
+            $listData = $listData->where(function ($query) use ($request){
+                $query->where('phone_customer', 'like', '%'.$request->get('key_search').'%')
+                    ->orWhere('name_customer', 'like', '%'.$request->get('key_search').'%')
+                    ->orWhere('order_code', 'like', '%'.$request->get('key_search').'%')
+                    ->orWhere('title', 'like', '%'.$request->get('key_search').'%');
+            });
+        }
+        $listData = $listData->orderBy('created_at', 'desc')->paginate(40);
+        return view('config.history_point', compact('listData'));
     }
 }

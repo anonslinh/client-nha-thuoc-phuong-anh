@@ -2,7 +2,8 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Http\Controllers\Controller;
+use App\Exports\EventHistoryExchangeGiftExport;
+use App\Models\AccountBranches;
 use App\Models\Branch;
 use App\Models\Customer;
 use App\Models\EventsModel;
@@ -19,6 +20,8 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
+use App\Exports\EventHistoryPointExport;
+use Maatwebsite\Excel\Facades\Excel;
 
 class EventsController extends SyncController
 {
@@ -195,12 +198,6 @@ class EventsController extends SyncController
             });
         }
         $listData = $listData->orderBy('created_at', 'desc')->paginate(20);
-//        foreach ($listData as $value){
-//            $customer = Customer::where('kiotviet_id', $value->customer_id)->first();
-//            $value['name_customer'] = $customer->name??'';
-//            $value['code_customer'] = $customer->code??'';
-//            $value['phone_customer'] = $customer->contact_number??'';
-//        }
         return view('events.history-point', compact('listData'));
     }
     /**
@@ -258,7 +255,8 @@ class EventsController extends SyncController
     public function viewCreateGift ()
     {
         $listBranch = Branch::all();
-        return view('events.create-gift', compact('listBranch'));
+        $account_branches = AccountBranches::where('active', 1)->get();
+        return view('events.create-gift', compact('listBranch', 'account_branches'));
     }
     /**
      * Tạo quà tặng
@@ -266,16 +264,33 @@ class EventsController extends SyncController
     public function createGift (Request $request)
     {
         try{
-            $checkQuantity = true;
-            if (!empty($request->branch)){
-                foreach ($request->branch as $value){
-                    if ( !empty($value['quantity']) && (int)$value['quantity'] > 0){
-                        $checkQuantity = false;
+            $release_code = [];
+            if ($request->get('type') == 1){
+                $checkQuantity = true;
+                if (!empty($request->branch)){
+                    foreach ($request->branch as $value){
+                        if ( !empty($value['quantity']) && (int)$value['quantity'] > 0){
+                            $checkQuantity = false;
+                        }
                     }
                 }
-            }
-            if ($checkQuantity){
-                return back()->with(['error' => 'Vui lòng điền số lượng quà tặng ít nhất cho một chi nhánh']);
+                if ($checkQuantity){
+                    return back()->with(['error' => 'Vui lòng điền số lượng quà tặng ít nhất cho một chi nhánh']);
+                }
+            }else{
+                $checkCode = true;
+                foreach ($request->get('voucher') as $value){
+                    if (empty($value['release_code'])){
+                        $checkCode = false;
+                    }
+                }
+                if (!$checkCode){
+                    return back()->with(['error' => 'Vui lòng thêm mã phát hành voucher']);
+                }
+                $release_code = $this->dataReleaseCode($request->get('voucher'));
+                if (is_array($release_code) && empty($release_code)) {
+                    return back()->with(['error' => 'Mã phát hành không tồn tại!']);
+                }
             }
             $file = $request->file('image');
             $nameFile = time().Str::random(10).'.'.$file->getClientOriginalExtension();
@@ -284,19 +299,22 @@ class EventsController extends SyncController
                 'name' => $request->get('name'),
                 'code' => $request->get('code'),
                 'point' => $request->get('point'),
-                'barcode' => $request->get('barcode'),
+                'type' => $request->get('type'),
                 'active' => 1,
-                'image' => 'upload/gift-event/'.$nameFile
+                'image' => 'upload/gift-event/'.$nameFile,
+                'release_code' => json_encode($release_code)
             ]);
             $gift->save();
-            foreach ($request->get('branch') as $value){
-                if ( !empty($value['quantity']) && (int)$value['quantity'] > 0){
-                    $quantityGift = new QuantityGiftEvents([
-                        'gift_events_id' => $gift['id'],
-                        'branch_id' => $value['id'],
-                        'quantity' => $value['quantity']
-                    ]);
-                    $quantityGift->save();
+            if ($request->get('type') == 1){
+                foreach ($request->get('branch') as $value){
+                    if ( !empty($value['quantity']) && (int)$value['quantity'] > 0){
+                        $quantityGift = new QuantityGiftEvents([
+                            'gift_events_id' => $gift['id'],
+                            'branch_id' => $value['id'],
+                            'quantity' => $value['quantity']
+                        ]);
+                        $quantityGift->save();
+                    }
                 }
             }
             return back()->with(['success' => 'Thêm quà tặng thành công']);
@@ -318,7 +336,18 @@ class EventsController extends SyncController
             $quantity = QuantityGiftEvents::where('gift_events_id', $id)->where('branch_id', $value->id)->first();
             $value['quantity'] = $quantity->quantity??null;
         }
-        return view('events.detail-gift', compact('gift', 'listBranch'));
+        $account_branches = AccountBranches::where('active', 1)->get();
+        if ($gift->type == 2){
+            $release_code = json_decode($gift->release_code, true);
+            foreach ($account_branches as $account_branch){
+                foreach ($release_code as $item){
+                    if ($account_branch->code == $item['code']){
+                        $account_branch->release_code = $item['release_code'];
+                    }
+                }
+            }
+        }
+        return view('events.detail-gift', compact('gift', 'listBranch', 'account_branches'));
     }
     /**
      * Cập nhât quà tặng
@@ -329,16 +358,33 @@ class EventsController extends SyncController
         if (empty($gift)){
             return back()->with(['error' => 'Không tìm thấy dữ liệu.Vui lòng kiểm tra lại']);
         }
-        $checkQuantity = true;
-        if (!empty($request->branch)){
-            foreach ($request->branch as $value){
-                if ( !empty($value['quantity']) && (int)$value['quantity'] > 0){
-                    $checkQuantity = false;
+        $release_code = [];
+        if ($request->get('type') == 1){
+            $checkQuantity = true;
+            if (!empty($request->branch)){
+                foreach ($request->branch as $value){
+                    if ( !empty($value['quantity']) && (int)$value['quantity'] > 0){
+                        $checkQuantity = false;
+                    }
                 }
             }
-        }
-        if ($checkQuantity){
-            return back()->with(['error' => 'Vui lòng điền số lượng quà tặng ít nhất cho một chi nhánh']);
+            if ($checkQuantity){
+                return back()->with(['error' => 'Vui lòng điền số lượng quà tặng ít nhất cho một chi nhánh']);
+            }
+        }else{
+            $checkCode = true;
+            foreach ($request->get('voucher') as $value){
+                if (empty($value['release_code'])){
+                    $checkCode = false;
+                }
+            }
+            if (!$checkCode){
+                return back()->with(['error' => 'Vui lòng thêm mã phát hành voucher']);
+            }
+            $release_code = $this->dataReleaseCode($request->get('voucher'));
+            if (is_array($release_code) && empty($release_code)) {
+                return back()->with(['error' => 'Mã phát hành không tồn tại!']);
+            }
         }
         if ($request->hasFile('image')){
             $file = $request->file('image');
@@ -353,18 +399,21 @@ class EventsController extends SyncController
         $gift->code = $request->get('code');
         $gift->point = $request->get('point');
         $gift->quantity = $request->get('quantity')??0;
-        $gift->barcode = $request->get('barcode');
+        $gift->type = $request->get('type');
         $gift->description = $request->get('description');
+        $gift->release_code = json_encode($release_code);
         $gift->save();
         QuantityGiftEvents::where('gift_events_id', $id)->delete();
-        foreach ($request->get('branch') as $value){
-            if ( !empty($value['quantity']) && (int)$value['quantity'] > 0){
-                $quantityGift = new QuantityGiftEvents([
-                    'gift_events_id' => $id,
-                    'branch_id' => $value['id'],
-                    'quantity' => $value['quantity']
-                ]);
-                $quantityGift->save();
+        if ($request->get('type') == 1){
+            foreach ($request->get('branch') as $value){
+                if ( !empty($value['quantity']) && (int)$value['quantity'] > 0){
+                    $quantityGift = new QuantityGiftEvents([
+                        'gift_events_id' => $id,
+                        'branch_id' => $value['id'],
+                        'quantity' => $value['quantity']
+                    ]);
+                    $quantityGift->save();
+                }
             }
         }
         return back()->with(['success' => 'Cập nhật dữ liệu thành công']);
@@ -507,5 +556,19 @@ class EventsController extends SyncController
         }catch (\Exception $exception){
             return \response()->json(['status' => false, 'msg' => 'Thêm sản phẩm thất bại.Vui lòng kiểm tra lại'], Response::HTTP_BAD_REQUEST);
         }
+    }
+    /**
+     * Xuẩt file excel cập nhật đơn hàng
+    **/
+    public function exportHistoryPoint (Request $request)
+    {
+        return Excel::download(new EventHistoryPointExport($request), 'Lich-su-xu.xlsx');
+    }
+    /**
+     * Xuẩt file excel lịch sử đổi quà
+    **/
+    public function exportHistoryExchangeGift (Request $request)
+    {
+        return Excel::download(new EventHistoryExchangeGiftExport($request), 'Lich-su-doi-qua.xlsx');
     }
 }

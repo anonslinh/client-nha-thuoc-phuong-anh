@@ -4,13 +4,18 @@
 namespace App\Http\Controllers\Admin;
 
 
+use App\Exports\CustomerExchangeGiftExport;
+use App\Exports\CustomerExport;
 use App\Models\AccountBranches;
 use App\Models\Customer;
 use App\Models\CustomerRank;
 use App\Models\Gift;
 use App\Models\GiftExchanges;
+use App\Models\GiftInventories;
+use App\Models\HistoryPointCustomer;
 use App\Models\MembershipLevel;
 use App\Models\RankModel;
+use App\Models\TypeRankModel;
 use App\Models\Voucher;
 use App\Models\VoucherExchanges;
 use App\Services\KiotVietService;
@@ -18,7 +23,9 @@ use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
+use Maatwebsite\Excel\Facades\Excel;
 
 class HomeController
 {
@@ -52,7 +59,19 @@ class HomeController
             $value->total_customer = CustomerRank::where('current_rank', $value->rank)
                 ->whereDate('rank_start_date', '<=', Carbon::now())->whereDate('rank_end_date', '>=', Carbon::now())->count();
         }
-        return view('rank.list-data', compact('listData'));
+        $typeRank = TypeRankModel::first();
+        return view('rank.list-data', compact('listData', 'typeRank'));
+    }
+    /**
+     * Cấu hình hạng thẻ
+    **/
+    public function typeRank (Request $request)
+    {
+        $typeRank = TypeRankModel::first();
+        $typeRank->type = $request->get('type');
+        $typeRank->time = $request->get('time')??0;
+        $typeRank->save();
+        return back()->with(['success' => 'Cấu hình thành công']);
     }
     /**
      * Cập nhật hạng thẻ
@@ -316,11 +335,11 @@ class HomeController
             ->leftJoin('invoices', 'customers.kiotviet_id', '=', 'invoices.customer_id')
             ->select(
                 'customers.id', 'customers.code', 'customers.name', 'customers.contact_number',
-                'customers.total_revenue', 'customers.kiotviet_reward_point', 'customers.used_points',
+                'customers.total_revenue', 'customers.kiotviet_reward_point', 'customers.used_points','customers.reward_point',
                 \DB::raw('COUNT(invoices.id) as total_orders') // Tổng số đơn hàng trong ngày
             )
             ->groupBy('customers.id', 'customers.code', 'customers.name', 'customers.contact_number',
-                'customers.total_revenue', 'customers.kiotviet_reward_point', 'customers.used_points'); // Nhóm theo khách hàng
+                'customers.total_revenue', 'customers.kiotviet_reward_point', 'customers.used_points', 'customers.reward_point'); // Nhóm theo khách hàng
 
         // Tìm kiếm theo key_search (kiotviet_id, code, contact_number, address)
         if (isset($request->key_search)) {
@@ -348,5 +367,100 @@ class HomeController
         $listData = $listData->paginate(20);
 
         return view('customer.index', compact('listData'));
+    }
+
+    /**
+     * Xuất excel
+    **/
+    public function exportCustomer (Request $request)
+    {
+        return Excel::download(new CustomerExport($request), 'Danh-sach-khach-hang.xlsx');
+    }
+    public function exportCustomerExchangeGift (Request $request)
+    {
+        return Excel::download(new CustomerExchangeGiftExport($request), 'Danh-sach-khach-hang-doi-qua.xlsx');
+    }
+    /**
+     * Hoàn điểm cho khách hàng
+    **/
+    public function customerExchangeGiftReturn ($id)
+    {
+        $giftExchange = GiftExchanges::find($id);
+        if (empty($giftExchange)){
+            return back()->with(['error' => 'Dữ liệu không tồn tại.Vui lòng kiểm tra lại']);
+        }
+        if ($giftExchange->status != 'pending'){
+            return back()->with(['error' => 'Không thể hoàn điểm cho khách hàng khi trạng thái không phải là chưa sử dụng']);
+        }
+        $quantity = GiftInventories::where('gift_id', $id)->where('branch_id', $giftExchange->branch_id)->first();
+        if (isset($quantity)){
+            $quantity->quantity += 1;
+            $quantity->save();
+        }
+        $giftExchange->status = 'cancelled';
+        $giftExchange->save();
+        $customer = Customer::where('kiotviet_id', $giftExchange->customer_id)->first();
+        $customer->reward_point += $giftExchange->points_used;
+        $customer->save();
+        return back()->with(['success' => 'Hoàn điểm cho khách hàng thành công']);
+    }
+
+    /**
+     * Cộng điểm cho khách hàng
+    **/
+    public function plusPointCustomer (Request $request)
+    {
+        $rule = [
+            'phone' => ['required', 'regex:/^(0[1-9][0-9]{8,9}|84[1-9][0-9]{8,9})$/'],
+            'point' => ['required']
+        ];
+        $message = [
+            'phone.required' => 'Vui lòng thêm số điện thoại khách hàng',
+            'phone.regex' => 'Số điện thoại không đúng',
+            'point.required' => 'Vui lòng điền số điểm muốn cộng',
+        ];
+        $validator = Validator::make($request->all(), $rule, $message);
+        if ($validator->fails()){
+            return back()->with(['error' => $validator->errors()->first()]);
+        }
+        $customer = Customer::where('contact_number', $request->get('phone'))->first();
+        $title = $request->get('note')??'Hệ thống cộng điểm cho khách';
+        if (isset($customer)){
+            $customer->reward_point += $request->get('point');
+            $customer->save();
+            $historyPoint = new HistoryPointCustomer([
+                'phone_customer' => $request->get('phone'),
+                'name_customer' => $customer->name,
+                'title' => $title,
+                'point' => $request->get('point')
+            ]);
+            $historyPoint->save();
+            return back()->with(['success' => 'Cộng điểm cho khách thành công']);
+        }else{
+            $customer = $this->kiotVietService->getDataCustomer($request->get('phone'), $request->get('name'));
+            if (!empty($customer)){
+                $customer = new Customer([
+                    'kiotviet_id' => $customer['id'],
+                    'code' => $customer['code'],
+                    'name' => $customer['name'],
+                    'contact_number' => $customer['contactNumber'],
+                    'address' => $customer['address']??null,
+                    'retailer_id' => $customer['retailerId'],
+                    'branch_id' => $customer['branchId'],
+                    'reward_point' => $request->get('point')
+                ]);
+                $customer->save();
+                $historyPoint = new HistoryPointCustomer([
+                    'phone_customer' => $request->get('phone'),
+                    'name_customer' => $customer['name'],
+                    'title' => $title,
+                    'point' => $request->get('point')
+                ]);
+                $historyPoint->save();
+                return back()->with(['success' => 'Cộng điểm cho khách thành công']);
+            }else{
+                return back()->with(['error' => 'Đã có lỗi xảy ra.Vui lòng tạo tài khoản trên hệ thống bán hàng trước']);
+            }
+        }
     }
 }

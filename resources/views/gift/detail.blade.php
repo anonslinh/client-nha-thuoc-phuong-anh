@@ -33,7 +33,7 @@
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Hình ảnh(Tỷ lệ 1:1 1000x1000px)</label>
-                        <input class="form-control" type="file" accept="image/png" name="image">
+                        <input class="form-control" type="file" accept="image/*" name="image">
                     </div>
                     <div class="mb-3">
                         <label class="form-label">Điểm quy đổi</label>

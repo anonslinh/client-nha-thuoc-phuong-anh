@@ -11,7 +11,8 @@
                                placeholder="Tìm kiếm theo tên, mã , khách hàng hoặc sảm phẩm"
                                class="form-control" style="max-width: 250px;margin-right: 15px">
                         <button class="btn btn-primary" style="margin-right: 15px">Tìm kiếm</button>
-                        <a href="{{route('events.history-point')}}" class="btn btn-danger">Hủy</a>
+                        <a href="{{route('events.history-point')}}" style="margin-right: 15px" class="btn btn-danger">Hủy</a>
+                        <a href="{{route('events.export-history-point')}}" style="margin-right: 15px" class="btn btn-warning">Xuất Excel</a>
                     </form>
                 </div>
             </div>

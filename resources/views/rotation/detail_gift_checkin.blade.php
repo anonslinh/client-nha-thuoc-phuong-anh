@@ -5,7 +5,7 @@
             <div class="row align-items-center">
                 <div class="col-12">
                     <div class="d-sm-flex align-items-center justify-space-between">
-                        <h4 class="mb-4 mb-sm-0 card-title">Cài quà tặng</h4>
+                        <h4 class="mb-4 mb-sm-0 card-title">Cập quà tặng Checkin</h4>
                         <nav aria-label="breadcrumb" class="ms-auto">
                             <ol class="breadcrumb">
                                 <li class="breadcrumb-item d-flex align-items-center">
@@ -21,56 +21,26 @@
         </div>
         <div class="card">
             <div class="card-body">
-                <form action="{{route('events.gift.update',$gift->id)}}" method="post" class="w-100" enctype="multipart/form-data">
+                <form action="{{route('rotation.gift_checkin.update',$gift->id)}}" method="post" class="w-100" enctype="multipart/form-data">
                     @csrf
                     <div class="mb-3">
-                        <label class="form-label">Tên</label>
-                        <input class="form-control" value="{{$gift->name}}" name="name" required>
+                        <label for="title" class="form-label">Tên quà:</label>
+                        <input type="text" class="form-control" value="{{$gift->title}}" name="title"/>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Mã</label>
-                        <input class="form-control" value="{{$gift->code}}" name="code" required>
+                        <label for="link" class="form-label">Mã quà:</label>
+                        <input type="text" class="form-control" value="{{$gift->code}}" name="code" required/>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Hình ảnh(Tỷ lệ 1:1 1000x1000px)</label>
-                        <input class="form-control" type="file" accept="image/png" name="image">
+                        <label for="link" class="form-label">Hình ảnh:</label>
+                        <img src="{{$gift->image}}" style="width: 150px;margin-bottom: 10px">
+                        <input type="file" accept="image/*" class="form-control" name="image"/>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Loại quà</label>
-                        <select name="type" class="form-control" required>
-                            <option value="1" @if($gift->type == 1) selected @endif>Quà tặng</option>
-                            <option value="2" @if($gift->type == 2) selected @endif>Voucher</option>
-                        </select>
+                        <label for="link" class="form-label">Tỷ lệ chúng thưởng: (Lưu ý: Tổng tỉ lệ chúng quà phải là 100%)</label>
+                        <input type="number" class="form-control" name="percent" value="{{$gift->percent * 100}}" required/>
                     </div>
                     <div class="mb-3">
-                        <label class="form-label">Điểm quy đổi</label>
-                        <input class="form-control" value="{{$gift->point}}" name="point" type="number" min="0" required>
-                    </div>
-                    <div class="mb-3 data-account @if($gift->type == 1) d-none @endif">
-                        <label class="form-label">Mã phát hành voucher theo tài khoản</label>
-                        <table class="table table-bordered">
-                            <thead>
-                            <tr>
-                                <th>STT</th>
-                                <th>Tên chi nhánh</th>
-                                <th>Mã phát hành</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            @foreach($account_branches as $key => $value)
-                                <tr>
-                                    <td>{{$key + 1}}</td>
-                                    <td>{{$value->code}}</td>
-                                    <td>
-                                        <input name="voucher[{{$key}}][code]" value="{{$value->code}}" hidden>
-                                        <input name="voucher[{{$key}}][release_code]" type="text" value="{{$value->release_code??''}}" class="form-control releaseCode">
-                                    </td>
-                                </tr>
-                            @endforeach
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="mb-3 data-branch @if($gift->type == 2) d-none @endif">
                         <label class="form-label">Cấu hình theo chi nhánh:</label>
                         <div class="list-branch">
                             <div class="d-flex align-items-center" style="margin-bottom: 15px">
@@ -96,17 +66,13 @@
                                         <td>
                                             <input  value="{{$item->kiotviet_id}}" hidden class="kiotviet_id">
                                             <input name="branch[{{$key}}][id]" value="{{$item->id}}" hidden>
-                                            <input name="branch[{{$key}}][quantity]" type="number" value="{{$item->quantity}}" class="form-control quantity">
+                                            <input name="branch[{{$key}}][quantity]" type="number" value="{{$item->quantity_gift}}" class="form-control quantity">
                                         </td>
                                     </tr>
                                 @endforeach
                                 </tbody>
                             </table>
                         </div>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Mô tả</label>
-                        <textarea id="mymce" name="description" class="form-control" rows="4">{{$gift->description}}</textarea>
                     </div>
                     <div class="d-flex">
                         <button class="btn btn-primary">Cập nhật</button>
@@ -165,16 +131,6 @@
                             }
                         }
                     })
-                }
-            });
-            $('select[name="type"]').change(function () {
-                var type = $(this).val();
-                if (parseInt(type) == 2){
-                    $(".data-account").removeClass('d-none');
-                    $(".data-branch").addClass('d-none');
-                }else{
-                    $(".data-account").addClass('d-none');
-                    $(".data-branch").removeClass('d-none');
                 }
             });
         });

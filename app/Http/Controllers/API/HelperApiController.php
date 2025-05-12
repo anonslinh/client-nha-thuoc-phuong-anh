@@ -7,9 +7,12 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use App\Models\Customer;
 use App\Models\CustomerSyncLog;
+use App\Models\GeneralSettings;
+use App\Models\HistoryPointCustomer;
 use App\Models\Invoice;
 use App\Models\InvoiceDetail;
 use App\Models\PersonalAccessTokens;
+use App\Models\ProductPoint;
 use Illuminate\Support\Facades\Http;
 use App\Services\KiotVietService;
 use App\Models\CustomerRank;
@@ -63,6 +66,7 @@ class HelperApiController extends Controller
             return response()->json(['status' => false, 'data' => []], 400);
         }
         try {
+            $type_point = GeneralSettings::where('code', 'type_point')->first()->value??1;
             $personalAccessTokens = PersonalAccessTokens::whereNotNull('retailer')->get();
             $firstCustomer = null;
             $totalInvoiced = 0;
@@ -70,16 +74,6 @@ class HelperApiController extends Controller
             $totalPoint = 0;
             $rewardPoint = 0;
             foreach ($personalAccessTokens as $personalAccessToken){
-
-//                //Hard code du lieu test
-//                if ($personalAccessToken->access_token_code == 'hmvietnam'){
-//                    $phone = '0963119570';
-//                }elseif ($personalAccessToken->access_token_code == 'hethongbabychipchip'){
-//                    $phone = '0982375649';
-//                }
-//                else{
-//                    $phone = '0981163959';
-//                }
                 $tokens = $this->kiotVietService->getAccessTokenAllBranches($personalAccessToken->access_token_code);
                 $accessToken = $tokens->access_token;
                 $retailer = $tokens->retailer;
@@ -99,9 +93,9 @@ class HelperApiController extends Controller
                 }
             }
             if (!empty($firstCustomer)) {
-                \DB::transaction(function () use ($firstCustomer, $totalInvoiced, $totalRevenue, $totalPoint, $rewardPoint, $phone) {
-                    $this->syncCustomerData($firstCustomer, $totalInvoiced, $totalRevenue, $totalPoint, $rewardPoint);
+                \DB::transaction(function () use ($firstCustomer, $totalInvoiced, $totalRevenue, $totalPoint, $rewardPoint, $phone, $type_point) {
                     $this->syncCustomerInvoicesData($phone, $firstCustomer);
+                    $this->syncCustomerData($firstCustomer, $totalInvoiced, $totalRevenue, $totalPoint, $rewardPoint, $type_point);
                 });
             }
             return response()->json(['status' => true, 'message' => 'Sync successful']);
@@ -149,18 +143,65 @@ class HelperApiController extends Controller
     /**
      * Đồng bộ thông tin khách hàng vào database
      */
-    private function syncCustomerData($customer, $totalInvoiced, $totalRevenue, $totalPoint, $rewardPoint)
+    private function syncCustomerData($customer, $totalInvoiced, $totalRevenue, $totalPoint, $rewardPoint, $type_point)
     {
         try{
             $existingCustomer = Customer::where('kiotviet_id', $customer['id'])->first();
-
             // Tính toán điểm thực tế
             $usedPoints = $existingCustomer->used_points ?? 0;
+            if ($type_point == 1){
+                // Điểm thực tế = điểm từ KiotViet - điểm đã dùng + điểm thưởng từ đánh giá
+                $actualRewardPoint = max($rewardPoint - $usedPoints , 0);
+            }else{
+                $calculatorPoint = GeneralSettings::where('code', 'calculator_point')->first()->value?? 0;
+                $pointCustomer = 0;
+                $orderIDCustomer = HistoryPointCustomer::where('phone_customer', $customer['contactNumber'])->pluck('order_id');
+                $invoice = Invoice::whereNotIn('kiotviet_id', $orderIDCustomer)->where('contact_number', $customer['contactNumber'])->get();
+                foreach ($invoice as $value){
+                    $invoiceDetail = InvoiceDetail::where('invoice_id', $value->id)->get();
+                    foreach ($invoiceDetail as $detail){
+                        if ($calculatorPoint == 1){
+                            if ($value->discount > 0 || $detail->discount > 0){
+                                continue;
+                            }
+                            $productPoint = ProductPoint::where('code', $detail->product_code)->first();
+                            if (isset($productPoint)){
+                                $title = 'Tích điểm sản phẩm '.$detail->product_code.'-'.$detail->product_name;
+                                $history = new HistoryPointCustomer([
+                                    'order_id' => $value->kiotviet_id,
+                                    'phone_customer' => $customer['contactNumber'],
+                                    'name_customer' => $customer['name'],
+                                    'order_code' => $value->code,
+                                    'title' => $title,
+                                    'point' => $productPoint->point,
+                                    'created_at' => $value->purchase_date
+                                ]);
+                                $history->save();
+                                $pointCustomer += $productPoint->point * $detail->quantity;
+                            }
+                        }else{
+                            $productPoint = ProductPoint::where('code', $detail->product_code)->first();
+                            if (isset($productPoint)){
+                                $title = 'Tích điểm sản phẩm '.$detail->product_code.'-'.$detail->product_name;
+                                $history = new HistoryPointCustomer([
+                                    'order_id' => $value->kiotviet_id,
+                                    'phone_customer' => $customer['contactNumber'],
+                                    'name_customer' => $customer['name'],
+                                    'order_code' => $value->code,
+                                    'title' => $title,
+                                    'point' => $productPoint->point,
+                                    'created_at' => $value->purchase_date
+                                ]);
+                                $history->save();
+                                $pointCustomer += $productPoint->point * $detail->quantity;
+                            }
+                        }
+                    }
+                }
+                $point = $existingCustomer->reward_point??0;
+                $actualRewardPoint = $pointCustomer + $point;
+            }
 
-            // Điểm thực tế = điểm từ KiotViet - điểm đã dùng + điểm thưởng từ đánh giá
-            $actualRewardPoint = max($rewardPoint - $usedPoints , 0);
-
-//            $customer['contactNumber'] = '0981163959'; //Hard code du lieu test
             Customer::updateOrCreate(
                 ['kiotviet_id' => $customer['id']],
                 [
@@ -225,8 +266,10 @@ class HelperApiController extends Controller
     */
     public function getInvoicesDataKiotViet($customerSyncLog){
         try{
+            $timeSetting = GeneralSettings::where('code', 'time_point')->first();
+            $firstDayOfYear = $timeSetting->value??Carbon::now()->subYear()->addDay()->toDateString();
             $lastDayOfYear = Carbon::now()->addDay()->toDateString(); // Ngày hôm nay + 1 ngày
-            $firstDayOfYear = Carbon::now()->subYear()->addDay()->toDateString(); // Ngày hôm nay - 1 năm + 1 ngày
+//            $firstDayOfYear = Carbon::now()->subYear()->addDay()->toDateString(); // Ngày hôm nay - 1 năm + 1 ngày
 
             $pageSize = 100;
             $currentItem = 0;
@@ -393,32 +436,34 @@ class HelperApiController extends Controller
             // Lấy tổng chi tiêu sau cập nhật
             $totalSpent = $spendingSummary->fresh()->total_spent;
 
+            // Chuyển đoạn code tạo hoặc cập nhật hạng người dùng bên dưới sang mục lấy hạng hiện tại của khách hàng
+
             // Lấy danh sách hạng thẻ (sắp xếp giảm dần theo spending_threshold)
-            $membershipLevels = MembershipLevel::orderBy('spending_threshold', 'desc')->get();
-
-            // Xác định hạng thẻ phù hợp
-            $newRank = null;
-            foreach ($membershipLevels as $level) {
-                if ($totalSpent >= $level->spending_threshold) {
-                    $newRank = $level->rank;
-                    break;
-                }
-            }
-
-            if (!$newRank) {
-                return;
-            }
-
-            // Cập nhật hoặc tạo mới hạng thẻ trong customer_ranks
-            CustomerRank::updateOrCreate(
-                ['contact_number' => $phone],
-                [
-                    'customer_id' => $firstCustomerId,
-                    'current_rank'    => $newRank,
-                    'rank_start_date' => Carbon::create($year, $month, 1), // Đầu tháng
-                    'rank_end_date'   => Carbon::create($year, $month, 1)->endOfMonth(), // Cuối tháng
-                ]
-            );
+//            $membershipLevels = MembershipLevel::orderBy('spending_threshold', 'desc')->get();
+//
+//            // Xác định hạng thẻ phù hợp
+//            $newRank = null;
+//            foreach ($membershipLevels as $level) {
+//                if ($totalSpent >= $level->spending_threshold) {
+//                    $newRank = $level->rank;
+//                    break;
+//                }
+//            }
+//
+//            if (!$newRank) {
+//                return;
+//            }
+//
+//            // Cập nhật hoặc tạo mới hạng thẻ trong customer_ranks
+//            CustomerRank::updateOrCreate(
+//                ['contact_number' => $phone],
+//                [
+//                    'customer_id' => $firstCustomerId,
+//                    'current_rank'    => $newRank,
+//                    'rank_start_date' => Carbon::create($year, $month, 1), // Đầu tháng
+//                    'rank_end_date'   => Carbon::create($year, $month, 1)->endOfMonth(), // Cuối tháng
+//                ]
+//            );
         }catch (\Exception $exception){
             \Log::error('Lỗi xảy ra: ' . $exception->getMessage(), [
                 'file' => $exception->getFile(),

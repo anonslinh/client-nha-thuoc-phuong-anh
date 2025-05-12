@@ -32,12 +32,13 @@
                         <select name="status" class="form-control">
                             <option value="">Trạng thái</option>
                             <option value="pending" @if(request()->get('status') == 'pending') selected @endif>Chưa sử dụng</option>
-                            <option value="complete" @if(request()->get('status') == 'complete') selected @endif>Đã sử dụng</option>
-                            <option value="cancel" @if(request()->get('status') == 'cancel') selected @endif>Đã hủy</option>
+                            <option value="completed" @if(request()->get('status') == 'completed') selected @endif>Đã sử dụng</option>
+                            <option value="cancelled" @if(request()->get('status') == 'cancelled') selected @endif>Đã hủy</option>
                         </select>
                     </div>
                     <button class="btn btn-primary" style="margin-right: 15px">Tìm kiếm</button>
-                    <a href="{{route('customer.exchange-gift')}}" class="btn btn-danger">Hủy</a>
+                    <a href="{{route('customer.exchange-gift')}}" style="margin-right: 15px" class="btn btn-danger">Hủy</a>
+                    <a href="{{route('customer.export-exchange-gift')}}" class="btn btn-warning">Xuất Excel</a>
                 </form>
                 <table class="table table-bordered mt-4">
                     <thead>
@@ -48,6 +49,7 @@
                         <th>Khách hàng</th>
                         <th>Trạng thái</th>
                         <th>Điểm quy đổi</th>
+                        <th>Hoàn Điểm</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -77,6 +79,11 @@
                                     @endif
                                 </td>
                                 <td class="align-middle">{{$value->points_used}}</td>
+                                <td class="align-middle">
+                                    @if($value->status == 'pending')
+                                        <a href="{{route('customer.exchange-gift-return',$value->id)}}" class="btn btn-warning">Hoàn điểm</a>
+                                    @endif
+                                </td>
                             </tr>
                         @endforeach
                     @else

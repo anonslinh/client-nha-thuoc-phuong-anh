@@ -19,6 +19,29 @@
                 </div>
             </div>
         </div>
+        <div class="card card-body py-3">
+            <div class="row align-items-center">
+                <div class="col-12">
+                    <div class="d-sm-flex align-items-center justify-space-between">
+                        <h4 class="mb-4 mb-sm-0 card-title">Cấu Hình Hạng thẻ</h4>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-4">
+                <form action="{{route('rank.type_rank')}}" method="post" class="row">
+                    @csrf
+                    <div class="col-4">
+                        <select name="type" class="form-control">
+                            <option value="1" @if($typeRank->type == 1) selected @endif>Cấu hình theo mức chi tiêu</option>
+                            <option value="2" @if($typeRank->type == 2) selected @endif>Cấu hình theo điểm hiện tại</option>
+                        </select>
+                    </div>
+                    <div class="col-4">
+                        <button class="btn btn-success">Cấu hình</button>
+                    </div>
+                </form>
+            </div>
+        </div>
         <div class="card">
             <div class="card-body">
                 <table class="table table-bordered">

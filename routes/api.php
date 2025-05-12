@@ -10,6 +10,7 @@ use App\Http\Controllers\API\SettingGlobalController;
 use App\Http\Controllers\VideoProductController;
 use App\Http\Controllers\RotationController;
 use App\Http\Controllers\API\PharmacyController;
+use App\Http\Controllers\API\WebhookController;
 
 Route::post('reward-point', [HomeController::class, 'rewardPointCustomer']);
 Route::get('banners', [HomeController::class, 'getBanners']);
@@ -80,7 +81,15 @@ Route::prefix('rotation')->group(function (){
     Route::post('list-gift-sub', [RotationController::class, 'listGiftSubAPI']);
     Route::post('exchange-gift-sub', [RotationController::class, 'exchangeGiftSubAPI']);
 });
+// Vòng quay checkin
+Route::prefix('rotation-checkin')->group(function (){
+   Route::post('list-gift', [RotationController::class, 'listGiftCheckinAPI']);
+    Route::post('exchange-gift', [RotationController::class, 'exchangeGiftCheckinAPI']);
+});
 //Nhà thuốc
 Route::prefix('pharmacy')->group(function (){
     Route::post('prescriptions', [PharmacyController::class, 'submitPrescription']);
 });
+//WebhookKiotviet
+Route::post('kiotviet-register-webhook', [WebhookController::class, 'registerWebhook']);
+Route::post('kiotviet-invoices-webhook', [WebhookController::class, 'invoiceUpdate']);

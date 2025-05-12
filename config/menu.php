@@ -137,7 +137,28 @@ return [
                 'name' => 'Lịch sử đổi quà',
                 'icon' => 'solar:settings-line-duotone',
                 'route' => 'rotation.history-exchange-gift'
-            ]
+            ],
+            [
+                'name' => 'Vòng quay checkin',
+                'icon' => null,
+                'route' => null,
+                'type' => 'title'
+            ],
+            [
+                'name' => 'DS quà tặng',
+                'icon' => 'solar:settings-line-duotone',
+                'route' => 'rotation.gift_checkin.index'
+            ],
+            [
+                'name' => 'Tạo quà tặng',
+                'icon' => 'solar:settings-line-duotone',
+                'route' => 'rotation.gift_checkin.create'
+            ],
+            [
+                'name' => 'Lịch sử đổi quà',
+                'icon' => 'solar:settings-line-duotone',
+                'route' => 'rotation.gift_checkin.exchange-gift'
+            ],
         ]
     ],
     [
@@ -193,7 +214,25 @@ return [
                 'name' => 'KIOTVIET',
                 'icon' => 'solar:settings-linear',
                 'route' => 'config.index-account-branches'
-            ]
+            ],
+            [
+                'name' => 'Tích điểm theo sản phẩm',
+                'icon' => null,
+                'route' => null,
+                'type' => 'type_point',
+            ],
+            [
+                'name' => 'Sản phẩm',
+                'icon' => 'solar:settings-line-duotone',
+                'route' => 'config.list-product',
+                'type_point' => 1
+            ],
+            [
+                'name' => 'Lịch sử tích điểm',
+                'icon' => 'solar:settings-line-duotone',
+                'route' => 'config.history-point',
+                'type_point' => 1
+            ],
         ]
     ]
 ];
