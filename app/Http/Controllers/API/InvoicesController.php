@@ -116,18 +116,21 @@ class InvoicesController extends HelperApiController
             if (!$phone || !Invoice::where('contact_number', $phone)->exists()) {
                 return response()->json(['status' => false, 'data' => []], 200);
             }
-
-            $data = Invoice::leftJoin('invoice_ratings', 'invoices.kiotviet_id', '=', 'invoice_ratings.kiotviet_invoice_id')
-                ->where('invoices.contact_number', $phone) //Bảng invoid thêm contact_number sẽ where theo bảng đó
-                ->whereDate('invoices.created_date', $today)
-                ->whereNull('invoice_ratings.kiotviet_invoice_id') // Chỉ lấy hóa đơn chưa đánh giá
-                ->select(
-                    'invoices.*',
-                    \DB::raw("false as is_rated")
-                )
-                ->with('details')
-                ->get();
-
+            $typeInvoice = GeneralSettings::where('code', 'invoice')->first()->value??1;
+            if ($typeInvoice == 1){
+                $data = Invoice::leftJoin('invoice_ratings', 'invoices.kiotviet_id', '=', 'invoice_ratings.kiotviet_invoice_id')
+                    ->where('invoices.contact_number', $phone) //Bảng invoid thêm contact_number sẽ where theo bảng đó
+                    ->whereDate('invoices.created_date', $today)
+                    ->whereNull('invoice_ratings.kiotviet_invoice_id') // Chỉ lấy hóa đơn chưa đánh giá
+                    ->select(
+                        'invoices.*',
+                        \DB::raw("false as is_rated")
+                    )
+                    ->with('details')
+                    ->get();
+            }else{
+                $data = [];
+            }
             return response()->json(['status' => true, 'data' => $data]);
         } catch (\Exception $exception) {
             \Log::error('Lỗi khi lấy hóa đơn hôm nay: ' . $exception->getMessage());
