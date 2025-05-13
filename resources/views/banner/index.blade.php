@@ -1,4 +1,8 @@
 @extends('Layout.index')
+@section('style')
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-select@1.14.0-beta3/dist/css/bootstrap-select.min.css">
+
+@endsection
 @section('content')
     <div class="container-fluid">
         <div class="card card-body py-3">
@@ -32,7 +36,6 @@
                     <tr>
                         <th>STT</th>
                         <th>Tiêu đề</th>
-                        <th>Đường link</th>
                         <th>Thời gian</th>
                         <th>Chi nhánh</th>
                         <th>Thao tác</th>
@@ -53,7 +56,7 @@
                                         </div>
                                     </div>
                                 </td>
-                                <td>{{$value->redirect_url}}</td>
+{{--                                <td>{{$value->redirect_url}}</td>--}}
                                 <td>
                                     <span class="fw-normal">Bắt đầu: {{date_format(date_create($value->start_date), 'h:s d/m/Y')}}</span><br>
                                     <span>Kết thúc: {{date_format(date_create($value->end_date), 'h:s d/m/Y')}}</span>
@@ -86,10 +89,12 @@
                                                     </div>
                                                     <div class="form-group mb-2">
                                                         <label class="form-label">Chi nhánh</label>
-                                                        <select name="branch_id" class="form-control">
-                                                            <option value="">Tất cả cửa hàng</option>
+                                                        <select name="branch_id[]" multiple class="form-control selectpicker">
                                                             @foreach($branches as $branch)
-                                                                <option @if($branch->kiotviet_id == $value->branch_id) selected @endif value="{{$branch->kiotviet_id}}">{{$branch->branch_name}}</option>
+                                                                @php
+                                                                    $check = \App\Models\BannerBranch::where('banner_id', $value->id)->where('branch_id', $branch->id)->exists();
+                                                                @endphp
+                                                                <option @if($check) selected @endif value="{{$branch->id}}">{{$branch->branch_name}}</option>
                                                             @endforeach
                                                         </select>
                                                     </div>
@@ -159,7 +164,7 @@
                         </div>
                         <div class="form-group mb-2">
                             <label class="form-label">Hình ảnh(Tỷ lệ 2:1 1200x600px)</label>
-                            <input class="form-control" type="file" accept="image/png" name="image" required>
+                            <input class="form-control" type="file" accept="image/*" name="image" required>
                         </div>
                         <div class="form-group mb-2">
                             <label class="form-label">Đường link</label>
@@ -167,10 +172,9 @@
                         </div>
                         <div class="form-group mb-2">
                             <label class="form-label">Chi nhánh</label>
-                            <select name="branch_id" class="form-control">
-                                <option value="">Tất cả cửa hàng</option>
+                            <select name="branch_id[]" multiple class="form-control selectpicker">
                                 @foreach($branches as $branch)
-                                    <option value="{{ $branch->kiotviet_id }}">
+                                    <option value="{{ $branch->id }}">
                                         {{ $branch->branch_name }}
                                     </option>
                                 @endforeach
@@ -200,4 +204,11 @@
             </div>
         </div>
     </div>
+@endsection
+@section('script')
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap-select@1.14.0-beta3/dist/js/bootstrap-select.min.js"></script>
+
+    <script>
+        $('.selectpicker').selectpicker();
+    </script>
 @endsection

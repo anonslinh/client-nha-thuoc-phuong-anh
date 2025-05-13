@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\API\HelperApiController;
 use App\Models\Banner;
+use App\Models\BannerBranch;
 use App\Models\Branch;
 use App\Models\Gift;
 use App\Models\GiftInventories;
@@ -185,7 +186,15 @@ class GiftController extends HelperApiController
     public function banner (Request $request)
     {
         $listData = Banner::orderBy('created_at', 'desc')->paginate(20);
-
+        foreach ($listData as $value){
+            $branchID = BannerBranch::where('banner_id', $value->id)->pluck('branch_id')->toArray();
+            if (empty($branchID)){
+                $value->branch_name = 'Toàn hệ thống';
+            }else{
+                $branchName = Branch::whereIn('id', $branchID)->pluck('branch_name')->toArray();
+                $value->branch_name = implode(',', $branchName);
+            }
+        }
         $branches = Branch::all();
         return view('banner.index', compact('listData', 'branches'));
     }
@@ -200,7 +209,6 @@ class GiftController extends HelperApiController
             $nameFile = time().Str::random(10).'.'.$file->getClientOriginalExtension();
             $file->move('upload/banner/', $nameFile);
             $banner = new Banner([
-                'branch_id' => $request->get('branch_id'),
                 'title' => $request->get('name'),
                 'image_url' => 'upload/banner/'.$nameFile,
                 'redirect_url' => $request->get('redirect_url'),
@@ -208,6 +216,15 @@ class GiftController extends HelperApiController
                 'end_date' => $request->get('time_end')
             ]);
             $banner->save();
+            if (isset($request->branch_id)){
+                foreach ($request->get('branch_id') as $value){
+                    $bannerBranch = new BannerBranch([
+                        'banner_id' => $banner['id'],
+                        'branch_id' => $value
+                    ]);
+                    $bannerBranch->save();
+                }
+            }
             return back()->with(['success' => 'Thêm banner thành công']);
         }catch (\Exception $exception){
             return back()->with(['error' => 'Thêm banner thất bại.Vui lòng điền đầy đủ thông tin']);
@@ -232,11 +249,20 @@ class GiftController extends HelperApiController
             $banner->image_url = 'upload/banner/'.$nameFile;
         }
         $banner->title = $request->get('name');
-        $banner->branch_id = $request->get('branch_id');
         $banner->redirect_url = $request->get('link');
         $banner->start_date = $request->get('time_start');
         $banner->end_date = $request->get('time_end');
         $banner->save();
+        BannerBranch::where('banner_id', $banner->id)->delete();
+        if (isset($request->branch_id)){
+            foreach ($request->get('branch_id') as $value){
+                $bannerBranch = new BannerBranch([
+                    'banner_id' => $banner->id,
+                    'branch_id' => $value
+                ]);
+                $bannerBranch->save();
+            }
+        }
         return back()->with(['success' => 'Cập nhật dữ liệu thành công']);
     }
     /**

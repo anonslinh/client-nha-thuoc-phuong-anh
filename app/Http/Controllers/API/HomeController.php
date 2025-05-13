@@ -3,6 +3,7 @@
 
 namespace App\Http\Controllers\API;
 
+use App\Models\BannerBranch;
 use App\Models\Branch;
 use App\Models\Contacts;
 use App\Models\Customer;
@@ -66,15 +67,23 @@ class HomeController extends HelperApiController
     */
     public function getBanners(Request $request)
     {
-        $customer = $this->getCustomerByPhone($request->phone);
-        $branchId = $customer->branch_id ?? null;
-
+        $customer = $this->getCustomerByPhone($request->get('phone'));
+        if (isset($customer->branch_id)){
+            $branch = Branch::where('kiotviet_id', $customer->branch_id)->first();
+            if (isset($branch)){
+                $branchId = BannerBranch::where('branch_id', $branch->id)->pluck('banner_id')->toArray();
+            }else{
+                $branchId = [];
+            }
+        }else{
+            $branchId = [];
+        }
+        $bannerID = BannerBranch::pluck('banner_id')->toArray();
         //Ghi log đếm số lượng truy cập ứng dụng
         DailyActivitySummary::logAction($customer->kiotviet_id ?? null, 'access_to');
-
-        $banners = Banner::where(function ($query) use ($branchId) {
-            $query->whereNull('branch_id') // Banner toàn hệ thống
-            ->orWhere('branch_id', $branchId); // Banner cho chi nhánh cụ thể
+        $banners = Banner::where(function ($query) use ($branchId,$bannerID) {
+            $query->whereNotIn('id', $bannerID) // Banner toàn hệ thống
+            ->orWhereIn('id', $branchId); // Banner cho chi nhánh cụ thể
         })
             ->where('status', 'active')
             ->where(function ($query) {
