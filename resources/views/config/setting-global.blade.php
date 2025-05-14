@@ -157,6 +157,17 @@
                             </label>
                         </td>
                     </tr>
+                    <tr>
+                        <td>{{$index + 2}}</td>
+                        <td>Tùy chọn xuất mã QR khi đổi quà</td>
+                        <td>Tính năng chọn hình thức xuất mã QR khi đổi quà: Bật khi sử dụng mã lịch sử đổi quà để thuận tiện ghi chú và đối soát kế toán và Tăt khi sử dụng mã sản phẩm để nhân viên bán hàng quét lấy hàng nhanh</td>
+                        <td>
+                            <label class="switch">
+                                <input type="checkbox" name="gift_code" @if($giftCode == 1) checked @endif>
+                                <span class="slider round2"></span>
+                            </label>
+                        </td>
+                    </tr>
                     </tbody>
                 </table>
             </div>
@@ -263,6 +274,11 @@
         $('input[name="calculator_point"]').click(function () {
             var data = {};
             data['type'] = 'calculator_point';
+            setTypeSetting(data);
+        });
+        $('input[name="gift_code"]').click(function () {
+            var data = {};
+            data['type'] = 'gift_code';
             setTypeSetting(data);
         });
         function setTypeSetting(data) {

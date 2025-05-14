@@ -8,6 +8,7 @@ use App\Models\Branch;
 use App\Models\Contacts;
 use App\Models\Customer;
 use App\Models\DailyActivitySummary;
+use App\Models\ProgramBranch;
 use App\Models\Promotion;
 use App\Models\Slogan;
 use App\Models\TypeRankModel;
@@ -149,10 +150,20 @@ class HomeController extends HelperApiController
     public function getPrograms(Request $request)
     {
         $customer = $this->getCustomerByPhone($request->phone);
-        $branchId = $customer->branch_id ?? null;
-
+        $branchName = 'Toàn Hệ Thống';
+        if (isset($customer->branch_id)){
+            $branch = Branch::where('kiotviet_id', $customer->branch_id)->first();
+            if (isset($branch)){
+                $branchId = ProgramBranch::where('branch_id', $branch->id)->pluck('program_id')->toArray();
+                $branchName = $branch->branch_name;
+            }else{
+                $branchId = [];
+            }
+        }else{
+            $branchId = [];
+        }
         $perPage = $request->input('per_page', 10);
-
+        $programID = ProgramBranch::pluck('program_id')->toArray();
         $programs = Program::where('status', 'active')
             ->where(function ($query) {
                 $query->whereNull('start_date')->orWhere('start_date', '<=', now());
@@ -160,22 +171,20 @@ class HomeController extends HelperApiController
             ->where(function ($query) {
                 $query->whereNull('end_date')->orWhere('end_date', '>=', now());
             })
-            ->where(function ($query) use ($branchId) {
-                if ($branchId) {
-                    $query->where('branch_id', $branchId)->orWhereNull('branch_id');;
-                }
+            ->where(function ($query) use ($branchId, $programID) {
+                $query->whereNotIn('id', $programID)->orWhereIn('id', $branchId);
             })
             ->orderByDesc('priority')
             ->orderBy('start_date', 'asc')
             ->paginate($perPage);
 
-        $programs->getCollection()->transform(function ($program) {
+        $programs->getCollection()->transform(function ($program) use ($branchName) {
             return [
                 'id' => $program->id,
                 'title' => $program->title,
                 'description' => $program->description,
                 'branch_id' => $program->branch_id,
-                'branch_name' => optional($program->branch)->branch_name ?? 'Toàn hệ thống',
+                'branch_name' => $branchName,
                 'thumbnail' => $program->thumbnail,
                 'images' => json_decode($program->images),
                 'start_time' => $program->start_date,

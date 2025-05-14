@@ -190,7 +190,16 @@ class SettingController extends SyncController
             $settingCalculatorPoint->save();
         }
         $calculator_point = $settingCalculatorPoint->value;
-        return view('config.setting-global', compact('listData', 'type_point', 'timePoint', 'type_invoice', 'calculator_point'));
+        $settingGiftCode = GeneralSettings::where('code', 'gift_code')->first();
+        if (empty($settingGiftCode)){
+            $settingGiftCode = new GeneralSettings([
+                'code' => 'gift_code',
+                'value' => 0
+            ]);
+            $settingGiftCode->save();
+        }
+        $giftCode = $settingGiftCode->value;
+        return view('config.setting-global', compact('listData', 'type_point', 'timePoint', 'type_invoice', 'calculator_point', 'giftCode'));
     }
 
     /**

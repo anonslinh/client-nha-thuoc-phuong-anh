@@ -12,6 +12,7 @@ use App\Models\MembershipLevel;
 use App\Models\ProductGiftModel;
 use App\Models\ProductsModel;
 use App\Models\Program;
+use App\Models\ProgramBranch;
 use App\Models\Promotion;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -293,6 +294,13 @@ class GiftController extends HelperApiController
         $listData = $listData->orderBy('created_at', 'desc')->paginate(20);
         foreach ($listData as $value){
             $value->images = json_decode($value->images);
+            $branchID = ProgramBranch::where('program_id', $value->id)->pluck('branch_id')->toArray();
+            $branchName = Branch::whereIn('id', $branchID)->pluck('branch_name')->toArray();
+            if (empty($branchName)){
+                $value->branch_name = 'Toàn hệ thống';
+            }else{
+                $value->branch_name = implode(',',$branchName);
+            }
         }
         return view('program.index', compact('listData', 'branches'));
     }
@@ -320,7 +328,7 @@ class GiftController extends HelperApiController
             $program = new Program([
                 'title' => $request->get('title'),
                 'description' => $request->get('description'),
-                'branch_id' => $request->get('branch_id'),
+//                'branch_id' => $request->get('branch_id'),
                 'thumbnail' => 'upload/program/'.$nameFile,
                 'images' => json_encode($dataImage),
                 'join_link' => $request->get('join_link'),
@@ -329,6 +337,15 @@ class GiftController extends HelperApiController
                 'end_date' => $request->get('end_date')
             ]);
             $program->save();
+            if (isset($request->branch_id)){
+                foreach ($request->get('branch_id') as $value){
+                    $programBranch = new ProgramBranch([
+                        'program_id' => $program['id'],
+                        'branch_id' => $value
+                    ]);
+                    $programBranch->save();
+                }
+            }
             return redirect()->route('program.list-data')->with(['success' => 'Thêm chương trình thành công']);
         }catch (\Exception $exception){
             return back()->with(['error' => 'Thêm chương trình thất bại.Vui lòng điền đầy đủ thông tin']);
@@ -385,12 +402,21 @@ class GiftController extends HelperApiController
             }
             $program->title = $request->get('title');
             $program->join_link = $request->get('join_link')??null;
-            $program->branch_id = $request->get('branch_id');
             $program->start_date = $request->get('start_date');
             $program->end_date = $request->get('end_date');
             $program->description = $request->get('description');
             $program->images = json_encode($dataImage);
             $program->save();
+            ProgramBranch::where('program_id', $program->id)->delete();
+            if (isset($request->branch_id)){
+                foreach ($request->get('branch_id') as $value){
+                    $programBranch = new ProgramBranch([
+                        'program_id' => $program->id,
+                        'branch_id' => $value
+                    ]);
+                    $programBranch->save();
+                }
+            }
             return back()->with(['success' => 'Cập nhật dữ liệu thành công']);
         }catch (\Exception $exception){
             return back()->with(['error' => 'Cập nhật dữ liệu thất bại.Vui lòng kiểm tra lại']);

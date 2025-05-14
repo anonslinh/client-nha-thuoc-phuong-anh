@@ -40,6 +40,7 @@
                     <tr>
                         <th>STT</th>
                         <th>Tiêu đề</th>
+                        <th>Chi nhánh</th>
                         <th>Thời gian</th>
                         <th>Thao tác</th>
                     </tr>
@@ -54,10 +55,10 @@
                                         <img src="{{$value->thumbnail}}" class="rounded-2" width="52" height="42">
                                         <div class="ms-3">
                                             <h6 class="fw-semibold mb-1">{{$value->title}}</h6>
-                                            <span>{{$value->branch_name}}</span>
                                         </div>
                                     </div>
                                 </td>
+                                <td class="align-middle" style="max-width: 300px"><span>{{$value->branch_name}}</span></td>
                                 <td>
                                     <span>Bắt đầu: {{date_format(date_create($value->start_date), 'd/m/Y')}}</span><br>
                                     <span>Kết thúc: {{date_format(date_create($value->end_date), 'd/m/Y')}}</span>
