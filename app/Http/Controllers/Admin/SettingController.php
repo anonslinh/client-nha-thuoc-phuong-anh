@@ -16,6 +16,7 @@ use App\Models\KpiSetting;
 use App\Models\ProductPoint;
 use App\Models\SettingGlobal;
 use App\Models\Slogan;
+use App\Models\TermsExchangeGift;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -24,6 +25,7 @@ use Illuminate\Support\Str;
 use App\Services\KiotVietService;
 
 use App\Models\PersonalAccessTokens;
+use Illuminate\Http\Response;
 use Maatwebsite\Excel\Facades\Excel;
 
 class SettingController extends SyncController
@@ -199,7 +201,8 @@ class SettingController extends SyncController
             $settingGiftCode->save();
         }
         $giftCode = $settingGiftCode->value;
-        return view('config.setting-global', compact('listData', 'type_point', 'timePoint', 'type_invoice', 'calculator_point', 'giftCode'));
+        $termsExchangeGift = TermsExchangeGift::first();
+        return view('config.setting-global', compact('listData', 'type_point', 'timePoint', 'type_invoice', 'calculator_point', 'giftCode', 'termsExchangeGift'));
     }
 
     /**
@@ -468,5 +471,41 @@ class SettingController extends SyncController
         }
         $listData = $listData->orderBy('created_at', 'desc')->paginate(40);
         return view('config.history_point', compact('listData'));
+    }
+
+    // Điều khoản sử dụng
+    public function termsUpdate (Request $request)
+    {
+        $terms = TermsExchangeGift::first();
+        if(empty($terms)){
+            $terms = new TermsExchangeGift([
+                'title' => null,
+                'content' => $request->get('description')
+            ]);
+            $terms->save();
+        }else{
+            $terms->content = $request->get('description');
+            $terms->save();
+        }
+        return back()->with(['success' => 'Cập nhật điều khoản thành công']);
+    }
+
+    public function statusTerms (Request $request)
+    {
+        $terms = TermsExchangeGift::first(); 
+        if (empty($terms)) {
+            $terms = new TermsExchangeGift([
+                'active' => 1,
+            ]);
+            $terms->save();
+        }else{
+            if($terms->active == 1){
+                $terms->active = 0;
+            }else{
+                $terms->active = 1;
+            }
+            $terms->save();
+        }
+        return response()->json(['status' => true, 'msg' => 'Cập nhật thành công'], Response::HTTP_OK);
     }
 }

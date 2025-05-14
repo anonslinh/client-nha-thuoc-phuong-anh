@@ -22,6 +22,7 @@ use App\Models\CustomerSpendingSummary;
 use App\Models\MembershipLevel;
 use App\Models\Voucher;
 use App\Models\MiniGame;
+use App\Models\TermsExchangeGift;
 
 class HomeController extends HelperApiController
 {
@@ -137,10 +138,19 @@ class HomeController extends HelperApiController
         foreach ($gifts as $item){
             $item->branch_id = $branchId;
         }
+        $terms = TermsExchangeGift::first();
+        if(empty($terms)){
+            $terms = [
+                'title' => null,
+                'content' => null,
+                'active' => 0
+            ];
+        }
         return response()->json([
             'status' => true,
             'reward_point' => $rewardPoint,
             'data' => $gifts,
+            'terms_exchange_gift' => $terms
         ]);
     }
 

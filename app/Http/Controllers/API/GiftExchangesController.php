@@ -12,6 +12,7 @@ use App\Models\Customer;
 use App\Models\GiftExchanges;
 use App\Models\GiftInventories;
 use App\Models\Gift;
+use App\Models\TermsExchangeGift;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
@@ -180,7 +181,6 @@ class GiftExchangesController extends HelperApiController
                 $value->gift = $gift;
             }
         }
-
         return response()->json(['status' => true, 'data' => $giftExchanges], 200);
     }
 

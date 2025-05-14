@@ -236,9 +236,40 @@
                 </table>
             </div>
         </div>
+        <div class="card card-body py-3">
+            <div class="row align-items-center">
+                <div class="col-12">
+                    <div class="d-sm-flex align-items-center justify-space-between">
+                        <h4 class="mb-4 mb-sm-0 card-title">Điều khoản đổi quà</h4>
+                        <nav aria-label="breadcrumb" class="ms-auto">
+                            <ol class="breadcrumb">
+                                <li class="breadcrumb-item d-flex align-items-center">
+                                    <label class="switch">
+                                        <input type="checkbox" name="terms_exchange_gift" @if($termsExchangeGift->active??0 == 1) checked @endif value="2">
+                                        <span class="slider round2"></span>
+                                    </label>
+                                </li>
+                            </ol>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-body">
+                <form action="{{route('config.terms.update')}}" method="POST" class="mb-3">
+                    @csrf
+                    <label class="form-label">Điều khoản</label>
+                    <textarea id="mymce" name="description">{!! $termsExchangeGift->content??'' !!}</textarea>
+                    <button class="btn btn-success mt-3" id="updateTerms">Lưu</button>
+                </form>
+            </div>
+        </div>
     </div>
 @endsection
 @section('script')
+    <script src="assets/libs/tinymce/tinymce.min.js"></script>
+    <script src="assets/js/forms/tinymce-init.js"></script>
     <script>
         $('input[name="type_point"]').click(function () {
             $('input[name="type_point"]').prop('checked', false);
@@ -292,5 +323,16 @@
                 }
             });
         }
+        $('input[name="terms_exchange_gift"]').click(function () {
+            $.ajax({
+                url: "{{route('config.terms.active')}}",
+                type: "post",
+                data: null,
+                dataType: "json",
+                success: function (data) {
+                console.log(data);
+            }
+            });
+        })
     </script>
 @endsection
