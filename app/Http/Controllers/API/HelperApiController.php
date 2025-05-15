@@ -328,6 +328,7 @@ class HelperApiController extends Controller
                 $invoice = Invoice::updateOrCreate(
                     [
                         'kiotviet_id' => $invoiceData['id'],
+                        'code'            => $invoiceData['code'],
                         'contact_number'  => $customerSyncLog->phone,
                         'personal_access_token'  => $customerSyncLog->personal_access_token
                     ],
