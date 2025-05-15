@@ -5,12 +5,14 @@ namespace App\Http\Controllers\API;
 use App\Models\Branch;
 use App\Models\CustomerPointLog;
 use App\Models\DailyActivitySummary;
+use App\Models\GeneralSettings;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Models\Customer;
 use App\Models\GiftExchanges;
 use App\Models\GiftInventories;
 use App\Models\Gift;
+use App\Models\TermsExchangeGift;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
@@ -87,7 +89,7 @@ class GiftExchangesController extends HelperApiController
             CustomerPointLog::updateUsedPoints($customer->kiotviet_id, $pointsRequired, 'increase');
 
             // Tạo mã đổi quà duy nhất
-            $exchangeCode = $gift->code;
+            $exchangeCode = Str::random(5).time();
 
             // Lưu giao dịch đổi quà
             $exchange = GiftExchanges::create([
@@ -95,19 +97,40 @@ class GiftExchangesController extends HelperApiController
                 'contact_phone' => $customer->contact_number,
                 'gift_id' => $gift->id,
                 'branch_id' => $validatedData['branch_id'] ?? null,
-                'exchange_code' => $gift->code,
+                'exchange_code' => $exchangeCode,
                 'points_used' => $pointsRequired,
                 'exchange_date' => now(),
                 'status' => 'pending',
+                'gift_name' => $gift->name,
+                'gift_code' => $gift->code
             ]);
 
             DB::commit();
 
+            // Trả về dữ liệu qr code theo cài đặt Tùy chọn xuất mã QR khi đổi quà
+            $typeGiftCode = GeneralSettings::where('code', 'gift_code')->first()->value??0;
+            if ($typeGiftCode == 1){
+                $giftCode = $exchangeCode;
+            }else{
+                $giftCode = $gift->code;
+            }
+            $data = [
+                'customer_id' => $customer->kiotviet_id,
+                'contact_phone' => $customer->contact_number,
+                'gift_id' => $gift->id,
+                'branch_id' => $validatedData['branch_id'] ?? null,
+                'exchange_code' => $exchangeCode,
+                'points_used' => $pointsRequired,
+                'exchange_date' => now(),
+                'status' => 'pending',
+                'gift_name' => $gift->name,
+                'gift_code' => $giftCode
+            ];
             return response()->json([
                 'status' => true,
                 'message' => 'Đổi quà thành công',
                 'exchange_code' => $exchangeCode,
-                'data' => $exchange
+                'data' => $data
             ]);
         } catch (\Illuminate\Validation\ValidationException $exception) {
             return response()->json(['error' => $exception->errors()], 422);
@@ -135,9 +158,29 @@ class GiftExchangesController extends HelperApiController
         $giftExchanges = GiftExchanges::where('customer_id', $customer->kiotviet_id)
             ->orderByRaw("CASE WHEN status = 'pending' THEN 1 ELSE 2 END")
             ->orderBy('exchange_date', 'desc')
-            ->with('gift', 'branch')
+            ->with('branch')
             ->paginate($perPage);
-
+        $typeGiftCode = GeneralSettings::where('code', 'gift_code')->first()->value??0;
+        foreach ($giftExchanges as $value){
+            $gift = Gift::find($value->gift_id);
+            if (empty($gift)){
+                if ($typeGiftCode == 1){
+                    $code = $value->exchange_code;
+                }else{
+                    $code = $value->gift_code;
+                }
+                $gift = [
+                    'name' => $value->gift_name,
+                    'code' => $code
+                ];
+                $value->gift = $gift;
+            }else{
+                if ($typeGiftCode == 1){
+                    $gift['code'] = $value->exchange_code;
+                }
+                $value->gift = $gift;
+            }
+        }
         return response()->json(['status' => true, 'data' => $giftExchanges], 200);
     }
 

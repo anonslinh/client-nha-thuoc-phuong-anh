@@ -157,6 +157,17 @@
                             </label>
                         </td>
                     </tr>
+                    <tr>
+                        <td>{{$index + 2}}</td>
+                        <td>Tùy chọn xuất mã QR khi đổi quà</td>
+                        <td>Tính năng chọn hình thức xuất mã QR khi đổi quà: Bật khi sử dụng mã lịch sử đổi quà để thuận tiện ghi chú và đối soát kế toán và Tăt khi sử dụng mã sản phẩm để nhân viên bán hàng quét lấy hàng nhanh</td>
+                        <td>
+                            <label class="switch">
+                                <input type="checkbox" name="gift_code" @if($giftCode == 1) checked @endif>
+                                <span class="slider round2"></span>
+                            </label>
+                        </td>
+                    </tr>
                     </tbody>
                 </table>
             </div>
@@ -225,9 +236,40 @@
                 </table>
             </div>
         </div>
+        <div class="card card-body py-3">
+            <div class="row align-items-center">
+                <div class="col-12">
+                    <div class="d-sm-flex align-items-center justify-space-between">
+                        <h4 class="mb-4 mb-sm-0 card-title">Điều khoản đổi quà</h4>
+                        <nav aria-label="breadcrumb" class="ms-auto">
+                            <ol class="breadcrumb">
+                                <li class="breadcrumb-item d-flex align-items-center">
+                                    <label class="switch">
+                                        <input type="checkbox" name="terms_exchange_gift" @if($termsExchangeGift->active??0 == 1) checked @endif value="2">
+                                        <span class="slider round2"></span>
+                                    </label>
+                                </li>
+                            </ol>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card">
+            <div class="card-body">
+                <form action="{{route('config.terms.update')}}" method="POST" class="mb-3">
+                    @csrf
+                    <label class="form-label">Điều khoản</label>
+                    <textarea id="mymce" name="description">{!! $termsExchangeGift->content??'' !!}</textarea>
+                    <button class="btn btn-success mt-3" id="updateTerms">Lưu</button>
+                </form>
+            </div>
+        </div>
     </div>
 @endsection
 @section('script')
+    <script src="assets/libs/tinymce/tinymce.min.js"></script>
+    <script src="assets/js/forms/tinymce-init.js"></script>
     <script>
         $('input[name="type_point"]').click(function () {
             $('input[name="type_point"]').prop('checked', false);
@@ -265,6 +307,11 @@
             data['type'] = 'calculator_point';
             setTypeSetting(data);
         });
+        $('input[name="gift_code"]').click(function () {
+            var data = {};
+            data['type'] = 'gift_code';
+            setTypeSetting(data);
+        });
         function setTypeSetting(data) {
             $.ajax({
                 url: "{{route('config.set-type-invoice')}}",
@@ -276,5 +323,16 @@
                 }
             });
         }
+        $('input[name="terms_exchange_gift"]').click(function () {
+            $.ajax({
+                url: "{{route('config.terms.active')}}",
+                type: "post",
+                data: null,
+                dataType: "json",
+                success: function (data) {
+                console.log(data);
+            }
+            });
+        })
     </script>
 @endsection

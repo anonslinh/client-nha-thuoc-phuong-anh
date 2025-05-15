@@ -315,10 +315,20 @@ class HelperApiController extends Controller
     private function storeInvoices($invoicesData, $customerSyncLog, $firstCustomer)
     {
         try{
+            //Log lỗi kiểm tra hoá đơn
+            if (!is_array($invoicesData)) {
+                \Log::error('Dữ liệu invoicesData không hợp lệ', [
+                    'invoicesData' => $invoicesData,
+                    'phone' => $customerSyncLog->phone,
+                ]);
+                return;
+            }
+
             foreach ($invoicesData as $invoiceData) {
                 $invoice = Invoice::updateOrCreate(
                     [
                         'kiotviet_id' => $invoiceData['id'],
+                        'code'            => $invoiceData['code'],
                         'contact_number'  => $customerSyncLog->phone,
                         'personal_access_token'  => $customerSyncLog->personal_access_token
                     ],

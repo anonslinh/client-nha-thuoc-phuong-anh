@@ -20,6 +20,8 @@ class GiftExchanges extends Model
         'exchange_date',
         'status',
         'notes',
+        'gift_name',
+        'gift_code'
     ];
 
     // Quan hệ với bảng Gifts

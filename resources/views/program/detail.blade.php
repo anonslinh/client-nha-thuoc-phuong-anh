@@ -37,10 +37,12 @@
                     </div>
                     <div class="form-group mb-3">
                         <label class="form-label">Chi nhánh</label>
-                        <select name="branch_id" class="form-control">
-                            <option value="">Áp dụng cho tất cả chi nhánh</option>
+                        <select name="branch_id[]" multiple title="Tất cả chi nhánh" class="form-control selectpicker">
                             @foreach($branches as $branch)
-                                <option @if($branch->kiotviet_id == $program->branch_id) selected @endif value="{{$branch->kiotviet_id}}">{{$branch->branch_name}}</option>
+                                @php
+                                    $check = \App\Models\ProgramBranch::where('branch_id', $branch->id)->where('program_id', $program->id)->exists();
+                                @endphp
+                                <option @if($check) selected @endif value="{{$branch->id}}">{{$branch->branch_name}}</option>
                             @endforeach
                         </select>
                     </div>
@@ -64,7 +66,11 @@
         </div>
     </div>
 @endsection
+@section('style')
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-select@1.14.0-beta3/dist/css/bootstrap-select.min.css">
+@endsection
 @section('script')
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap-select@1.14.0-beta3/dist/js/bootstrap-select.min.js"></script>
     <script src="assets/libs/tinymce/tinymce.min.js"></script>
     <script src="assets/js/forms/tinymce-init.js"></script>
     <script>
@@ -81,6 +87,7 @@
                 input.value = values.join(",");
                 $(this).parent().remove();
             });
+            $('.selectpicker').selectpicker();
         });
     </script>
 @endsection

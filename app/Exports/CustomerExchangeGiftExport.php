@@ -2,6 +2,7 @@
 
 namespace App\Exports;
 
+use App\Models\Gift;
 use App\Models\GiftExchanges;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -24,10 +25,10 @@ class CustomerExchangeGiftExport implements FromCollection, WithHeadings, WithCo
     {
         $query = GiftExchanges::query()
                 ->join('customers', 'customers.kiotviet_id', '=', 'gift_exchanges.customer_id')
-                ->join('gifts', 'gifts.id', '=','gift_exchanges.gift_id')
-                ->select('gift_exchanges.*','customers.name as name_customer', 'gifts.name', 'gifts.code', 'gifts.image');
+                ->select('gift_exchanges.*','customers.name as name_customer');
 
         return $query->orderBy('customers.created_at', 'desc')->get()->map(function ($item) {
+            $gift = Gift::find($item->gift_id);
             if ($item->status == 'pending'){
                 $status = 'Chưa Nhận Quà';
             }elseif ($item->status == 'completed'){
@@ -35,11 +36,13 @@ class CustomerExchangeGiftExport implements FromCollection, WithHeadings, WithCo
             }else{
                 $status = 'Đã hủy';
             }
+            $nameGift = $gift->name??$item->gift_name;
+            $codeGift = $gift->code??$item->gift_code;
             return [
                 $item->name_customer,
                 $item->contact_phone,
-                $item->name,
-                $item->code,
+                $nameGift,
+                $codeGift,
                 $item->points_used,
                 $status,
                 date_format(date_create($item->created_at), 'H:i d/m/Y')

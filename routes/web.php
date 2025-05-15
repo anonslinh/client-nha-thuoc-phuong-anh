@@ -47,6 +47,7 @@ Route::middleware([CheckLogin::class])->group(function (){
     Route::get('customer-exchange-gift', [HomeController::class, 'customerExchangeGift'])->name('customer.exchange-gift');
     Route::get('export-customer-exchange-gift', [HomeController::class, 'exportCustomerExchangeGift'])->name('customer.export-exchange-gift');
     Route::get('customer-exchange-gift/{id}', [HomeController::class, 'customerExchangeGiftReturn'])->name('customer.exchange-gift-return');
+    Route::get('customer-exchange-gift-confirm/{id}', [HomeController::class, 'customerExchangeGiftConfirm'])->name('customer.exchange-gift-confirm');
     Route::get('customer-exchange-voucher', [HomeController::class, 'customerVoucher'])->name('customer.exchange-voucher');
     Route::get('customer', [HomeController::class, 'customer'])->name('customer');
     Route::get('export-customer', [HomeController::class, 'exportCustomer'])->name('customer.export');
@@ -149,6 +150,12 @@ Route::middleware([CheckLogin::class])->group(function (){
         Route::post('change-type-point', [SettingController::class, 'changeTypePoint'])->name('change-type-point');
         Route::post('set-time-point', [SettingController::class, 'setTimePoint'])->name('set-time-point');
         Route::post('set-type-invoice', [SettingController::class, 'typeInvoice'])->name('set-type-invoice');
+
+        //Cấu hình điều khoản khi đổi quà
+        Route::prefix('terms')->name('terms.')->group(function () {
+            Route::post('update', [SettingController::class, 'termsUpdate'])->name('update');
+            Route::post('active', [SettingController::class, 'statusTerms'])->name('active');
+        });
         //Cài đặt nhiều tài khoản kiotviet
         Route::get('index-account-branches', [SettingController::class, 'indexAccountBranches'])->name('index-account-branches');
         Route::post('store-account-branches', [SettingController::class, 'storeAccountBranch'])->name('store-account-branches');

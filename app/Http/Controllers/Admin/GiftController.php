@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\API\HelperApiController;
 use App\Models\Banner;
+use App\Models\BannerBranch;
 use App\Models\Branch;
 use App\Models\Gift;
 use App\Models\GiftInventories;
@@ -11,6 +12,7 @@ use App\Models\MembershipLevel;
 use App\Models\ProductGiftModel;
 use App\Models\ProductsModel;
 use App\Models\Program;
+use App\Models\ProgramBranch;
 use App\Models\Promotion;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -185,7 +187,15 @@ class GiftController extends HelperApiController
     public function banner (Request $request)
     {
         $listData = Banner::orderBy('created_at', 'desc')->paginate(20);
-
+        foreach ($listData as $value){
+            $branchID = BannerBranch::where('banner_id', $value->id)->pluck('branch_id')->toArray();
+            if (empty($branchID)){
+                $value->branch_name = 'Toàn hệ thống';
+            }else{
+                $branchName = Branch::whereIn('id', $branchID)->pluck('branch_name')->toArray();
+                $value->branch_name = implode(',', $branchName);
+            }
+        }
         $branches = Branch::all();
         return view('banner.index', compact('listData', 'branches'));
     }
@@ -200,7 +210,6 @@ class GiftController extends HelperApiController
             $nameFile = time().Str::random(10).'.'.$file->getClientOriginalExtension();
             $file->move('upload/banner/', $nameFile);
             $banner = new Banner([
-                'branch_id' => $request->get('branch_id'),
                 'title' => $request->get('name'),
                 'image_url' => 'upload/banner/'.$nameFile,
                 'redirect_url' => $request->get('redirect_url'),
@@ -208,6 +217,15 @@ class GiftController extends HelperApiController
                 'end_date' => $request->get('time_end')
             ]);
             $banner->save();
+            if (isset($request->branch_id)){
+                foreach ($request->get('branch_id') as $value){
+                    $bannerBranch = new BannerBranch([
+                        'banner_id' => $banner['id'],
+                        'branch_id' => $value
+                    ]);
+                    $bannerBranch->save();
+                }
+            }
             return back()->with(['success' => 'Thêm banner thành công']);
         }catch (\Exception $exception){
             return back()->with(['error' => 'Thêm banner thất bại.Vui lòng điền đầy đủ thông tin']);
@@ -232,11 +250,20 @@ class GiftController extends HelperApiController
             $banner->image_url = 'upload/banner/'.$nameFile;
         }
         $banner->title = $request->get('name');
-        $banner->branch_id = $request->get('branch_id');
         $banner->redirect_url = $request->get('link');
         $banner->start_date = $request->get('time_start');
         $banner->end_date = $request->get('time_end');
         $banner->save();
+        BannerBranch::where('banner_id', $banner->id)->delete();
+        if (isset($request->branch_id)){
+            foreach ($request->get('branch_id') as $value){
+                $bannerBranch = new BannerBranch([
+                    'banner_id' => $banner->id,
+                    'branch_id' => $value
+                ]);
+                $bannerBranch->save();
+            }
+        }
         return back()->with(['success' => 'Cập nhật dữ liệu thành công']);
     }
     /**
@@ -267,6 +294,13 @@ class GiftController extends HelperApiController
         $listData = $listData->orderBy('created_at', 'desc')->paginate(20);
         foreach ($listData as $value){
             $value->images = json_decode($value->images);
+            $branchID = ProgramBranch::where('program_id', $value->id)->pluck('branch_id')->toArray();
+            $branchName = Branch::whereIn('id', $branchID)->pluck('branch_name')->toArray();
+            if (empty($branchName)){
+                $value->branch_name = 'Toàn hệ thống';
+            }else{
+                $value->branch_name = implode(',',$branchName);
+            }
         }
         return view('program.index', compact('listData', 'branches'));
     }
@@ -294,7 +328,7 @@ class GiftController extends HelperApiController
             $program = new Program([
                 'title' => $request->get('title'),
                 'description' => $request->get('description'),
-                'branch_id' => $request->get('branch_id'),
+//                'branch_id' => $request->get('branch_id'),
                 'thumbnail' => 'upload/program/'.$nameFile,
                 'images' => json_encode($dataImage),
                 'join_link' => $request->get('join_link'),
@@ -303,6 +337,15 @@ class GiftController extends HelperApiController
                 'end_date' => $request->get('end_date')
             ]);
             $program->save();
+            if (isset($request->branch_id)){
+                foreach ($request->get('branch_id') as $value){
+                    $programBranch = new ProgramBranch([
+                        'program_id' => $program['id'],
+                        'branch_id' => $value
+                    ]);
+                    $programBranch->save();
+                }
+            }
             return redirect()->route('program.list-data')->with(['success' => 'Thêm chương trình thành công']);
         }catch (\Exception $exception){
             return back()->with(['error' => 'Thêm chương trình thất bại.Vui lòng điền đầy đủ thông tin']);
@@ -359,12 +402,21 @@ class GiftController extends HelperApiController
             }
             $program->title = $request->get('title');
             $program->join_link = $request->get('join_link')??null;
-            $program->branch_id = $request->get('branch_id');
             $program->start_date = $request->get('start_date');
             $program->end_date = $request->get('end_date');
             $program->description = $request->get('description');
             $program->images = json_encode($dataImage);
             $program->save();
+            ProgramBranch::where('program_id', $program->id)->delete();
+            if (isset($request->branch_id)){
+                foreach ($request->get('branch_id') as $value){
+                    $programBranch = new ProgramBranch([
+                        'program_id' => $program->id,
+                        'branch_id' => $value
+                    ]);
+                    $programBranch->save();
+                }
+            }
             return back()->with(['success' => 'Cập nhật dữ liệu thành công']);
         }catch (\Exception $exception){
             return back()->with(['error' => 'Cập nhật dữ liệu thất bại.Vui lòng kiểm tra lại']);

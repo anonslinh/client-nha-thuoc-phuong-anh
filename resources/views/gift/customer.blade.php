@@ -81,6 +81,7 @@
                                 <td class="align-middle">{{$value->points_used}}</td>
                                 <td class="align-middle">
                                     @if($value->status == 'pending')
+                                        <a href="{{route('customer.exchange-gift-confirm',$value->id)}}" class="btn btn-info mb-2">Đã nhận</a>
                                         <a href="{{route('customer.exchange-gift-return',$value->id)}}" class="btn btn-warning">Hoàn điểm</a>
                                     @endif
                                 </td>

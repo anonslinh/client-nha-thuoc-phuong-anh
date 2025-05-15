@@ -37,6 +37,10 @@ return new class extends Migration
             [
                 'code' => 'calculator_point',
                 'value' => 0
+            ],
+            [
+                'code' => 'gift_code',
+                'value' => 0
             ]
         ]);
     }

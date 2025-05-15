@@ -309,14 +309,13 @@ class HomeController
     {
         $listData = GiftExchanges::query();
         $listData = $listData->join('customers', 'customers.kiotviet_id', '=', 'gift_exchanges.customer_id')
-            ->join('gifts', 'gifts.id', '=','gift_exchanges.gift_id')
-            ->select('gift_exchanges.*','customers.name as name_customer', 'gifts.name', 'gifts.code', 'gifts.image');
+            ->select('gift_exchanges.*','customers.name as name_customer');
         if (isset($request->key_search)){
             $listData = $listData->where(function ($query) use ($request){
                $query->where('customers.name', 'like', '%'.$request->get('key_search').'%')
                    ->orWhere('gift_exchanges.contact_phone', 'like', '%'.$request->get('key_search').'%')
-                   ->orWhere('gifts.name', 'like', '%'.$request->get('key_search').'%')
-                   ->orWhere('gifts.code', 'like', '%'.$request->get('key_search').'%')
+                   ->orWhere('gift_exchanges.gift_name', 'like', '%'.$request->get('key_search').'%')
+                   ->orWhere('gift_exchanges.gift_code', 'like', '%'.$request->get('key_search').'%')
                    ->orWhere('gift_exchanges.exchange_code', 'like', '%'.$request->get('key_search').'%');
             });
         }
@@ -324,6 +323,12 @@ class HomeController
             $listData = $listData->where('gift_exchanges.status', $request->get('status'));
         }
         $listData = $listData->orderBy('created_at', 'desc')->paginate(20);
+        foreach ($listData as $value){
+            $gift = Gift::find($value->gift_id);
+            $value->name = $gift->name??$value->gift_name;
+            $value->code = $gift->code??$value->gift_code;
+            $value->image = $gift->image??null;
+        }
         return view('gift.customer', compact('listData'));
     }
     /**
@@ -462,5 +467,19 @@ class HomeController
                 return back()->with(['error' => 'Đã có lỗi xảy ra.Vui lòng tạo tài khoản trên hệ thống bán hàng trước']);
             }
         }
+    }
+
+    public function customerExchangeGiftConfirm ($id)
+    {
+        $giftExchange = GiftExchanges::find($id);
+        if (empty($giftExchange)){
+            return back()->with(['error' => 'Dữ liệu không tồn tại.Vui lòng kiểm tra lại']);
+        }
+        if ($giftExchange->status != 'pending'){
+            return back()->with(['error' => 'Không thể hoàn điểm cho khách hàng khi trạng thái không phải là chưa sử dụng']);
+        }
+        $giftExchange->status = 'completed';
+        $giftExchange->save();
+        return back()->with(['success' => 'Xác nhận cho khách hàng thành công']);
     }
 }

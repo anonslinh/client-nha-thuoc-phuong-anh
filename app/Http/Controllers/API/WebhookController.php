@@ -8,8 +8,9 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Http;
+use App\Http\Controllers\API\HomeController;
 
-class WebhookController extends Controller
+class WebhookController extends HelperApiController
 {
     /**
      * Đăng ký webhook
@@ -34,37 +35,30 @@ class WebhookController extends Controller
                     ]
                 ]);
 
-            dd($response->json());
+            return response($response, 200);
         }catch (\Exception $exception){
-            dd($exception);
+            Log::info('Webhook register.webhook error', $exception->getMessage());
         }
     }
 
     /**
-     * Webhook hoá đơn
+     * Webhook khách hàng
+     * customer.update
     */
-    public function invoiceUpdate(Request $request)
+    public function customerUpdateWebhook(Request $request)
     {
-        $secret = base64_decode('winbaby14081995'); // KHÔNG dùng mã hóa Base64 ở đây
+        try{
+            $payload_data = $request->all();
+            foreach ($payload_data['Notifications'] as $payload_datum){
+                foreach ($payload_datum['Data'] as $datum){
+                    $phone = $this->normalizePhone($datum['ContactNumber']);
 
-        $payload = $request->getContent();
-        $signatureFromHeader = $request->header('X-Hub-Signature');
-        $generatedSignature = hash_hmac('sha256', $payload, $secret);
-
-        if (!hash_equals($generatedSignature, $signatureFromHeader)) {
-            Log::warning('Webhook invoice.update - Signature mismatch', [
-                'expected' => $generatedSignature,
-                'received' => $signatureFromHeader,
-            ]);
-            return response('Unauthorized', 401);
+                    $this->syncCustomerInvoices($phone);
+                }
+            }
+            return response('OK', 200);
+        }catch (\Exception $exception){
+            Log::info('Webhook customer.update error', $exception->getMessage());
         }
-
-        // ✅ Dữ liệu hợp lệ - xử lý payload
-        $data = $request->all();
-        Log::info('Webhook invoice.update received', $data);
-
-        // TODO: Ghi log, cập nhật đơn hàng trong DB nếu cần...
-
-        return response('OK', 200);
     }
 }
