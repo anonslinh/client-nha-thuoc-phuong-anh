@@ -92,5 +92,4 @@ Route::prefix('pharmacy')->group(function (){
 });
 //WebhookKiotviet
 Route::post('register-webhook', [WebhookController::class, 'registerWebhook']);
-Route::post('invoices-webhook', [WebhookController::class, 'invoiceUpdate']);
 Route::post('customers-webhook', [WebhookController::class, 'customerUpdateWebhook']);
