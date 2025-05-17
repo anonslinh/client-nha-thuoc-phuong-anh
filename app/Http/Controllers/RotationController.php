@@ -24,6 +24,7 @@ use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use App\Http\Controllers\API\HelperApiController;
+use App\Models\InterfaceRotation;
 use Maatwebsite\Excel\Facades\Excel;
 
 class RotationController extends HelperAdminController
@@ -35,7 +36,8 @@ class RotationController extends HelperAdminController
         if (!empty($rotation)){
            $dataRule = $rotation->DataRuleRotation;
         }
-        return view('rotation.index', compact('rotation', 'dataRule'));
+        $interface_rotation = InterfaceRotation::first();
+        return view('rotation.index', compact('rotation', 'dataRule', 'interface_rotation'));
     }
 
     public function create (Request $request)
@@ -784,5 +786,43 @@ class RotationController extends HelperAdminController
     public function exportExchangeGiftCheckin (Request $request)
     {
         return Excel::download(new RotationExchangeGiftCheckinExport($request), 'Lich-su-doi-qua-vong-quay-checkin.xlsx');
+    }
+
+    /**
+     * Giao diện vòng quay
+    **/
+    public function interface(Request $request){
+        $logo = null;
+        if($request->hasFile('logo')){
+            $file = $request->file('logo');
+            $nameFile = 'logo'.time().Str::random(10).'.'.$file->getClientOriginalExtension();
+            $file->move('upload/rotation/', $nameFile);
+            $logo = 'upload/rotation/'.$nameFile;
+        }
+        $background = null;
+        if($request->hasFile('background')){
+            $file = $request->file('background');
+            $nameFile = 'background'.time().Str::random(10).'.'.$file->getClientOriginalExtension();
+            $file->move('upload/rotation/', $nameFile);
+            $background = 'upload/rotation/'.$nameFile;
+        }
+        $interface = InterfaceRotation::first();
+        if(isset($interface)){
+            $interface->logo = $logo??$interface->logo;
+            $interface->background = $background??$interface->background;
+        }else{
+            $interface = new InterfaceRotation([
+                'logo' => $logo,
+                'background' => $background
+            ]);
+        }
+        $interface->save();
+        return back()->with(['success' => 'Cập nhập giao diện vòng quay thành công']);
+    }
+
+    public function interfaceAPI ()
+    {
+        $interface = InterfaceRotation::first();
+        return response()->json(['status' => true, 'data' => $interface], 200);
     }
 }

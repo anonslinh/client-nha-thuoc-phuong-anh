@@ -1,4 +1,3 @@
-
 const { useState, useEffect, useRef, useContext } = React
 
 // API endpoints
@@ -7,7 +6,8 @@ const baseUrl = window.location.origin + '/';
 const API = {
     getMyGift: () => baseUrl + "api/rotation/get-my-gift",
     exchangeGift: () => baseUrl + "api/rotation/exchange-gift",
-    getListGift:()=> baseUrl + "api/rotation/list-gift"
+    getListGift:()=> baseUrl + "api/rotation/list-gift",
+    interface: () => baseUrl + "api/rotation/interface"
 }
 
 // Hàm gọi API với Axios
@@ -57,7 +57,9 @@ function App() {
     const skewY = 90 - rotate
     const timeRotate = 7000
     const [showModalGift,setShowModalGift]=React.useState(false)
-
+    const [logo, setLogo] = React.useState('assets/static/logo.png')
+    const [background, setBackground] = React.useState('assets/static/background.png')
+ 
     const rotateWheel = (currentRotate, index) => {
         refT.current = `rotate(${currentRotate - index * rotate - rotate / 2}deg)`
     }
@@ -81,7 +83,20 @@ function App() {
         })
         return list[0]
     }
-
+    const getInterface = async () => {
+        const res = await REQUEST_API({
+                url: API.interface(),
+                method: "get",
+                data: null
+            })
+            if(res.status){                
+                setLogo(res.data.logo);
+                setBackground(res.data.background)
+            }
+    }
+    useEffect(() => {        
+        getInterface() 
+    }, [])
 
     const getListGift = async () => {
         try {
@@ -175,33 +190,6 @@ function App() {
             setLoading(false)
         }
     }
-
-    const postMyGift = async item => {
-        try {
-            setLoading(true)
-            const formData = new FormData()
-            formData.append("phone", phoneUser)
-            formData.append("app_id", "your-app-id")
-            formData.append("product_id", item.id.toString())
-            const res = await REQUEST_API({
-                url: API.getMyGift(),
-                method: "post",
-                data: formData
-            })
-            if (!res.status && res.msg?.includes("Chưa follow OA")) {
-                setIsFollowOA(false)
-            } else if (res.status) {
-                setListMyGift(res.response)
-            } else {
-                alert(res.msg)
-            }
-        } catch (error) {
-            console.log(error)
-        } finally {
-            setLoading(false)
-        }
-    }
-
 
     const ModalShowListGift = React.forwardRef((props, ref) => {
         const [showModal, setShowModal] = useState(false)
@@ -433,22 +421,22 @@ function App() {
 
 
     return (
-        <div className="main max-w-lg min-h-screen w-full m-auto">
+        <div className="main max-w-lg min-h-screen w-full m-auto" style={{ backgroundImage: `url(${background})`}}>
         <div className="py-4 flex flex-col items-center justify-center">
         {/* logo  */}
         <div className="mt-12">
         <img
-    src={"assets/static/logo.png"}
-    alt="logo"
-    style={{width: "200px"}}
-    className="w-64 h-auto object-cover"
+            src={logo}
+            alt="logo"
+            style={{width: "200px"}}
+            className="w-64 h-auto object-cover"
         />
         </div>
         <div className="flex items-center justify-between w-full pt-2 relative">
         <img
-    src={"assets/static/firework.png"}
-    alt="logo"
-    className="w-20 h-14 object-cover"
+            src={"assets/static/firework.png"}
+            alt="logo"
+            className="w-20 h-14 object-cover"
         />
         <span className="text-xl text-center text-white font-bold mx-auto">
         Bạn có {countSpin} lượt quay
@@ -558,14 +546,13 @@ function App() {
                 showLogin && (
                     <div className={'fixed top-0 left-0 right-0 bottom-0 h-screen w-screen  z-50'}>
                         <div
-                            className="relative main flex flex-col justify-center items-center h-full w-full "
-
+                            className="relative main flex flex-col justify-center items-center h-full w-full " style={{ backgroundImage: `url(${background})` }}
                         >
 
                         <div className="px-2 w-full ">
                             <div className="absolute top-20  w-full flex justify-center ">
                                 <img
-                                    src={"assets/static/logo.png"}
+                                    src={logo}
                                     alt="logo"
                                     style={{width: "200px"}}
                                     className="w-64 h-auto object-cover"

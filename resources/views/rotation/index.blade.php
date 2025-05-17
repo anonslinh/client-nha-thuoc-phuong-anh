@@ -105,6 +105,68 @@
                 </form>
             </div>
         </div>
+        <div class="card card-body py-3">
+            <div class="row align-items-center">
+                <div class="col-12">
+                    <div class="d-sm-flex align-items-center justify-space-between">
+                        <h4 class="mb-4 mb-sm-0 card-title">Cài đặt giao diện vòng quay may mắn</h4>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card card-body py-3">
+            <table class="table table-border">
+                <thead>
+                    <tr>
+                        <th>Logo</th>
+                        <th>Backgroup</th>
+                        <th>Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <img src="{{$interface_rotation->logo??''}}" style="width: 150px"/>
+                        </td>
+                        <td>
+                            <img src="{{$interface_rotation->background??''}}" style="width: 150px"/>
+                        </td>
+                        <td>
+                            <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#modalCreate">Cập nhật</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="modal fade" id="modalCreate" tabindex="-1">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header d-flex align-items-center">
+                    <h4 class="modal-title" id="myLargeModalLabel">
+                        Cập nhật giao diện vòng quay
+                    </h4>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form action="{{route('rotation.interface')}}" method="post" class="modal-content" enctype="multipart/form-data">
+                    @csrf
+                    <div class="modal-body">
+                        <div class="form-group mb-2">
+                            <label class="form-label">Logo(Tỷ lệ 2:1 1200x600px)</label>
+                            <input class="form-control" type="file" accept="image/*" name="logo">
+                        </div>
+                        <div class="form-group mb-2">
+                            <label class="form-label">Ảnh nền (Tỷ lệ như màn hình điện thoại)</label>
+                            <input class="form-control" type="file" accept="image/*" name="background">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                        <button class="btn btn-primary">Xác nhận</button>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
 @endsection
 @section('script')
