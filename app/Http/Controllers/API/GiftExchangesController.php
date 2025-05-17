@@ -87,9 +87,10 @@ class GiftExchangesController extends HelperApiController
 
             //Lưu log số điểm đã dùng
             CustomerPointLog::updateUsedPoints($customer->kiotviet_id, $pointsRequired, 'increase');
-
+            
             // Tạo mã đổi quà duy nhất
-            $exchangeCode = Str::random(5).time();
+            $maxID = GiftExchanges::max('id') + 1;
+            $exchangeCode = $this->kiotVietService->encodeId($maxID);
 
             // Lưu giao dịch đổi quà
             $exchange = GiftExchanges::create([

@@ -214,4 +214,20 @@ class KiotVietService
         }
         return $customer;
     }
+
+        /**
+     * Tạo ra mã số theo id bản ghi
+     */
+    public function encodeId($id) {
+        $length = 8;
+        $characters = 'A7F2D9KQX8M1Z3R0PLNBV6E5H4CTWYGU';
+        $base = strlen($characters);
+        $str = '';
+        $num = ($id * 54673181) % 1000000000;
+        do {
+            $str = $characters[$num % $base] . $str;
+            $num = floor($num / $base);
+        } while ($num > 0);
+        return str_pad($str, $length, $characters[0], STR_PAD_LEFT);
+    }
 }

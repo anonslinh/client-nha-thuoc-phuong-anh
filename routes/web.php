@@ -52,7 +52,7 @@ Route::middleware([CheckLogin::class])->group(function (){
     Route::get('customer', [HomeController::class, 'customer'])->name('customer');
     Route::get('export-customer', [HomeController::class, 'exportCustomer'])->name('customer.export');
     Route::post('customer/plus-points', [HomeController::class, 'plusPointCustomer'])->name('customer.plus-point');
-    Route::get('logout', [HomeController::class, 'logout'])->name('logout');
+    Route::post('customer/exchange-code', [HomeController::class, 'exchangeCodeCustomer'])->name('customer.exchange-code');
     Route::prefix('gift')->name('gift.')->group(function (){
         Route::get('index', [GiftController::class, 'index'])->name('index');
         Route::get('created', [GiftController::class, 'created'])->name('created');
@@ -258,6 +258,7 @@ Route::middleware([CheckLogin::class])->group(function (){
           Route::get('exchange-gift', [RotationController::class, 'exchangeGiftCheckin'])->name('exchange-gift');
           Route::get('export-exchange-gift', [RotationController::class, 'exportExchangeGiftCheckin'])->name('export-exchange-gift');
        });
+       Route::post('interface', [RotationController::class, 'interface'])->name('interface');
     });
     //Giấy chứng nhận sản phẩm
     Route::prefix('certificates')->name('certificates.')->group(function () {
@@ -281,6 +282,7 @@ Route::middleware([CheckLogin::class])->group(function (){
         Route::get('prescription', [PharmacyController::class, 'indexPrescription'])->name('prescription');
         Route::get('prescription-detail/{id}', [PharmacyController::class, 'showPrescription'])->name('prescription-detail');
     });
+    Route::get('logout', [HomeController::class, 'logout'])->name('logout');
 });
 // Giao diện vòng quay
 Route::get('play-rotation', [RotationController::class, 'playRotation']);

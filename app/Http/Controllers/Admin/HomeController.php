@@ -7,7 +7,9 @@ namespace App\Http\Controllers\Admin;
 use App\Exports\CustomerExchangeGiftExport;
 use App\Exports\CustomerExport;
 use App\Models\AccountBranches;
+use App\Models\Branch;
 use App\Models\Customer;
+use App\Models\CustomerPointLog;
 use App\Models\CustomerRank;
 use App\Models\Gift;
 use App\Models\GiftExchanges;
@@ -20,8 +22,10 @@ use App\Models\Voucher;
 use App\Models\VoucherExchanges;
 use App\Services\KiotVietService;
 use Carbon\Carbon;
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
@@ -371,7 +375,10 @@ class HomeController
         // Phân trang 20 bản ghi
         $listData = $listData->paginate(20);
 
-        return view('customer.index', compact('listData'));
+        $listGift = Gift::where('is_display', 1)->get();
+        $branch = Branch::where('is_active', 1)->get();
+
+        return view('customer.index', compact('listData','listGift', 'branch'));
     }
 
     /**
@@ -481,5 +488,58 @@ class HomeController
         $giftExchange->status = 'completed';
         $giftExchange->save();
         return back()->with(['success' => 'Xác nhận cho khách hàng thành công']);
+    }
+
+    /* Đổi quà quà cho khách */
+    public function exchangeCodeCustomer (Request $request)
+    {
+        DB::beginTransaction();
+        try{
+            $customer = Customer::where('id', $request->get('customer_id'))->lockForUpdate()->first();
+            if(empty($customer)){
+                return response()->json(['status' => false, 'msg' => 'Vui lòng chọn khách hàng để đổi quà hộ'], 200);
+            }
+            $gift = Gift::find($request->get('gift_id'));
+            if(empty($gift)){
+                return response()->json(['status' => false, 'msg' => 'Vui lòng chọn quà tặng để đổi quà hộ'], 200);
+            }
+            $quantity = GiftInventories::where('gift_id', $request->get('gift_id'))->where('branch_id', $request->get('branch_id'))->first();
+            if(empty($quantity)){
+                return response()->json(['status' => false, 'msg' => 'Chi nhánh này đã hết quà.Vui lòng kiểm tra lại'], 200);
+            }
+            if($quantity->quantity < 1){
+                return response()->json(['status' => false, 'msg' => 'Chi nhánh này đã hết quà.Vui lòng kiểm tra lại'], 200);
+            }
+            if($customer->reward_point < $gift->points_required){
+                return response()->json(['status' => false, 'msg' => 'Số điểm hiện tại của khách hàng không đủ để đổi phần quà này'], 200);   
+            }
+            $customer->reward_point -= $gift->points_required;
+            $customer->save();
+            //Lưu log số điểm đã dùng
+            CustomerPointLog::updateUsedPoints($customer->kiotviet_id, $gift->points_required, 'increase');
+            
+            // Tạo mã đổi quà duy nhất
+            $maxID = GiftExchanges::max('id') + 1;
+            $exchangeCode = $this->kiotVietService->encodeId($maxID);
+
+            // Lưu giao dịch đổi quà
+            GiftExchanges::create([
+                'customer_id' => $customer->kiotviet_id,
+                'contact_phone' => $customer->contact_number,
+                'gift_id' => $gift->id,
+                'branch_id' => $request->get('branch_id') ?? null,
+                'exchange_code' => $exchangeCode,
+                'points_used' => $gift->points_required,
+                'exchange_date' => now(),
+                'status' => 'pending',
+                'gift_name' => $gift->name,
+                'gift_code' => $gift->code
+            ]);
+            DB::commit();
+            return response()->json(['status' => true, 'msg' => 'Đổi quà thành công', 'exchange_code' => $exchangeCode], 200);
+        }catch (\Exception $exception){
+            DB::rollBack();
+            return response()->json(['status' => false, 'msg' => $exception->getMessage()], 200);
+        }
     }
 }

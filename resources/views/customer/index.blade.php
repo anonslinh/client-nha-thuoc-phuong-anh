@@ -49,6 +49,7 @@
                         <th>Tổng đơn hàng</th>
                         <th>Điểm kiotviet</th>
                         <th>Điểm hệ thống</th>
+                        <th>Đổi quà hộ</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -68,6 +69,9 @@
                                 </td>
                                 <td class="align-middle">{{$value->kiotviet_reward_point}}</td>
                                 <td class="align-middle">{{$value->reward_point}}</td>
+                                <td class="align-middle">
+                                    <button class="justify-content-center badge fw-medium fs-2 btn btn-rounded btn-danger d-flex align-items-center btnExchangeGift" value="{{$value->id}}">Đổi quà hộ</button>
+                                </td>
                             </tr>
                         @endforeach
                     @else
@@ -126,4 +130,85 @@
             </form>
         </div>
     </div>
+    <div class="modal fade" id="customer-gift-exchange" tabindex="-1" aria-labelledby="vertical-center-modal" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+            <form action="{{route('customer.exchange-code')}}" id="giftExchange" method="post" class="modal-content">
+                @csrf
+                <input name="customer_id" hidden/>
+                <div class="modal-header d-flex align-items-center">
+                    <h4 class="modal-title" id="myLargeModalLabel">Đổi quà hộ cho khách hàng</h4>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group" style="min-height: 300px">
+                        <label class="mb-2">Quà tặng</label>
+                        <select class="form-control selectpicker" name="gift_id" data-live-search="true" title="Chọn quà tặng">
+                            @foreach ($listGift as $gift)
+                                <option data-tokens="{{$gift->name}}" value="{{$gift->id}}">{{$gift->name}}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="form-group" style="min-height: 250px">
+                        <label class="mb-2">Chi nhánh</label>
+                        <select class="form-control selectpicker" name="branch_id" data-live-search="true" title="Chọn chi nhánh">
+                            @foreach ($branch as $item)
+                                <option data-tokens="{{$item->branch_name}}" value="{{$item->id}}">{{$item->branch_name}}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
+            
+            
+                <div class="modal-footer">
+                    <button type="button" class="btn bg-danger-subtle text-danger  waves-effect text-start" data-bs-dismiss="modal">
+                        Close
+                    </button>
+                    <button class="btn bg-success text-white  waves-effect text-start">
+                        Xác nhận
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+@endsection
+@section('style')
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-select@1.14.0-beta3/dist/css/bootstrap-select.min.css">
+@endsection
+@section('script')
+<script src="https://cdn.jsdelivr.net/npm/bootstrap-select@1.14.0-beta3/dist/js/bootstrap-select.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $('.selectpicker').selectpicker();
+        $(".btnExchangeGift").click(function(){
+            var customer_id = $(this).val();
+            $("#customer-gift-exchange input[name='customer_id']").val(customer_id);
+            $("#customer-gift-exchange").modal("show");
+        });
+        $("#giftExchange").submit(function(e){
+            e.preventDefault();
+            $.ajax({
+                url: $(this).attr('action'),
+                type: "post",
+                data: $(this).serialize(),
+                dataType: "json",
+                success: function (data){
+                    $("#customer-gift-exchange").modal("hide");
+                    if(data.status){
+                        Swal.fire({
+                            type: "success",
+                            title: data.msg,
+                            text: "Mã đổi quà là: "+ data.exchange_code
+                        });
+                    }else{
+                        Swal.fire({
+                            type: "error",
+                            title: "Đổi quà thất bại",
+                            text: data.msg
+                        });
+                    }
+                }
+            })
+        })
+    });
+</script>
 @endsection

@@ -7,7 +7,8 @@ const baseUrl = window.location.origin + '/';
 const API = {
     exchangeGift: () => baseUrl + "api/rotation-checkin/exchange-gift",
     getBranch: () => baseUrl + "api/branches",
-    listGiftCheckRotationCheck: ()=>baseUrl+'api/rotation-checkin/list-gift'
+    listGiftCheckRotationCheck: ()=>baseUrl+'api/rotation-checkin/list-gift',
+    interface: () => baseUrl + "api/rotation/interface"
 }
 
 // Hàm gọi API với Axios
@@ -53,6 +54,8 @@ function App() {
     const [imageCheckin, setImageCheckin] = React.useState(null);
     const [selectedFile, setSelectedFile] = React.useState(null);
     const [showModalAlert, setShowModalAlert] = useState(false)
+    const [logo, setLogo] = React.useState('assets/static/logo.png')
+    const [background, setBackground] = React.useState('assets/static/background.png')
 
     const fileCheckinInputRef = React.useRef(null);
 
@@ -61,13 +64,21 @@ function App() {
         refT.current = `rotate(${currentRotate - index * rotate - rotate / 2}deg)`
     }
 
+    const getInterface = async () => {
+        const res = await REQUEST_API({
+                url: API.interface(),
+                method: "get",
+                data: null
+            })
+            if(res.status){                
+                setLogo(res.data.logo);
+                setBackground(res.data.background)
+            }
+    }
     useEffect(()=>{
         getListBranch()
+        getInterface()
     },[]);
-
-    useEffect(()=>{
-        console.log('branch_id',branch_id)
-    },[branch_id]);
 
     const getGift = () => {
         const randomNumber = Math.random()
@@ -259,12 +270,12 @@ function App() {
         }
     }
     return (
-        <div className="main max-w-lg min-h-screen w-full m-auto">
+        <div className="main max-w-lg min-h-screen w-full m-auto" style={{ backgroundImage: `url(${background})`}}>
             <div className="py-4 flex flex-col items-center justify-center">
                 {/* logo  */}
                 <div className="mt-12">
                     <img
-                        src={"assets/static/logo.png"}
+                        src={logo}
                         alt="logo"
                         style={{width: "200px"}}
                         className="w-64 h-auto object-cover"
@@ -368,7 +379,7 @@ function App() {
                                 <div className="bg-white p-2 w-full rounded-md">
                                     <div className=" w-full mt-5 flex justify-center ">
                                         <img
-                                            src={"assets/static/logo.png"}
+                                            src={logo}
                                             alt="logo"
                                             style={{width: "200px"}}
                                             className="w-64 h-auto object-cover"
