@@ -38,7 +38,8 @@
                     </div>
                     <button class="btn btn-primary" style="margin-right: 15px">Tìm kiếm</button>
                     <a href="{{route('customer')}}" style="margin-right: 15px" class="btn btn-danger">Hủy</a>
-                    <a href="{{route('customer.export')}}" class="btn btn-warning">Xuất Excel</a>
+                    <a href="{{route('customer.export')}}" class="btn btn-warning" style="margin-right: 15px">Xuất Excel</a>
+                    <button class="btn btn-info" type="button" data-bs-toggle="modal" data-bs-target="#checkPointCustomer">Kiểm tra điểm và đổi quà hộ</button>
                 </form>
                 <table class="table table-bordered mt-4">
                     <thead>
@@ -140,21 +141,25 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <div class="form-group" style="min-height: 300px">
+                    <div class="form-group">
                         <label class="mb-2">Quà tặng</label>
-                        <select class="form-control selectpicker" name="gift_id" data-live-search="true" title="Chọn quà tặng">
+                        <input class="form-control" name="name_gift" placeholder="Nhập tên quà tặng"/>
+                        <input name="gift_id" hidden/>
+                        <ul class="list mb-0 p-0" style="height: 250px; overflow:auto">
                             @foreach ($listGift as $gift)
-                                <option data-tokens="{{$gift->name}}" value="{{$gift->id}}">{{$gift->name}}</option>
+                                <li class="p-2 data-item-gift cursor-pointer" data-tokens="{{$gift->name}}" value="{{$gift->id}}">{{$gift->name}}</li>
                             @endforeach
-                        </select>
+                        </ul>
                     </div>
-                    <div class="form-group" style="min-height: 250px">
+                    <div class="form-group">
                         <label class="mb-2">Chi nhánh</label>
-                        <select class="form-control selectpicker" name="branch_id" data-live-search="true" title="Chọn chi nhánh">
+                        <input class="form-control" name="name_branch" placeholder="Nhập tên chi nhánh"/>
+                        <input name="branch_id" hidden/>
+                        <ul class="list mb-0 p-0" style="height: 250px; overflow:auto">
                             @foreach ($branch as $item)
-                                <option data-tokens="{{$item->branch_name}}" value="{{$item->id}}">{{$item->branch_name}}</option>
+                                <li class="p-2 data-item-branch cursor-pointer" data-tokens="{{$item->branch_name}}" value="{{$item->id}}">{{$item->branch_name}}</li>
                             @endforeach
-                        </select>
+                        </ul>
                     </div>
                 </div>
             
@@ -170,6 +175,50 @@
             </form>
         </div>
     </div>
+    {{-- // Modal đổi quà hộ cho khách hàng // --}}
+    <div class="modal fade" id="checkPointCustomer" tabindex="-1" aria-labelledby="vertical-center-modal" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header d-flex align-items-center">
+                    <h4 class="modal-title" id="myLargeModalLabel">Kiểm tra điểm cho khách </h4>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label class="mb-2">Số điện thoại khách hàng</label>
+                        <input name="phone" maxlength="10" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <table class="table table-bordered mt-4">
+                            <thead>
+                                <tr>
+                                    <th>Mã KH</th>
+                                    <th>Tên KH</th>
+                                    <th>Điểm KH</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><span class="code-customer"></span></td>
+                                    <td><span class="name-customer"></span></td>
+                                    <td><span class="point-customer"></span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn bg-danger-subtle text-danger  waves-effect text-start" data-bs-dismiss="modal">
+                        Đóng
+                    </button>
+                    <button class="btn bg-success text-white  waves-effect text-start btnExchangeGift action-exchange-gift d-none">
+                        Đổi quà hộ
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
 @endsection
 @section('style')
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-select@1.14.0-beta3/dist/css/bootstrap-select.min.css">
@@ -182,7 +231,32 @@
         $(".btnExchangeGift").click(function(){
             var customer_id = $(this).val();
             $("#customer-gift-exchange input[name='customer_id']").val(customer_id);
+            $("#checkPointCustomer").modal('hide');
             $("#customer-gift-exchange").modal("show");
+        });
+        $('#checkPointCustomer input[name="phone"]').keyup(function(){
+            var length = $(this).val().length;            
+            if(length == 10){
+                $(".loading").addClass('active');
+                $.ajax({
+                    url: window.location.origin + '/api/reward-point',
+                    data:{"phone": $(this).val()},
+                    dataType: "json",
+                    type: "post",
+                    success: function (data){
+                        $(".loading").removeClass('active');
+                        $("#checkPointCustomer .code-customer").text(data.membership_level.customer_code);
+                        $("#checkPointCustomer .name-customer").text(data.membership_level.customer_name);
+                        $("#checkPointCustomer .point-customer").text(data.data);
+                        if(data.data > 0){
+                            $("#checkPointCustomer .btnExchangeGift").val(data.membership_level.customer_id);
+                            $("#checkPointCustomer .action-exchange-gift").removeClass('d-none');
+                        }else{
+                            $("#checkPointCustomer .action-exchange-gift").addClass('d-none');
+                        }
+                    }
+                })
+            }
         });
         $("#giftExchange").submit(function(e){
             e.preventDefault();
@@ -208,7 +282,33 @@
                     }
                 }
             })
-        })
+        });
+        $("#customer-gift-exchange input[name='name_gift']").on("keyup", function(){
+            var searchText = $(this).val().toLowerCase();
+            $(".data-item-gift").each(function(){
+                var productName = $(this).attr('data-tokens').toLowerCase();
+                $(this).toggle(productName.includes(searchText));
+            });
+        });
+        $("#customer-gift-exchange input[name='name_branch']").on("keyup", function(){
+            var searchText = $(this).val().toLowerCase();
+            $(".data-item-branch").each(function(){
+                var productName = $(this).attr('data-tokens').toLowerCase();
+                $(this).toggle(productName.includes(searchText));
+            });
+        });
+        $(".data-item-gift").click(function(){
+            var id = $(this).attr('value');
+            var name = $(this).attr('data-tokens');
+            $("#customer-gift-exchange input[name='name_gift']").val(name);
+            $("#customer-gift-exchange input[name='gift_id']").val(id);
+        });
+        $(".data-item-branch").click(function(){
+            var id = $(this).attr('value');
+            var name = $(this).attr('data-tokens');
+            $("#customer-gift-exchange input[name='name_branch']").val(name);
+            $("#customer-gift-exchange input[name='branch_id']").val(id);
+        });
     });
 </script>
 @endsection

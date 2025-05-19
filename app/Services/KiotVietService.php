@@ -220,7 +220,7 @@ class KiotVietService
      */
     public function encodeId($id) {
         $length = 8;
-        $characters = 'A7F2D9KQX8M1Z3R0PLNBV6E5H4CTWYGU';
+        $characters = '9FAD7B3C2E6HKMTXWPLGV84Y01ZQUN5R';
         $base = strlen($characters);
         $str = '';
         $num = ($id * 54673181) % 1000000000;

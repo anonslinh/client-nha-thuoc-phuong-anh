@@ -23,7 +23,7 @@
             width: 100%;
             height: 100%;
             background: #33333330;
-            z-index: 100;
+            z-index: 10000;
             top: 0;
             left: 0;
             display: none;
