@@ -18,6 +18,7 @@ use App\Http\Controllers\VideoProductController;
 use App\Http\Controllers\RotationController;
 use App\Http\Controllers\Admin\ProductCertificateController;
 use App\Http\Controllers\Admin\InvoicesController;
+use App\Http\Controllers\Admin\TaskManagementController;
 
 Route::get('login', [LoginController::class, 'login'])->name('login');
 Route::get('authentication-forgot-password', [LoginController::class, 'forgotPassword'])->name('authentication-forgot-password');
@@ -275,6 +276,11 @@ Route::middleware([CheckLogin::class])->group(function (){
         Route::get('destroy/{id}', [InvoicesController::class, 'destroyRequestInvoice'])->name('destroy');
         Route::get('/invoices-request/export', [InvoicesController::class, 'exportInvoiceRequest'])->name('export');
         Route::post('/invoices-request/import', [InvoicesController::class, 'importRequestInvoice'])->name('import');
+    });
+
+    //CRM chăm sóc khách hàng
+    Route::prefix('crm-customers')->name('crm-customers.')->group(function () {
+        Route::get('task-management', [TaskManagementController::class, 'indexProductBy'])->name('task-management');
     });
 
     Route::get('logout', [HomeController::class, 'logout'])->name('logout');
