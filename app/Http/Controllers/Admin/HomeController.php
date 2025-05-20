@@ -422,6 +422,10 @@ class HomeController
     **/
     public function plusPointCustomer (Request $request)
     {
+        $user = Auth::guard('users')->user();
+        if($user['role'] != 'admin'){
+            return back()->with(['error' => 'Bạn không có quyền để thực hiện thao tác này']);
+        }
         $rule = [
             'phone' => ['required', 'regex:/^(0[1-9][0-9]{8,9}|84[1-9][0-9]{8,9})$/'],
             'point' => ['required']

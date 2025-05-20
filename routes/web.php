@@ -19,6 +19,7 @@ use App\Http\Controllers\RotationController;
 use App\Http\Controllers\Admin\ProductCertificateController;
 use App\Http\Controllers\Admin\PharmacyController;
 use App\Http\Controllers\Admin\InvoicesController;
+use App\Http\Controllers\Admin\TaskManagementController;
 
 Route::get('login', [LoginController::class, 'login'])->name('login');
 Route::get('authentication-forgot-password', [LoginController::class, 'forgotPassword'])->name('authentication-forgot-password');
@@ -282,6 +283,12 @@ Route::middleware([CheckLogin::class])->group(function (){
         Route::get('prescription', [PharmacyController::class, 'indexPrescription'])->name('prescription');
         Route::get('prescription-detail/{id}', [PharmacyController::class, 'showPrescription'])->name('prescription-detail');
     });
+
+    //CRM chăm sóc khách hàng
+    Route::prefix('crm-customers')->name('crm-customers.')->group(function () {
+        Route::get('task-management', [TaskManagementController::class, 'indexProductBy'])->name('task-management');
+    });
+
     Route::get('logout', [HomeController::class, 'logout'])->name('logout');
 });
 // Giao diện vòng quay

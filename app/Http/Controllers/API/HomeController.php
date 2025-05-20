@@ -286,6 +286,8 @@ class HomeController extends HelperApiController
                     'total_spent'     => 0,
                     'next_rank'       => $nextRank->name ?? null,
                     'amount_to_next'  => $amountNeeded,
+                    'customer_code' => $customer->code??null,
+                    'customer_id' => $customer->id??null
                 ];
 
                 return $data_return;
@@ -354,6 +356,8 @@ class HomeController extends HelperApiController
                 'total_spent'     => $totalSpent,
                 'next_rank'       => $nextRank->name ?? null,
                 'amount_to_next'  => $amountNeeded,
+                'customer_code' => $customer->code,
+                'customer_id' => $customer->id
             ];
 
             return $data_return;

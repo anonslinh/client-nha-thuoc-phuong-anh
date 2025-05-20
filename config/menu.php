@@ -162,6 +162,17 @@ return [
         ]
     ],
     [
+        'name' => 'CRM CSKH',
+        'icon' => 'solar:widget-6-line-duotone',
+        'submenu' => [
+            [
+                'name' => 'CSKH mã sản phẩm',
+                'icon' => 'solar:mask-happly-line-duotone',
+                'route' => 'crm-customers.task-management'
+            ]
+        ]
+    ],
+    [
         'name' => 'Cài đặt',
         'icon' => 'solar:settings-linear',
         'submenu' => [
