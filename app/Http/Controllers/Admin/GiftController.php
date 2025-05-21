@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\API\HelperApiController;
+use App\Imports\GiftImport;
 use App\Models\Banner;
 use App\Models\BannerBranch;
 use App\Models\Branch;
@@ -14,8 +15,10 @@ use App\Models\ProductsModel;
 use App\Models\Program;
 use App\Models\ProgramBranch;
 use App\Models\Promotion;
+use App\Services\KiotVietService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use Maatwebsite\Excel\Facades\Excel;
 
 class GiftController extends HelperApiController
 {
@@ -540,7 +543,7 @@ class GiftController extends HelperApiController
 
     public function detailProductKiotviet (Request $request)
     {
-        $product = $this->detailProduct($request->get('product_code'));
+        $product = $this->kiotVietService->detailProduct($request->get('product_code'));
         $dataBranch = [];
         foreach ($product as $value){
             foreach ($value['inventories'] as $item){
@@ -552,5 +555,15 @@ class GiftController extends HelperApiController
             }
         }
         return response()->json(['status' => true, 'data' => $dataBranch], 200);
+    }
+
+    public function import (Request $request, KiotVietService $helper)
+    {
+        $request->validate([
+            'file' => 'required|mimes:xlsx,xls',
+        ]);
+        Excel::import(new GiftImport($helper), $request->file('file'));
+
+        return back()->with('success', 'Import thành công!');
     }
 }

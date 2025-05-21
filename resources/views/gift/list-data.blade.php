@@ -27,11 +27,18 @@
         </div>
         <div class="card">
             <div class="card-body">
-                <form action="{{route('gift.index')}}" method="get" class="d-flex">
-                    <input name="key_search" value="{{request()->get('key_search')}}" class="form-control" style="max-width: 250px;margin-right: 15px" placeholder="Tìm kiếm tên hoặc mã quà tặng">
-                    <button class="btn btn-primary" style="margin-right: 15px">Tìm kiếm</button>
-                    <a href="{{route('gift.index')}}" class="btn btn-danger">Hủy</a>
-                </form>
+                <div class="d-flex align-items-center justify-space-between">
+                    <form action="{{route('gift.index')}}" method="get" class="d-flex w-50">
+                        <input name="key_search" value="{{request()->get('key_search')}}" class="form-control" style="max-width: 250px;margin-right: 15px" placeholder="Tìm kiếm tên hoặc mã quà tặng">
+                        <button class="btn btn-primary" style="margin-right: 15px">Tìm kiếm</button>
+                        <a href="{{route('gift.index')}}" class="btn btn-danger">Hủy</a>
+                    </form>
+                    <form action="{{route('gift.import')}}" method="post" class="d-flex w-50 justify-content-end" enctype="multipart/form-data">
+                        @csrf
+                        <input name="file" type="file" accept=".xls,.xlsx" class="form-control" required style="max-width: 250px;margin-right: 15px">
+                        <button class="btn btn-info">Import dữ liệu</button>
+                    </form>
+                </div>
                 <table class="table table-bordered mt-4 table-hover">
                     <thead>
                     <tr>
