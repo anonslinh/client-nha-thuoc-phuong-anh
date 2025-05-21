@@ -89,9 +89,13 @@ function App() {
                 method: "get",
                 data: null
             })
-            if(res.status){                
-                setLogo(res.data.logo);
-                setBackground(res.data.background)
+            if(res.status){ 
+                if (res.data.logo) {
+                    setLogo(res.data.logo);
+                }               
+                if (res.data.background) {
+                    setBackground(res.data.background);
+                }               
             }
     }
     useEffect(() => {        
