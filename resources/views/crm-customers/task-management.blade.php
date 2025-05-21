@@ -51,7 +51,7 @@
                             <tr>
                                 <td class="align-middle">{{$key + 1}}</td>
                                 <td class="align-middle">
-                                    <span>{{$value->customer_code}}</span><br>
+                                    <a href="{{route('crm-customers.detail-customer', ['customer_id' => $value->customer_id])}}"><span>{{$value->customer_code}}</span><br></a>
                                     <span>{{$value->customer_name}}</span><br>
                                     <span class="text-info">{{$value->contact_number}}</span><br>
                                 </td>

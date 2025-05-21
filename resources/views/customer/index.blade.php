@@ -30,7 +30,7 @@
                         >
                     </div>
                     <div class="col-md-2" style="margin-right: 15px">
-                        <select name="status" class="form-control">
+                        <select name="sort" class="form-control">
                             <option value="">Sắp xếp theo</option>
                             <option value="total_invoiced" @if(request()->get('sort') == 'total_invoiced') selected @endif>Tổng đơn hàng</option>
                             <option value="total_point" @if(request()->get('sort') == 'total_point') selected @endif>Tổng điểm</option>
@@ -59,7 +59,7 @@
                             <tr>
                                 <td class="align-middle">{{$key + 1}}</td>
                                 <td class="align-middle">
-                                    <span>{{$value->code}}</span><br>
+                                    <a href="{{route('crm-customers.detail-customer', ['customer_id' => $value->kiotviet_id])}}"><span>{{$value->code}}</span></a><br>
                                     <span>{{$value->name}} - {{$value->contact_number}}</span>
                                 </td>
                                 <td class="align-middle">
@@ -162,8 +162,8 @@
                         </ul>
                     </div>
                 </div>
-            
-            
+
+
                 <div class="modal-footer">
                     <button type="button" class="btn bg-danger-subtle text-danger  waves-effect text-start" data-bs-dismiss="modal">
                         Close
@@ -235,7 +235,7 @@
             $("#customer-gift-exchange").modal("show");
         });
         $('#checkPointCustomer input[name="phone"]').keyup(function(){
-            var length = $(this).val().length;            
+            var length = $(this).val().length;
             if(length == 10){
                 $(".loading").addClass('active');
                 $.ajax({

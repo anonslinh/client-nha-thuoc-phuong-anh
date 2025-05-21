@@ -343,7 +343,7 @@ class HomeController
         $listData = Customer::query()
             ->leftJoin('invoices', 'customers.kiotviet_id', '=', 'invoices.customer_id')
             ->select(
-                'customers.id', 'customers.code', 'customers.name', 'customers.contact_number',
+                'customers.id', 'customers.kiotviet_id', 'customers.code', 'customers.name', 'customers.contact_number',
                 'customers.total_revenue', 'customers.kiotviet_reward_point', 'customers.used_points','customers.reward_point',
                 \DB::raw('COUNT(invoices.id) as total_orders') // Tổng số đơn hàng trong ngày
             )
@@ -515,13 +515,13 @@ class HomeController
                 return response()->json(['status' => false, 'msg' => 'Chi nhánh này đã hết quà.Vui lòng kiểm tra lại'], 200);
             }
             if($customer->reward_point < $gift->points_required){
-                return response()->json(['status' => false, 'msg' => 'Số điểm hiện tại của khách hàng không đủ để đổi phần quà này'], 200);   
+                return response()->json(['status' => false, 'msg' => 'Số điểm hiện tại của khách hàng không đủ để đổi phần quà này'], 200);
             }
             $customer->reward_point -= $gift->points_required;
             $customer->save();
             //Lưu log số điểm đã dùng
             CustomerPointLog::updateUsedPoints($customer->kiotviet_id, $gift->points_required, 'increase');
-            
+
             // Tạo mã đổi quà duy nhất
             $maxID = GiftExchanges::max('id') + 1;
             $exchangeCode = $this->kiotVietService->encodeId($maxID);

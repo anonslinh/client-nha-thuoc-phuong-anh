@@ -281,6 +281,10 @@ Route::middleware([CheckLogin::class])->group(function (){
     //CRM chăm sóc khách hàng
     Route::prefix('crm-customers')->name('crm-customers.')->group(function () {
         Route::get('task-management', [TaskManagementController::class, 'indexProductBy'])->name('task-management');
+        Route::get('detail-customer/{customer_id}', [TaskManagementController::class, 'detailCustomer'])->name('detail-customer');
+        Route::post('store-child', [TaskManagementController::class, 'storeChildCustomer'])->name('store-child');
+        Route::get('delete-child/{child_id}', [TaskManagementController::class, 'deleteChild'])->name('delete-child');
+        Route::post('store-customer-note', [TaskManagementController::class, 'storeCustomerNote'])->name('store-customer-note');
     });
 
     Route::get('logout', [HomeController::class, 'logout'])->name('logout');
