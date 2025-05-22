@@ -12,6 +12,7 @@ use App\Exports\EmployeeRatingsExport;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Models\EmployeeRatingSummary;
 use App\Exports\EmployeeExport;
+use App\Exports\RatingInvoicesExport;
 
 class EmployeeController extends HelperAdminController
 {
@@ -330,6 +331,40 @@ class EmployeeController extends HelperAdminController
             return view('employee.ratings-invoice', compact( 'listData', 'months', 'chartSeries'));
         }catch (\Exception $exception){
             return back()->with(['error' => 'Lỗi! Liên hệ với bộ phận CSKH']);
+        }
+    }
+
+    /**
+     * Xuất excel đánh giá hoá đơn
+    */
+    public function exportRatingsInvoice(Request $request){
+        try{
+            $query = InvoiceRating::with(['invoice' => function ($query) {
+                $query->select('id', 'kiotviet_id', 'code', 'total_payment', 'sold_by_name', 'branch_name', 'contact_number', 'customer_code', 'customer_name');
+            }])
+                ->orderByDesc('created_at');
+
+            // Lọc theo ngày từ và ngày đến
+            if (!empty($request->from_date) || !empty($request->to_date)) {
+                if (!empty($request->from_date) && !empty($request->to_date)) {
+                    $query->whereBetween('created_at', [$request->from_date, $request->to_date]);
+                } elseif (!empty($request->from_date)) {
+                    $query->where('created_at', '>=', $request->from_date);
+                } elseif (!empty($request->to_date)) {
+                    $query->where('created_at', '<=', $request->to_date);
+                }
+            }
+
+            // Lọc theo số lượng sao (rating)
+            if ($request->has('rating') && in_array($request->rating, [1, 2, 3, 4, 5])) {
+                $query->where('rating', $request->rating);
+            }
+
+            $listData = $query->get();
+
+            return Excel::download(new RatingInvoicesExport($listData), "rating-invoice.xlsx");
+        }catch (\Exception $exception){
+            dd($exception);
         }
     }
 

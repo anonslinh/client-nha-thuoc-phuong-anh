@@ -188,6 +188,7 @@ Route::middleware([CheckLogin::class])->group(function (){
         Route::get('employee-detail/{id}', [EmployeeController::class, 'getEmployeeDetails'])->name('employee-detail');
         Route::get('employee-export/{id}', [EmployeeController::class, 'exportEmployeeRatings'])->name('employee-export');
         Route::get('ratings-invoice', [EmployeeController::class, 'getRatingsInvoice'])->name('ratings-invoice');
+        Route::get('export-ratings-invoice', [EmployeeController::class, 'exportRatingsInvoice'])->name('export-ratings-invoice');
     });
 
     //Cài đặt tự động
