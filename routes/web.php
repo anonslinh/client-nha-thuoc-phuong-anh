@@ -285,6 +285,8 @@ Route::middleware([CheckLogin::class])->group(function (){
         Route::post('store-child', [TaskManagementController::class, 'storeChildCustomer'])->name('store-child');
         Route::get('delete-child/{child_id}', [TaskManagementController::class, 'deleteChild'])->name('delete-child');
         Route::post('store-customer-note', [TaskManagementController::class, 'storeCustomerNote'])->name('store-customer-note');
+        Route::post('update-note-item', [TaskManagementController::class, 'updateCustomerNoteItem'])->name('update-note-item');
+        Route::get('list-task-note', [TaskManagementController::class, 'listTaskNote'])->name('list-task-note');
     });
 
     Route::get('logout', [HomeController::class, 'logout'])->name('logout');

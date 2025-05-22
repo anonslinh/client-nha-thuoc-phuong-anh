@@ -93,253 +93,290 @@
                     </div>
                 </div>
             </div>
-            <div class="col-lg-12">
-                <div class="card">
-                    <div class="card-body">
-                        <div class="d-flex flex-wrap gap-3 mb-9 justify-content-between align-items-center">
-                            <h5 class="card-title fw-semibold mb-0">Thông tin con</h5>
-                            <nav aria-label="breadcrumb" class="ms-auto">
-                                <ol class="breadcrumb">
-                                    <li class="breadcrumb-item" aria-current="page">
-                                        <button class="justify-content-center badge fw-medium fs-2 btn btn-rounded btn-info d-flex align-items-center" data-bs-toggle="modal" data-bs-target="#modalCreateChild">
-                                            <i class="ti ti-send fs-4 me-2"></i>
-                                            Thêm mới
-                                        </button>
-                                    </li>
-                                </ol>
-                            </nav>
+        </div>
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex flex-wrap gap-3 mb-9 justify-content-between align-items-center">
+                    <h5 class="card-title fw-semibold mb-0">Thông tin con</h5>
+                    <nav aria-label="breadcrumb" class="ms-auto">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item" aria-current="page">
+                                <button class="justify-content-center badge fw-medium fs-2 btn btn-rounded btn-info d-flex align-items-center" data-bs-toggle="modal" data-bs-target="#modalCreateChild">
+                                    <i class="ti ti-send fs-4 me-2"></i>
+                                    Thêm mới
+                                </button>
+                            </li>
+                        </ol>
+                    </nav>
+                </div>
+                <div class="tab-content mb-n3">
+                    <div class="tab-pane active" id="app" role="tabpanel">
+                        <div class="table-responsive" data-simplebar>
+                            <table class="table text-nowrap align-middle table-custom mb-0 last-items-borderless">
+                                <thead>
+                                <tr>
+                                    <th scope="col" class="fw-normal ps-0">STT</th>
+                                    <th scope="col" class="fw-normal">Tên bé</th>
+                                    <th scope="col" class="fw-normal">Giới tính</th>
+                                    <th scope="col" class="fw-normal">Trạng thái</th>
+                                    <th scope="col" class="fw-normal">Ngày sinh hoặc dư kiến</th>
+                                    <th scope="col" class="fw-normal">Hành động</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                @foreach($children as $k => $_child)
+                                    <tr>
+                                        <td class="ps-0">{{$k+1}}</td>
+                                        <td>
+                                            <span>{{$_child->name}}</span><br>
+                                            <span>{{$_child->display_info}}</span>
+                                        </td>
+                                        <td>
+                                            @if($_child->gender == 'male') <span>Bé trai</span> @endif
+                                            @if($_child->gender == 'female') <span>Bé gái</span> @endif
+                                            @if($_child->gender == 'unknown') <span>Không xác định</span> @endif
+                                        </td>
+                                        <td>
+                                            @if($_child->status == 'pregnant') <span>Đang mang bầu</span> @endif
+                                            @if($_child->status == 'born') <span>Đã sinh</span> @endif
+                                        </td>
+                                        <td>
+                                            @if($_child->status == 'pregnant' && $_child->due_date)
+                                                <span>{{ \Carbon\Carbon::parse($_child->due_date)->format('d/m/Y') }}</span>
+                                            @endif
+                                            @if($_child->status == 'born' && $_child->dob)
+                                                <span>{{ \Carbon\Carbon::parse($_child->dob)->format('d/m/Y') }}</span>
+                                            @endif
+                                        </td>
+                                        <td>
+                                            <a class="dropdown-item text-danger btn-sa-confirm" href="{{route('crm-customers.delete-child', ['child_id' => $_child->id])}}">Xóa</a>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                                </tbody>
+                            </table>
                         </div>
-                        <!-- Modal thêm con -->
-                        <div class="modal fade" id="modalCreateChild" tabindex="-1">
-                            <div class="modal-dialog" role="document">
-                                <div class="modal-content">
-                                    <div class="modal-header d-flex align-items-center">
-                                        <h4 class="modal-title" id="myLargeModalLabel">
-                                            Thêm con
-                                        </h4>
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                    </div>
-                                    <form action="{{route('crm-customers.store-child', ['customer_id' => $customer->kiotviet_id, 'contact_number' => $customer->contact_number])}}" method="post" class="modal-content" enctype="multipart/form-data">
-                                        @csrf
-                                        <div class="modal-body">
-                                            <div class="form-group mb-2">
-                                                <label class="form-label">Tên con</label>
-                                                <input class="form-control" name="name" required>
-                                            </div>
-                                            <div class="form-group mb-2">
-                                                <label class="form-label">Trạng thái</label>
-                                                <select name="status" class="form-control">
-                                                    <option value="born">Đã sinh</option>
-                                                    <option value="pregnant">Mang bầu</option>
-                                                </select>
-                                            </div>
-                                            <div class="form-group mb-2">
-                                                <label class="form-label">Giới tính</label>
-                                                <select name="gender" class="form-control ">
-                                                    <option value="male">Bé trai</option>
-                                                    <option value="female">Bé gái</option>
-                                                    <option value="unknown">Không xác định</option>
-                                                </select>
-                                            </div>
-                                            <div class="form-group mb-2">
-                                                <label class="form-label">Ngày sinh hoặc dư kiến</label>
-                                                <input class="form-control" name="date_of_birth" type="date" required>
-                                            </div>
-                                        </div>
-                                        <div class="modal-footer">
-                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                                            <button class="btn btn-primary">Xác nhận</button>
-                                        </div>
-                                    </form>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="tab-content mb-n3">
-                            <div class="tab-pane active" id="app" role="tabpanel">
-                                <div class="table-responsive" data-simplebar>
-                                    <table class="table text-nowrap align-middle table-custom mb-0 last-items-borderless">
-                                        <thead>
-                                        <tr>
-                                            <th scope="col" class="fw-normal ps-0">STT</th>
-                                            <th scope="col" class="fw-normal">Tên bé</th>
-                                            <th scope="col" class="fw-normal">Giới tính</th>
-                                            <th scope="col" class="fw-normal">Trạng thái</th>
-                                            <th scope="col" class="fw-normal">Ngày sinh hoặc dư kiến</th>
-                                            <th scope="col" class="fw-normal">Hành động</th>
-                                        </tr>
-                                        </thead>
-                                        <tbody>
-                                        @foreach($children as $k => $_child)
-                                            <tr>
-                                                <td class="ps-0">{{$k+1}}</td>
-                                                <td>
-                                                    <span>{{$_child->name}}</span><br>
-                                                    <span>{{$_child->display_info}}</span>
-                                                </td>
-                                                <td>
-                                                    @if($_child->gender == 'male') <span>Bé trai</span> @endif
-                                                    @if($_child->gender == 'female') <span>Bé gái</span> @endif
-                                                    @if($_child->gender == 'unknown') <span>Không xác định</span> @endif
-                                                </td>
-                                                <td>
-                                                    @if($_child->status == 'pregnant') <span>Đang mang bầu</span> @endif
-                                                    @if($_child->status == 'born') <span>Đã sinh</span> @endif
-                                                </td>
-                                                <td>
-                                                    @if($_child->status == 'pregnant' && $_child->due_date)
-                                                        <span>{{ \Carbon\Carbon::parse($_child->due_date)->format('d/m/Y') }}</span>
-                                                    @endif
-                                                    @if($_child->status == 'born' && $_child->dob)
-                                                        <span>{{ \Carbon\Carbon::parse($_child->dob)->format('d/m/Y') }}</span>
-                                                    @endif
-                                                </td>
-                                                <td>
-                                                    <a class="dropdown-item text-danger btn-sa-confirm" href="{{route('crm-customers.delete-child', ['child_id' => $_child->id])}}">Xóa</a>
-                                                </td>
-                                            </tr>
-                                        @endforeach
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-
                     </div>
                 </div>
             </div>
-            <div class="col-lg-12">
-                <div class="card">
-                    <div class="card-body">
-                        <div class="d-flex flex-wrap gap-3 mb-9 justify-content-between align-items-center">
-                            <h5 class="card-title fw-semibold mb-0">Ghi chú</h5>
-                            <nav aria-label="breadcrumb" class="ms-auto">
-                                <ol class="breadcrumb">
-                                    <li class="breadcrumb-item" aria-current="page">
-                                        <button class="justify-content-center badge fw-medium fs-2 btn btn-rounded btn-info d-flex align-items-center" data-bs-toggle="modal" data-bs-target="#modalCreateNote">
-                                            <i class="ti ti-send fs-4 me-2"></i>
-                                            Thêm mới
-                                        </button>
-                                    </li>
-                                </ol>
-                            </nav>
-                        </div>
-
-                        <!-- Modal thêm ghi chú -->
-                        <div class="modal fade" id="modalCreateNote" tabindex="-1">
-                            <div class="modal-dialog" role="document">
-                                <div class="modal-content">
-                                    <div class="modal-header d-flex align-items-center">
-                                        <h4 class="modal-title" id="myLargeModalLabel">
-                                            Ghi chú khách hàng
-                                        </h4>
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex flex-wrap gap-3 mb-9 justify-content-between align-items-center">
+                    <h5 class="card-title fw-semibold mb-0">Ghi chú</h5>
+                    <nav aria-label="breadcrumb" class="ms-auto">
+                        <ol class="breadcrumb">
+                            <li class="breadcrumb-item" aria-current="page">
+                                <button class="justify-content-center badge fw-medium fs-2 btn btn-rounded btn-info d-flex align-items-center" data-bs-toggle="modal" data-bs-target="#modalCreateNote">
+                                    <i class="ti ti-send fs-4 me-2"></i>
+                                    Thêm mới
+                                </button>
+                            </li>
+                        </ol>
+                    </nav>
+                </div>
+                <table class="table ">
+                    <thead>
+                    <tr>
+                        <th scope="col" class="fw-normal ps-0">STT</th>
+                        <th scope="col" class="fw-normal">Ngày ghi chú</th>
+                        <th scope="col" class="fw-normal">Lịch gọi lại</th>
+                        <th scope="col" class="fw-normal">Nội dung</th>
+                        <th scope="col" class="fw-normal">Hành động</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    @foreach($customer_notes as $key => $note)
+                        <tr>
+                            <td class="ps-0">{{$key+1}}</td>
+                            <td class="ps-0">
+                                <span>{{ \Carbon\Carbon::parse($note->created_at)->format('d/m/Y') }}</span><br>
+                                @if($note->status == 'done') <span class="text-success">Hoàn thành</span><br> @endif
+                                @if($note->status == 'overdue') <span class="text-danger">Huỷ</span><br> @endif
+                            </td>
+                            <td>
+                                @if($note->schedule_date) <span>{{ \Carbon\Carbon::parse($note->schedule_date)->format('d/m/Y') }}</span><br> @endif
+                                <span class="text-danger">{{$note->days_diff_text}}</span>
+                            </td>
+                            <td>
+                                <span>{{$note->note}}</span>
+                                @if($note->called_at)
+                                    <br><span class="text-primary">Ghi chú lần 2: {{ \Carbon\Carbon::parse($note->called_at)->format('d/m/Y') }}</span><br>
+                                    <span>{{$note->result_note}}</span>
+                                @endif
+                            </td>
+                            <td>
+                                @if($note->schedule_date && $note->status == 'pending')
+                                    <div class="modal fade" id="modalUpdate{{$note->id}}" tabindex="-1" aria-labelledby="vertical-center-modal" aria-hidden="true">
+                                        <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                                            <form action="{{route('crm-customers.update-note-item',['note_id' => $note->id])}}" method="post" class="modal-content" enctype="multipart/form-data">
+                                                @csrf
+                                                <div class="modal-header d-flex align-items-center">
+                                                    <h4 class="modal-title" id="myLargeModalLabel">
+                                                        Cập nhật ghi chú: {{ \Carbon\Carbon::parse($note->created_at)->format('d/m/Y') }}
+                                                    </h4>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <div class="form-group mb-2">
+                                                        <label class="form-label">Trạng thái</label>
+                                                        <select name="status" class="form-control">
+                                                            <option value="done">Hoàn thành</option>
+                                                            <option value="overdue">Huỷ</option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="form-group mb-2">
+                                                        <label class="form-label">Nội dung</label>
+                                                        <textarea style="height: 150px" class="form-control" name="result_note" required></textarea>
+                                                    </div>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn bg-danger-subtle text-danger  waves-effect text-start" data-bs-dismiss="modal">
+                                                        Hủy
+                                                    </button>
+                                                    <button class="btn btn-primary">Xác nhận</button>
+                                                </div>
+                                            </form>
+                                        </div>
                                     </div>
-                                    <form action="{{route('crm-customers.store-customer-note', ['customer_id' => $customer->kiotviet_id, 'contact_number' => $customer->contact_number])}}" method="post" class="modal-content" enctype="multipart/form-data">
-                                        @csrf
-                                        <div class="modal-body">
-                                            <div class="form-group mb-2">
-                                                <label class="form-label">Nội dung</label>
-                                                <textarea style="height: 150px" class="form-control" name="note" required></textarea>
-                                            </div>
-                                            <div class="form-group mb-2">
-                                                <label class="form-label">Lịch gọi lại</label>
-                                                <input class="form-control" name="schedule_date" type="date">
-                                            </div>
-                                        </div>
-                                        <div class="modal-footer">
-                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
-                                            <button class="btn btn-primary">Xác nhận</button>
-                                        </div>
-                                    </form>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="tab-content mb-n3">
-                            <div class="tab-pane active" id="app" role="tabpanel">
-                                <div class="table-responsive" data-simplebar>
-                                    <table class="table text-nowrap align-middle table-custom mb-0 last-items-borderless">
-                                        <thead>
-                                        <tr>
-                                            <th scope="col" class="fw-normal">Ngày ghi chú</th>
-                                            <th scope="col" class="fw-normal">Lịch gọi lại</th>
-                                            <th scope="col" class="fw-normal">Nội dung</th>
-                                        </tr>
-                                        </thead>
-                                        <tbody>
-                                        @foreach($customer_notes as $note)
-                                            <tr>
-                                                <td class="ps-0">
-                                                    <span>{{ \Carbon\Carbon::parse($note->created_at)->format('d/m/Y') }}</span>
-                                                </td>
-                                                <td>
-                                                    @if($note->schedule_date) <span>{{ \Carbon\Carbon::parse($note->schedule_date)->format('d/m/Y') }}</span> @endif
-                                                </td>
-                                                <td>
-                                                    <span>{{$note->note}}</span>
-                                                </td>
-                                            </tr>
-                                        @endforeach
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
 
-                    </div>
-                </div>
+                                    <button class="badge fw-medium fs-2 btn btn-rounded btn-primary" data-bs-toggle="modal" data-bs-target="#modalUpdate{{$note->id}}">
+                                        Cập nhật
+                                    </button>
+                                @endif
+                            </td>
+                        </tr>
+                    @endforeach
+                    </tbody>
+                </table>
+
             </div>
-            <div class="col-lg-12">
-                <div class="card">
-                    <div class="card-body">
-                        <div class="d-flex flex-wrap gap-3 mb-9 justify-content-between align-items-center">
-                            <div>
-                                <h5 class="card-title fw-semibold mb-0">Lịch sử mua sắm</h5>
-                            </div>
-                        </div>
-
-                        <div class="tab-content mb-n3">
-                            <div class="tab-pane active" id="app" role="tabpanel">
-                                <div class="table-responsive" data-simplebar>
-                                    <table class="table text-nowrap align-middle table-custom mb-0 last-items-borderless">
-                                        <thead>
-                                        <tr>
-                                            <th scope="col" class="fw-normal ps-0">STT</th>
-                                            <th scope="col" class="fw-normal">Sản phẩm</th>
-                                            <th scope="col" class="fw-normal">Cửa hàng</th>
-                                            <th scope="col" class="fw-normal">Ngày mua</th>
-                                        </tr>
-                                        </thead>
-                                        <tbody>
-                                        @foreach($invoice_details as $key => $invoice_detail)
-                                            <tr>
-                                                <td>
-                                                    <span>{{$key+1}}</span>
-                                                </td>
-                                                <td>
-                                                    <span>{{$invoice_detail->product_name}}</span><br>
-                                                    <span>SKU: {{$invoice_detail->product_code}}</span><br>
-                                                    <span>SL: {{$invoice_detail->quantity}}</span><br>
-                                                    <span>Tổng tiền: {{number_format($invoice_detail->sub_total)}}đ</span><br>
-                                                </td>
-                                                <td>
-                                                    <span>{{$invoice_detail->sold_by_name}}</span><br>
-                                                    <span>{{$invoice_detail->branch_name}}</span><br>
-                                                </td>
-                                                <td>
-                                                    <span>{{$invoice_detail->created_date}}</span><br>
-                                                    <span class="text-danger">Đã mua: {{$invoice_detail->days_since_purchase}} ngày</span><br>
-                                                </td>
-                                            </tr>
-                                        @endforeach
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-
+        </div>
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex flex-wrap gap-3 mb-9 justify-content-between align-items-center">
+                    <div>
+                        <h5 class="card-title fw-semibold mb-0">Lịch sử mua sắm</h5>
                     </div>
                 </div>
+
+                <div class="tab-content mb-n3">
+                    <div class="tab-pane active" id="app" role="tabpanel">
+                        <div class="table-responsive" data-simplebar>
+                            <table class="table text-nowrap align-middle table-custom mb-0 last-items-borderless">
+                                <thead>
+                                <tr>
+                                    <th scope="col" class="fw-normal ps-0">STT</th>
+                                    <th scope="col" class="fw-normal">Sản phẩm</th>
+                                    <th scope="col" class="fw-normal">Cửa hàng</th>
+                                    <th scope="col" class="fw-normal">Ngày mua</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                @foreach($invoice_details as $key => $invoice_detail)
+                                    <tr>
+                                        <td>
+                                            <span>{{$key+1}}</span>
+                                        </td>
+                                        <td>
+                                            <span>{{$invoice_detail->product_name}}</span><br>
+                                            <span>SKU: {{$invoice_detail->product_code}}</span><br>
+                                            <span>SL: {{$invoice_detail->quantity}}</span><br>
+                                            <span>Tổng tiền: {{number_format($invoice_detail->sub_total)}}đ</span><br>
+                                        </td>
+                                        <td>
+                                            <span>{{$invoice_detail->sold_by_name}}</span><br>
+                                            <span>{{$invoice_detail->branch_name}}</span><br>
+                                        </td>
+                                        <td>
+                                            <span>{{$invoice_detail->created_date}}</span><br>
+                                            <span class="text-danger">Đã mua: {{$invoice_detail->days_since_purchase}} ngày</span><br>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal thêm con -->
+    <div class="modal fade" id="modalCreateChild" tabindex="-1">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header d-flex align-items-center">
+                    <h4 class="modal-title" id="myLargeModalLabel">
+                        Thêm con
+                    </h4>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form action="{{route('crm-customers.store-child', ['customer_id' => $customer->kiotviet_id, 'contact_number' => $customer->contact_number])}}" method="post" class="modal-content" enctype="multipart/form-data">
+                    @csrf
+                    <div class="modal-body">
+                        <div class="form-group mb-2">
+                            <label class="form-label">Tên con</label>
+                            <input class="form-control" name="name" required>
+                        </div>
+                        <div class="form-group mb-2">
+                            <label class="form-label">Trạng thái</label>
+                            <select name="status" class="form-control">
+                                <option value="born">Đã sinh</option>
+                                <option value="pregnant">Mang bầu</option>
+                            </select>
+                        </div>
+                        <div class="form-group mb-2">
+                            <label class="form-label">Giới tính</label>
+                            <select name="gender" class="form-control ">
+                                <option value="male">Bé trai</option>
+                                <option value="female">Bé gái</option>
+                                <option value="unknown">Không xác định</option>
+                            </select>
+                        </div>
+                        <div class="form-group mb-2">
+                            <label class="form-label">Ngày sinh hoặc dư kiến</label>
+                            <input class="form-control" name="date_of_birth" type="date" required>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                        <button class="btn btn-primary">Xác nhận</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal thêm ghi chú -->
+    <div class="modal fade" id="modalCreateNote" tabindex="-1">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header d-flex align-items-center">
+                    <h4 class="modal-title" id="myLargeModalLabel">
+                        Ghi chú khách hàng
+                    </h4>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form action="{{route('crm-customers.store-customer-note', ['customer_id' => $customer->kiotviet_id, 'contact_number' => $customer->contact_number])}}" method="post" class="modal-content" enctype="multipart/form-data">
+                    @csrf
+                    <div class="modal-body">
+                        <div class="form-group mb-2">
+                            <label class="form-label">Nội dung</label>
+                            <textarea style="height: 150px" class="form-control" name="note" required></textarea>
+                        </div>
+                        <div class="form-group mb-2">
+                            <label class="form-label">Lịch gọi lại</label>
+                            <input class="form-control" name="schedule_date" type="date">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                        <button class="btn btn-primary">Xác nhận</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>

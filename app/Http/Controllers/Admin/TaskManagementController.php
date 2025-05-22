@@ -198,7 +198,7 @@ class TaskManagementController extends HelperAdminController
             foreach ($children as $child) {
                 $child->display_info = $this->getChildDisplayInfo($child, $now);
             }
-            $customer_notes = CustomerFollowUp::where('contact_number', $customer->contact_number)->orderBy('id', 'desc')->get();
+            $customer_notes = $this->customerNoteDiffDays($customer->contact_number);
 
             return view('customer.detail-customer', compact('customer', 'spending_summary', 'invoice_details', 'children', 'customer_notes'));
 
@@ -217,9 +217,25 @@ class TaskManagementController extends HelperAdminController
     }
 
     /**
+     * Tính ngày còn lại hoặc quá hạn
+    */
+    private function customerNoteDiffDays($contact_number){
+        try{
+            $customer_notes = CustomerFollowUp::where('contact_number', $contact_number)
+                ->orderByRaw("CASE WHEN status = 'pending' THEN 0 ELSE 1 END")
+                ->orderByRaw("ISNULL(schedule_date), schedule_date ASC")
+                ->get();
+            $customer_notes = $this->getDayItemNote($customer_notes);
+            return $customer_notes;
+        }catch (\Exception $exception){
+            return null;
+        }
+    }
+
+    /**
      * Tính display_info cho child dựa trên trạng thái và ngày tháng.
      */
-    private function getChildDisplayInfo(Child $child, Carbon $now): string
+    private function getChildDisplayInfo(Child $child, Carbon $now)
     {
         if ($child->status === 'pregnant' && $child->due_date) {
             $dueDate = Carbon::parse($child->due_date);
@@ -359,6 +375,78 @@ class TaskManagementController extends HelperAdminController
         } catch (\Exception $exception) {
             // Trả về trang lỗi chung hoặc thông báo lỗi phù hợp
             return back()->withErrors('Đã xảy ra lỗi, vui lòng thử lại sau.');
+        }
+    }
+
+    /**
+     * Cập nhật lại ghi chú
+    */
+    public function updateCustomerNoteItem(Request $request){
+        try{
+            $note = CustomerFollowUp::find($request->note_id);
+            if ($note){
+                $note->status = $request->status;
+                $note->result_note = $request->result_note;
+                $note->called_at = now();
+
+                $note->save();
+                return back()->with(['success' => 'Cập nhật thành công!']);
+            }
+        } catch (\Exception $exception) {
+            // Trả về trang lỗi chung hoặc thông báo lỗi phù hợp
+            return back()->withErrors('Đã xảy ra lỗi, vui lòng thử lại sau.');
+        }
+    }
+
+    /**
+     * Danh sách lịch gọi lại
+    */
+    public function listTaskNote(Request $request){
+        try{
+            $listData = CustomerFollowUp::query();
+            if (!empty($request->status)){
+                $listData = $listData->where('status', $request->status);
+            }
+            $listData = $listData->with('customer')->whereNotNull('schedule_date')
+                ->orderByRaw("CASE WHEN status = 'pending' THEN 0 ELSE 1 END")
+                ->orderByRaw('ISNULL(schedule_date), schedule_date ASC')->paginate(20);
+
+            $listData = $this->getDayItemNote($listData);
+            return view('crm-customers.list-task-note', compact('listData'));
+        }catch (\Exception $exception){
+            dd($exception);
+        }
+    }
+
+    /**
+     * Tính số ngày của item note
+    */
+    private function getDayItemNote($customer_notes){
+        try{
+            $today = Carbon::today();
+            foreach ($customer_notes as $note) {
+                if ($note->schedule_date && empty($note->called_at)) {
+                    $scheduleDate = Carbon::parse($note->schedule_date);
+                    $diffInDays = $today->diffInDays($scheduleDate, false); // false để giữ dấu âm
+
+                    if ($diffInDays > 0) {
+                        $note->days_diff_text = "Còn {$diffInDays} ngày";
+                    } elseif ($diffInDays < 0) {
+                        $note->days_diff_text = "Quá hạn " . abs($diffInDays) . " ngày";
+                    } else {
+                        $note->days_diff_text = "Hôm nay cần gọi";
+                    }
+
+                    $note->days_diff = $diffInDays;
+                } else {
+                    $note->days_diff_text = "Không có lịch gọi";
+                    $note->days_diff = null;
+                }
+            }
+
+            return $customer_notes;
+        }catch (\Exception $exception){
+
         }
     }
 }

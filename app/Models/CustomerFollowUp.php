@@ -19,4 +19,9 @@ class CustomerFollowUp extends Model
         'called_at',
         'result_note',
     ];
+
+    public function customer()
+    {
+        return $this->belongsTo(Customer::class, 'customer_id', 'kiotviet_id');
+    }
 }
