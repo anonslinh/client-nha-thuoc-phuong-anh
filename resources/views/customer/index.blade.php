@@ -64,7 +64,7 @@
                                 <tr>
                                     <td class="align-middle">{{$key + 1}}</td>
                                     <td class="align-middle">
-                                        <span>{{$value->code}}</span><br>
+                                        <a href="{{route('crm-customers.detail-customer', ['customer_id' => $value->kiotviet_id])}}"><span>{{$value->code}}</span></a><br>
                                         <span>{{$value->name}} - {{$value->contact_number}}</span>
                                     </td>
                                     <td class="align-middle">
@@ -81,27 +81,8 @@
                                 </tr>
                             @endforeach
                         @else
-                            <tr>
-<<<<<<< HEAD
-                                <td class="align-middle">{{$key + 1}}</td>
-                                <td class="align-middle">
-                                    <a href="{{route('crm-customers.detail-customer', ['customer_id' => $value->kiotviet_id])}}"><span>{{$value->code}}</span></a><br>
-                                    <span>{{$value->name}} - {{$value->contact_number}}</span>
-                                </td>
-                                <td class="align-middle">
-                                    <span>{{number_format($value->total_revenue)}}đ</span>
-                                </td>
-                                <td class="align-middle">
-                                    <p class="m-0">{{$value->total_orders}}</p>
-                                </td>
-                                <td class="align-middle">{{$value->kiotviet_reward_point}}</td>
-                                <td class="align-middle">{{$value->reward_point}}</td>
-                                <td class="align-middle">
-                                    <button class="justify-content-center badge fw-medium fs-2 btn btn-rounded btn-danger d-flex align-items-center btnExchangeGift" value="{{$value->id}}">Đổi quà hộ</button>
-=======
                                 <td colspan="6">
                                     <p class="m-0 text-center text-danger">Không có dữ liệu</p>
->>>>>>> 4b51d4a (fix view mobile)
                                 </td>
                             </tr>
                         @endif

@@ -347,7 +347,7 @@ class HomeController
                 'customers.total_revenue', 'customers.kiotviet_reward_point', 'customers.used_points','customers.reward_point',
                 \DB::raw('COUNT(invoices.id) as total_orders') // Tổng số đơn hàng trong ngày
             )
-            ->groupBy('customers.id', 'customers.code', 'customers.name', 'customers.contact_number',
+            ->groupBy('customers.id', 'customers.code', 'customers.name', 'customers.contact_number', 'customers.kiotviet_id',
                 'customers.total_revenue', 'customers.kiotviet_reward_point', 'customers.used_points', 'customers.reward_point'); // Nhóm theo khách hàng
 
         // Tìm kiếm theo key_search (kiotviet_id, code, contact_number, address)
