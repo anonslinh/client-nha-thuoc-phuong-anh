@@ -32,8 +32,8 @@
             </div>
         </div>
         <div class="card">
-            <div class="card-body">
-                <table class="table table-bordered">
+            <div class="card-body table-responsive">
+                <table class="table table-bordered text-nowrap">
                     <thead>
                     <tr>
                         <th>STT</th>

@@ -12,13 +12,17 @@
         </div>
         <div class="card">
             <div class="card-body">
-                <form action="{{route('rotation.gift_checkin.index')}}" method="get" class="d-flex align-items-center justify-content-end">
-                    <input name="key_search" value="{{request()->get('key_search')}}" class="form-control" style="max-width: 200px;margin-right: 15px" placeholder="Tìm theo tên phần quà">
-                    <button class="btn btn-success" style="margin-right: 15px">Tìm kiếm</button>
-                    <a href="{{route('rotation.gift')}}" class="btn btn-danger">Hủy</a>
+                <form action="{{route('rotation.gift_checkin.index')}}" method="get" class="row">
+                    <div class="col-md-4 mb-2">
+                        <input name="key_search" value="{{request()->get('key_search')}}" class="form-control" placeholder="Tìm theo tên phần quà">
+                    </div>
+                    <div class="col-md-4">
+                        <button class="btn btn-success" style="margin-right: 15px">Tìm kiếm</button>
+                        <a href="{{route('rotation.gift')}}" class="btn btn-danger">Hủy</a>
+                    </div>
                 </form>
-                <div class="mt-4">
-                    <table class="table table-bordered">
+                <div class="mt-4 table-responsive">
+                    <table class="table table-bordered text-nowrap">
                         <thead>
                         <tr>
                             <th>STT</th>

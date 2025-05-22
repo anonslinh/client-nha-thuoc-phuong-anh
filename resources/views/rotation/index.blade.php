@@ -114,8 +114,8 @@
                 </div>
             </div>
         </div>
-        <div class="card card-body py-3">
-            <table class="table table-border">
+        <div class="card card-body py-3 table-responsive">
+            <table class="table table-border text-nowrap">
                 <thead>
                     <tr>
                         <th>Logo</th>

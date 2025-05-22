@@ -12,20 +12,26 @@
         </div>
         <div class="card">
             <div class="card-body">
-                <form action="{{route('rotation.history-exchange-gift')}}" method="get" class="d-flex align-items-center justify-content-end">
-                    <select name="rule_rotation_id" class="form-control" style="max-width: 200px;margin-right: 15px">
-                        <option value="">Chi nhánh</option>
-                        @foreach($branch as $value)
-                            <option value="{{$value->id}}" @if($value->id == request()->get('branch_id')) selected @endif>{{$value->branch_name}}</option>
-                        @endforeach
-                    </select>
-                    <input name="key_search" value="{{request()->get('key_search')}}" class="form-control" style="max-width: 300px;margin-right: 15px" placeholder="Tìm theo tên, sđt khách hàng, tên - mã phần quà">
-                    <button class="btn btn-success" style="margin-right: 15px">Tìm kiếm</button>
-                    <a href="{{route('rotation.gift_checkin.exchange-gift')}}" style="margin-right: 15px" class="btn btn-danger">Hủy</a>
-                    <a href="{{route('rotation.gift_checkin.export-exchange-gift')}}" class="btn btn-warning">Xuất Excel</a>
+                <form action="{{route('rotation.history-exchange-gift')}}" method="get" class="row">
+                    <div class="col-md-4 mb-2">
+                        <select name="rule_rotation_id" class="form-control">
+                            <option value="">Chi nhánh</option>
+                            @foreach($branch as $value)
+                                <option value="{{$value->id}}" @if($value->id == request()->get('branch_id')) selected @endif>{{$value->branch_name}}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-md-4 mb-2">
+                        <input name="key_search" value="{{request()->get('key_search')}}" class="form-control" placeholder="Tìm theo tên, sđt khách hàng, tên - mã phần quà">
+                    </div>
+                    <div class="col-md-4">
+                        <button class="btn btn-success" style="margin-right: 15px">Tìm kiếm</button>
+                        <a href="{{route('rotation.gift_checkin.exchange-gift')}}" style="margin-right: 15px" class="btn btn-danger">Hủy</a>
+                        <a href="{{route('rotation.gift_checkin.export-exchange-gift')}}" class="btn btn-warning">Xuất Excel</a>
+                    </div>
                 </form>
-                <div class="mt-4">
-                    <table class="table table-bordered">
+                <div class="mt-4 table-responsive">
+                    <table class="table table-bordered text-nowrap">
                         <thead>
                         <tr>
                             <th>STT</th>
