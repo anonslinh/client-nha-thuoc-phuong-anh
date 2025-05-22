@@ -10,5 +10,5 @@ class Child extends Model
 
     use HasFactory;
 
-    protected $fillable = ['customer_id', 'contact_number', 'name', 'status', 'dob', 'due_date', 'gender'];
+    protected $fillable = ['customer_id', 'contact_number', 'name', 'status', 'dob', 'due_date', 'gender', 'note'];
 }

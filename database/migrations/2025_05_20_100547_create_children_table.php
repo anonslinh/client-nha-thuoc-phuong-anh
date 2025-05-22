@@ -20,6 +20,7 @@ return new class extends Migration
             $table->date('dob')->nullable(); // ngày sinh thực tế hoặc ước lượng
             $table->date('due_date')->nullable(); // ngày dự sinh (nếu đang mang bầu)
             $table->enum('gender', ['male', 'female', 'unknown'])->default('unknown');
+            $table->text('note')->nullable(); // ghi chú con
             $table->timestamps();
         });
     }

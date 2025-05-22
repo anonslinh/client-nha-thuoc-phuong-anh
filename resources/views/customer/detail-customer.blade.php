@@ -117,9 +117,8 @@
                                 <tr>
                                     <th scope="col" class="fw-normal ps-0">STT</th>
                                     <th scope="col" class="fw-normal">Tên bé</th>
-                                    <th scope="col" class="fw-normal">Giới tính</th>
-                                    <th scope="col" class="fw-normal">Trạng thái</th>
-                                    <th scope="col" class="fw-normal">Ngày sinh hoặc dư kiến</th>
+                                    <th scope="col" class="fw-normal">Thông tin</th>
+                                    <th scope="col" class="fw-normal">Ghi chú</th>
                                     <th scope="col" class="fw-normal">Hành động</th>
                                 </tr>
                                 </thead>
@@ -129,24 +128,29 @@
                                         <td class="ps-0">{{$k+1}}</td>
                                         <td>
                                             <span>{{$_child->name}}</span><br>
-                                            <span>{{$_child->display_info}}</span>
-                                        </td>
-                                        <td>
-                                            @if($_child->gender == 'male') <span>Bé trai</span> @endif
-                                            @if($_child->gender == 'female') <span>Bé gái</span> @endif
-                                            @if($_child->gender == 'unknown') <span>Không xác định</span> @endif
-                                        </td>
-                                        <td>
+                                            <span>{{$_child->display_info}}</span><br>
                                             @if($_child->status == 'pregnant') <span>Đang mang bầu</span> @endif
                                             @if($_child->status == 'born') <span>Đã sinh</span> @endif
                                         </td>
                                         <td>
+                                            <span>
+                                                Giới tính:
+                                                @if($_child->gender == 'male') Bé trai @endif
+                                                @if($_child->gender == 'female') Bé gái @endif
+                                                @if($_child->gender == 'unknown') Không xác định @endif
+                                            </span>
+                                            <br><span>
+                                                Ngày sinh hoặc dư kiến:
+                                            </span><br>
                                             @if($_child->status == 'pregnant' && $_child->due_date)
                                                 <span>{{ \Carbon\Carbon::parse($_child->due_date)->format('d/m/Y') }}</span>
                                             @endif
                                             @if($_child->status == 'born' && $_child->dob)
                                                 <span>{{ \Carbon\Carbon::parse($_child->dob)->format('d/m/Y') }}</span>
                                             @endif
+                                        </td>
+                                        <td>
+                                            <span>{{$_child->note}}</span>
                                         </td>
                                         <td>
                                             <a class="dropdown-item text-danger btn-sa-confirm" href="{{route('crm-customers.delete-child', ['child_id' => $_child->id])}}">Xóa</a>
@@ -339,6 +343,10 @@
                         <div class="form-group mb-2">
                             <label class="form-label">Ngày sinh hoặc dư kiến</label>
                             <input class="form-control" name="date_of_birth" type="date" required>
+                        </div>
+                        <div class="form-group mb-2">
+                            <label class="form-label">Ghi chú</label>
+                            <textarea style="height: 150px" class="form-control" name="note" required></textarea>
                         </div>
                     </div>
                     <div class="modal-footer">

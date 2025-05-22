@@ -14,7 +14,7 @@
             <div class="card-body">
                 @if($listData) <label>Kết quả tìm kiếm: {{$listData->total()}}</label> @endif
                 <form action="{{route('crm-customers.task-management')}}" method="get" class="d-flex">
-                    <div class="col-md-4" style="margin-right: 15px">
+                    <div class="col-md-2" style="margin-right: 15px">
                         <input name="key_search" class="form-control"
                                placeholder="Tìm theo tên, mã sản phẩm ..."
                                value="{{request()->get('key_search')}}"
@@ -34,6 +34,9 @@
                     </div>
                     <button class="btn btn-primary" style="margin-right: 15px">Tìm kiếm</button>
                     <a href="{{route('crm-customers.task-management')}}" style="margin-right: 15px" class="btn btn-danger">Hủy</a>
+                    <a href="{{ route('crm-customers.export-task-management', ['key_search' => request('key_search'), 'from_days' => request('from_days'), 'to_days' => request('to_days')]) }}"
+                       class="btn btn-danger align-self-end">
+                        <i class="ti ti-transition-right me-1 fs-4"></i>Xuất Excel</a>
                 </form>
                 <table class="table table-bordered mt-4">
                     <thead>
@@ -65,7 +68,7 @@
                                     <span>SL: {{$value->quantity}}</span><br>
                                 </td>
                                 <td class="align-middle">
-                                    <p class="m-0">{{$value->purchase_date}}</p>
+                                    <p class="m-0">{{date_format(date_create($value->purchase_date), 'h:s d/m/Y')}}</p>
                                     <span class="text-danger">Đã mua: {{$value->days_since_purchase}} ngày</span>
                                 </td>
                             </tr>

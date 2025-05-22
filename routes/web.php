@@ -288,6 +288,7 @@ Route::middleware([CheckLogin::class])->group(function (){
         Route::post('store-customer-note', [TaskManagementController::class, 'storeCustomerNote'])->name('store-customer-note');
         Route::post('update-note-item', [TaskManagementController::class, 'updateCustomerNoteItem'])->name('update-note-item');
         Route::get('list-task-note', [TaskManagementController::class, 'listTaskNote'])->name('list-task-note');
+        Route::get('export-task-management', [TaskManagementController::class, 'excelIndexProductBy'])->name('export-task-management');
     });
 
     Route::get('logout', [HomeController::class, 'logout'])->name('logout');
