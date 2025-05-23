@@ -806,14 +806,27 @@ class RotationController extends HelperAdminController
             $file->move('upload/rotation/', $nameFile);
             $background = 'upload/rotation/'.$nameFile;
         }
+        $rotationImage = null;
+        if($request->hasFile('rotation')){
+            $file = $request->file('rotation');
+            $nameFile = 'rotation'.time().Str::random(10).'.'.$file->getClientOriginalExtension();
+            $file->move('upload/rotation/', $nameFile);
+            $rotationImage = 'upload/rotation/'.$nameFile;
+        }
         $interface = InterfaceRotation::first();
         if(isset($interface)){
             $interface->logo = $logo??$interface->logo;
             $interface->background = $background??$interface->background;
+            $interface->rotation = $rotationImage??$interface->rotation;
+            $interface->color_button = $request->get('color_button')??$interface->color_button;
+            $interface->color_gift = $request->get('color_gift')??$interface->color_gift;
         }else{
             $interface = new InterfaceRotation([
                 'logo' => $logo,
-                'background' => $background
+                'background' => $background,
+                'rotation' => $rotationImage,
+                'color_button' => $request->get('color_button'),
+                'color_gift' => $request->get('color_gift')
             ]);
         }
         $interface->save();

@@ -79,7 +79,7 @@
      width: calc(var(--size) * 1.15);
      height: calc(var(--size) * 1.15);
      border-radius: 50%;
-     background-image: url("./../static/backgroundSpinner.png");
+     /* background-image: url("./../static/backgroundSpinner.png"); */
      background-position: center;
      background-repeat: repeat;
      background-size: contain;
@@ -128,10 +128,9 @@
      background-color: #f2f2f2;
 
  }
- .text-item.even {
+ /* .text-item.even {
      background-color: #eb5757;
-
- }
+ } */
  .border-li {
      /*border-bottom: 1px solid white !important;*/
      /*border-left: 1px solid white !important;*/

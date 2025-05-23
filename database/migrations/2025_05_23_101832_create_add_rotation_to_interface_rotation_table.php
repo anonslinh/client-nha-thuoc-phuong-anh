@@ -1,0 +1,30 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::table('interface_rotation', function (Blueprint $table) {
+            $table->string('rotation')->nullable();
+            $table->string('color_button')->nullable();
+            $table->string('color_gift')->nullable();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::table('interface_rotation', function (Blueprint $table) {
+            //
+        });
+    }
+};

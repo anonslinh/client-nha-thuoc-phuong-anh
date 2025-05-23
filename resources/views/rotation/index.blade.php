@@ -120,6 +120,9 @@
                     <tr>
                         <th>Logo</th>
                         <th>Backgroup</th>
+                        <th>Ảnh vòng quay</th>
+                        <th>Màu nút button</th>
+                        <th>Màu ô quà tặng</th>
                         <th>Thao tác</th>
                     </tr>
                 </thead>
@@ -130,6 +133,15 @@
                         </td>
                         <td>
                             <img src="{{$interface_rotation->background??''}}" style="width: 150px"/>
+                        </td>
+                        <td>
+                            <img src="{{$interface_rotation->rotation??''}}" style="width: 150px"/>
+                        </td>
+                        <td>
+                            <button class="btn" style="background: {{$interface_rotation->color_button??''}}"></button>
+                        </td>
+                        <td>
+                            <button class="btn" style="background: {{$interface_rotation->color_gift??''}}"></button>
                         </td>
                         <td>
                             <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#modalCreate">Cập nhật</button>
@@ -158,6 +170,18 @@
                         <div class="form-group mb-2">
                             <label class="form-label">Ảnh nền (Tỷ lệ như màn hình điện thoại)</label>
                             <input class="form-control" type="file" accept="image/*" name="background">
+                        </div>
+                        <div class="form-group mb-2">
+                            <label class="form-label">Ảnh vòng quay</label>
+                            <input class="form-control" type="file" accept="image/*" name="rotation">
+                        </div>
+                        <div class="form-group mb-2">
+                            <label class="form-label">Màu nút button</label>
+                            <input class="form-control" type="color" value="{{$interface_rotation->color_button??''}}" name="color_button">
+                        </div>
+                        <div class="form-group mb-2">
+                            <label class="form-label">Màu ô quà tặng</label>
+                            <input class="form-control" type="color" value="{{$interface_rotation->color_gift??''}}" name="color_gift">
                         </div>
                     </div>
                     <div class="modal-footer">
