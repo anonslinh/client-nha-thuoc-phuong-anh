@@ -220,6 +220,37 @@ class TaskManagementController extends HelperAdminController
     }
 
     /**
+     * Cập nhật thông tin
+    */
+    public function updateChildCustomer(Request $request){
+        try{
+
+            $dob = null;
+            $due_date = $request->date_of_birth;
+
+            if ($request->status == 'born'){
+                $dob = $request->date_of_birth;
+                $due_date = null;
+            }
+
+            $child = Child::find($request->child_id);
+            if ($child){
+                $child->name = $request->name;
+                $child->gender = $request->gender;
+                $child->status = $request->status;
+                $child->dob = $dob;
+                $child->due_date = $due_date;
+                $child->note = $request->note;
+
+                $child->save();
+            }
+            return back()->with(['success' => 'Cập nhật thành công!']);
+        }catch (\Exception $exception){
+            return back()->withErrors('Đã xảy ra lỗi, vui lòng thử lại sau.');
+        }
+    }
+
+    /**
      * Tính ngày tháng năm sinh của con
     */
     public function calculateDob(array $data)

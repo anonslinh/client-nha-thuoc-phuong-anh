@@ -284,6 +284,7 @@ Route::middleware([CheckLogin::class])->group(function (){
         Route::get('task-management', [TaskManagementController::class, 'indexProductBy'])->name('task-management');
         Route::get('detail-customer/{customer_id}', [TaskManagementController::class, 'detailCustomer'])->name('detail-customer');
         Route::post('store-child', [TaskManagementController::class, 'storeChildCustomer'])->name('store-child');
+        Route::post('update-child', [TaskManagementController::class, 'updateChildCustomer'])->name('update-child');
         Route::get('delete-child/{child_id}', [TaskManagementController::class, 'deleteChild'])->name('delete-child');
         Route::post('store-customer-note', [TaskManagementController::class, 'storeCustomerNote'])->name('store-customer-note');
         Route::post('update-note-item', [TaskManagementController::class, 'updateCustomerNoteItem'])->name('update-note-item');
