@@ -192,7 +192,9 @@ class GiftExchangesController extends HelperApiController
 
         $exchangeId = $request->exchange_id;
 
-        $exchange = GiftExchanges::find($exchangeId);
+        $exchange = GiftExchanges::where(function($query) use ($exchangeId){
+            $query->where('id', $exchangeId)->orWhere('exchange_code', $exchangeId);
+        })->first();
 
         if (!$exchange) {
             return response()->json(['status' => false, 'message' => 'Mã đổi quà không tồn tại'], 404);
