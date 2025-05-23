@@ -125,7 +125,8 @@ class GiftExchangesController extends HelperApiController
                 'exchange_date' => now(),
                 'status' => 'pending',
                 'gift_name' => $gift->name,
-                'gift_code' => $giftCode
+                'gift_code' => $giftCode,
+                'id' => $exchange['id']
             ];
             return response()->json([
                 'status' => true,
