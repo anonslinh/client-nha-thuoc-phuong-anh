@@ -97,7 +97,7 @@
         <div class="card">
             <div class="card-body">
                 <div class="d-flex flex-wrap gap-3 mb-9 justify-content-between align-items-center">
-                    <h5 class="card-title fw-semibold mb-0">Thông tin con</h5>
+                    <h5 class="card-title fw-semibold mb-0">Thông tin gia đình</h5>
                     <nav aria-label="breadcrumb" class="ms-auto">
                         <ol class="breadcrumb">
                             <li class="breadcrumb-item" aria-current="page">
@@ -113,7 +113,7 @@
                     <thead>
                     <tr>
                         <th scope="col" class="fw-normal ps-0">STT</th>
-                        <th scope="col" class="fw-normal">Tên bé</th>
+                        <th scope="col" class="fw-normal">Tên</th>
                         <th scope="col" class="fw-normal">Thông tin</th>
                         <th scope="col" class="fw-normal">Ghi chú</th>
                         <th scope="col" class="fw-normal">Hành động</th>
@@ -165,7 +165,7 @@
                                                 @csrf
                                                 <div class="modal-body">
                                                     <div class="form-group mb-2">
-                                                        <label class="form-label">Tên con</label>
+                                                        <label class="form-label">Tên</label>
                                                         <input class="form-control" name="name" value="{{$_child->name}}" required>
                                                     </div>
                                                     <div class="form-group mb-2">
@@ -361,7 +361,7 @@
             <div class="modal-content">
                 <div class="modal-header d-flex align-items-center">
                     <h4 class="modal-title" id="myLargeModalLabel">
-                        Thêm con
+                        Thêm thông tin gia đình
                     </h4>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
@@ -369,7 +369,7 @@
                     @csrf
                     <div class="modal-body">
                         <div class="form-group mb-2">
-                            <label class="form-label">Tên con</label>
+                            <label class="form-label">Tên</label>
                             <input class="form-control" name="name" required>
                         </div>
                         <div class="form-group mb-2">
