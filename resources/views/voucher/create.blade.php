@@ -46,8 +46,8 @@
 
                     <div class="mb-3">
                         <label class="form-label">Mã phát hành voucher theo tài khoản</label>
-                        <div class="list-branch">
-                            <table class="table table-bordered">
+                        <div class="list-branch table-responsive">
+                            <table class="table table-bordered text-nowrap">
                                 <thead>
                                 <tr>
                                     <th>STT</th>

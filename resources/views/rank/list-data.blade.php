@@ -30,21 +30,21 @@
             <div class="mt-4">
                 <form action="{{route('rank.type_rank')}}" method="post" class="row">
                     @csrf
-                    <div class="col-4">
+                    <div class="col-md-4 mb-2">
                         <select name="type" class="form-control">
                             <option value="1" @if($typeRank->type == 1) selected @endif>Cấu hình theo mức chi tiêu</option>
                             <option value="2" @if($typeRank->type == 2) selected @endif>Cấu hình theo điểm hiện tại</option>
                         </select>
                     </div>
-                    <div class="col-4">
+                    <div class="col-md-4">
                         <button class="btn btn-success">Cấu hình</button>
                     </div>
                 </form>
             </div>
         </div>
         <div class="card">
-            <div class="card-body">
-                <table class="table table-bordered">
+            <div class="card-body table-responsive">
+                <table class="table table-bordered text-nowrap">
                     <thead>
                     <tr>
                         <th>STT</th>

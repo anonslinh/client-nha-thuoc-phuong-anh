@@ -33,6 +33,11 @@
         .loading.active{
             display: flex;
         }
+        @media only screen and (max-width: 600px) {
+            .logo-win {
+                width: 100px;
+            }
+        }
     </style>
 </head>
 
@@ -45,7 +50,7 @@
     <div class="page-wrapper">
         @include('Layout.header-start')
 
-{{--        @include('Layout.left-sidebar')--}}
+       {{-- @include('Layout.left-sidebar') --}}
 
         <div class="body-wrapper">
             <div id="toast-container" class="toast-container">

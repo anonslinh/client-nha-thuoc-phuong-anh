@@ -15,6 +15,9 @@ class ProductCertificateImport implements ToModel, WithHeadingRow
     */
     public function model(array $row)
     {
+        if(empty($row['ma_san_pham'])){
+            return null;
+        }
         $productCode = $row['ma_san_pham'] ?? $row['mã_sản_phẩm']; // hỗ trợ tên cột có dấu hoặc không
 
         if (!$productCode) return null;

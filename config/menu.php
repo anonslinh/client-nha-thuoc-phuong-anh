@@ -169,6 +169,11 @@ return [
                 'name' => 'CSKH mã sản phẩm',
                 'icon' => 'solar:mask-happly-line-duotone',
                 'route' => 'crm-customers.task-management'
+            ],
+            [
+                'name' => 'Lịch ghi chú',
+                'icon' => 'solar:document-text-line-duotone',
+                'route' => 'crm-customers.list-task-note'
             ]
         ]
     ],

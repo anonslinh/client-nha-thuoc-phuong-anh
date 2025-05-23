@@ -1,3 +1,4 @@
+
 const { useState, useEffect, useRef, useContext } = React
 
 // API endpoints
@@ -59,6 +60,9 @@ function App() {
     const [showModalGift,setShowModalGift]=React.useState(false)
     const [logo, setLogo] = React.useState('assets/static/logo.png')
     const [background, setBackground] = React.useState('assets/static/background.png')
+    const [rotationImage, setRotationImage] = React.useState('assets/static/backgroundSpinner.png')
+    const [colorButton, setColorButton] = React.useState('#FF4D5C')
+    const [colorGift, setColorGift] = React.useState('#eb5757')
  
     const rotateWheel = (currentRotate, index) => {
         refT.current = `rotate(${currentRotate - index * rotate - rotate / 2}deg)`
@@ -89,9 +93,22 @@ function App() {
                 method: "get",
                 data: null
             })
-            if(res.status){                
-                setLogo(res.data.logo);
-                setBackground(res.data.background)
+            if(res.status){ 
+                if (res.data.logo) {
+                    setLogo(res.data.logo);
+                }               
+                if (res.data.background) {
+                    setBackground(res.data.background);
+                }   
+                if(res.data.rotation){
+                    setRotationImage(res.data.rotation);
+                }            
+                if(res.data.color_button){
+                    setColorButton(res.data.color_button);
+                }
+                if(res.data.color_gift){
+                    setColorGift(res.data.color_gift);
+                }
             }
     }
     useEffect(() => {        
@@ -443,7 +460,7 @@ function App() {
     </span>
         <img src={"assets/static/firework.png"} alt="logo" className="w-20 h-14 object-cover"/>
         </div>
-            <div className="main-wheel">
+            <div className="main-wheel" style={{ backgroundImage: `url(${rotationImage})`}}>
                 <ul className="wheel" style={{ transform: refT.current }}>
                     {!!listGift &&
                     !!listGift.length &&
@@ -463,6 +480,7 @@ function App() {
                                         transform: `skewY(${skewY}deg) rotate(${
                                             rotate / 2
                                         }deg)`,
+                                        backgroundColor: index % 2 == 0 ? colorGift : "#FFFFFF"
                                     }}
                                     className={`${
                                         index % 2 == 0 ? "text-item even" : "text-item"
@@ -489,23 +507,23 @@ function App() {
             </div>
 
     {/* bóng và hộp quà  */}
-<div className="w-full flex items-center justify-center pt-12 relative">
-        <img
-    src={"assets/static/giftLeft.png"}
-    className="w-7 h-auto object-cover absolute left-0 -top-7 z-10"
-        />
-        <img
-    src={"assets/static/giftRight.png"}
-    className="w-5 h-auto object-contain absolute right-0 -top-14 z-10"
-        />
-        <img
-    src={"assets/static/shadow.png"}
-    className="w-[75%] h-auto object-cover absolute bottom-0"
-        />
-        </div>
+        {/* <div className="w-full flex items-center justify-center pt-12 relative">
+                <img
+            src={"assets/static/giftLeft.png"}
+            className="w-7 h-auto object-cover absolute left-0 -top-7 z-10"
+                />
+                <img
+            src={"assets/static/giftRight.png"}
+            className="w-5 h-auto object-contain absolute right-0 -top-14 z-10"
+                />
+                <img
+            src={"assets/static/shadow.png"}
+            className="w-[75%] h-auto object-cover absolute bottom-0"
+                />
+        </div> */}
         <div className="w-full flex flex-col items-center mt-6 justify-center">
         <button
-    className="bg-[#FF4D5C] w-[90%] flex items-center justify-center rounded-[20px] mx-auto py-3"
+    className="w-[90%] flex items-center justify-center rounded-[20px] mx-auto py-3" style={{background:colorButton}}
     onClick={() =>startSpin()}
 >
 <span className="text-base font-bold text-white uppercase">
@@ -514,7 +532,7 @@ function App() {
         </button>
         <div className="grid grid-cols-2 w-[90%] gap-x-2">
         <button
-    className="bg-[#FF4D5C] flex items-center justify-center rounded-[20px] mt-4 py-3"
+    className="flex items-center justify-center rounded-[20px] mt-4 py-3" style={{background:colorButton}}
     onClick={() => getMyGift()}
 >
 <span className="text-sm font-bold text-white uppercase">
@@ -522,7 +540,7 @@ function App() {
     </span>
     </button>
     <button
-    className="bg-[#FF4D5C] flex items-center justify-center rounded-[20px] mt-4 py-3"
+    className="flex items-center justify-center rounded-[20px] mt-4 py-3" style={{background:colorButton}}
     onClick={() => refModalShowListGift.current?.setShowModal(true)}
 >
 <span className="text-sm font-bold text-white uppercase">

@@ -5,8 +5,27 @@
         <!-- Start Vertical Layout Header -->
         <!-- ---------------------------------- -->
         <nav class="navbar navbar-expand-lg p-0">
+            <ul class="navbar-nav">
+              <li class="nav-item d-flex d-xl-none">
+                <a class="nav-link nav-icon-hover-bg rounded-circle  sidebartoggler " id="headerCollapse" href="javascript:void(0)">
+                  <iconify-icon icon="solar:hamburger-menu-line-duotone" class="fs-6"></iconify-icon>
+                </a>
+              </li>
+              <li class="nav-item d-none d-xl-flex nav-icon-hover-bg rounded-circle">
+                <a class="nav-link" href="javascript:void(0)" data-bs-toggle="modal" data-bs-target="#exampleModal">
+                  <iconify-icon icon="solar:magnifer-linear" class="fs-6"></iconify-icon>
+                </a>
+              </li>
+              <li class="nav-item d-none d-lg-flex dropdown nav-icon-hover-bg rounded-circle">
+                <div class="hover-dd">
+                  <a class="nav-link" id="drop2" href="javascript:void(0)" aria-haspopup="true" aria-expanded="false">
+                    <iconify-icon icon="solar:widget-3-line-duotone" class="fs-6"></iconify-icon>
+                  </a>
+                </div>
+              </li>
+            </ul>
             <div class="d-block d-lg-none py-9 py-xl-0">
-                <img src="../assets/images/logos/logo_win_baby.svg" alt="matdash-img" />
+                <img src="../assets/images/logos/logo_win_baby.svg" class="logo-win" alt="matdash-img" />
             </div>
             <a class="navbar-toggler p-0 border-0 nav-icon-hover-bg rounded-circle" href="javascript:void(0)" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <iconify-icon icon="solar:menu-dots-bold-duotone" class="fs-6"></iconify-icon>

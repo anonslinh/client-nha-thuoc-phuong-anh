@@ -22,68 +22,73 @@
         </div>
         <div class="card">
             <div class="card-body">
-                <form action="{{route('customer')}}" method="get" class="d-flex">
-                    <div class="col-md-3" style="margin-right: 15px">
+                <form action="{{route('customer')}}" method="get" class="row">
+                    <div class="col-md-3 mb-2">
                         <input name="key_search" class="form-control"
                                placeholder="Tìm theo tên, số điện thoại ..."
                                value="{{request()->get('key_search')}}"
                         >
                     </div>
-                    <div class="col-md-2" style="margin-right: 15px">
+                    <div class="col-md-3 mb-2">
                         <select name="status" class="form-control">
                             <option value="">Sắp xếp theo</option>
                             <option value="total_invoiced" @if(request()->get('sort') == 'total_invoiced') selected @endif>Tổng đơn hàng</option>
                             <option value="total_point" @if(request()->get('sort') == 'total_point') selected @endif>Tổng điểm</option>
                         </select>
                     </div>
-                    <button class="btn btn-primary" style="margin-right: 15px">Tìm kiếm</button>
-                    <a href="{{route('customer')}}" style="margin-right: 15px" class="btn btn-danger">Hủy</a>
-                    <a href="{{route('customer.export')}}" class="btn btn-warning" style="margin-right: 15px">Xuất Excel</a>
-                    <button class="btn btn-info" type="button" data-bs-toggle="modal" data-bs-target="#checkPointCustomer">Kiểm tra điểm và đổi quà hộ</button>
+                    <div class="col-md-3 mb-2">
+                        <button class="btn btn-primary" style="margin-right: 15px">Tìm kiếm</button>
+                        <a href="{{route('customer')}}" style="margin-right: 15px" class="btn btn-danger">Hủy</a>
+                    </div>
+                    <div class="col-md-3 mb-2">
+                        <button class="btn btn-info mb-2" type="button" data-bs-toggle="modal" data-bs-target="#checkPointCustomer">Kiểm tra điểm và đổi quà hộ</button>
+                        <a href="{{route('customer.export')}}" class="btn btn-warning" style="margin-right: 15px">Xuất Excel</a>
+                    </div>
                 </form>
-                <table class="table table-bordered mt-4">
-                    <thead>
-                    <tr>
-                        <th>STT</th>
-                        <th>Khách hàng</th>
-                        <th>Tổng chi tiêu</th>
-                        <th>Tổng đơn hàng</th>
-                        <th>Điểm kiotviet</th>
-                        <th>Điểm hệ thống</th>
-                        <th>Đổi quà hộ</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    @if($listData->total() > 0)
-                        @foreach($listData as $key => $value)
-                            <tr>
-                                <td class="align-middle">{{$key + 1}}</td>
-                                <td class="align-middle">
-                                    <span>{{$value->code}}</span><br>
-                                    <span>{{$value->name}} - {{$value->contact_number}}</span>
-                                </td>
-                                <td class="align-middle">
-                                    <span>{{number_format($value->total_revenue)}}đ</span>
-                                </td>
-                                <td class="align-middle">
-                                    <p class="m-0">{{$value->total_orders}}</p>
-                                </td>
-                                <td class="align-middle">{{$value->kiotviet_reward_point}}</td>
-                                <td class="align-middle">{{$value->reward_point}}</td>
-                                <td class="align-middle">
-                                    <button class="justify-content-center badge fw-medium fs-2 btn btn-rounded btn-danger d-flex align-items-center btnExchangeGift" value="{{$value->id}}">Đổi quà hộ</button>
+                <div class="table-responsive mt-4">
+                    <table class="table table-bordered text-nowrap">
+                        <thead>
+                        <tr>
+                            <th>STT</th>
+                            <th>Khách hàng</th>
+                            <th>Tổng chi tiêu</th>
+                            <th>Tổng đơn hàng</th>
+                            <th>Điểm kiotviet</th>
+                            <th>Điểm hệ thống</th>
+                            <th>Đổi quà hộ</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        @if($listData->total() > 0)
+                            @foreach($listData as $key => $value)
+                                <tr>
+                                    <td class="align-middle">{{$key + 1}}</td>
+                                    <td class="align-middle">
+                                        <a href="{{route('crm-customers.detail-customer', ['customer_id' => $value->kiotviet_id])}}"><span>{{$value->code}}</span></a><br>
+                                        <span>{{$value->name}} - {{$value->contact_number}}</span>
+                                    </td>
+                                    <td class="align-middle">
+                                        <span>{{number_format($value->total_revenue)}}đ</span>
+                                    </td>
+                                    <td class="align-middle">
+                                        <p class="m-0">{{$value->total_orders}}</p>
+                                    </td>
+                                    <td class="align-middle">{{$value->kiotviet_reward_point}}</td>
+                                    <td class="align-middle">{{$value->reward_point}}</td>
+                                    <td class="align-middle">
+                                        <button class="justify-content-center badge fw-medium fs-2 btn btn-rounded btn-danger d-flex align-items-center btnExchangeGift" value="{{$value->id}}">Đổi quà hộ</button>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        @else
+                                <td colspan="6">
+                                    <p class="m-0 text-center text-danger">Không có dữ liệu</p>
                                 </td>
                             </tr>
-                        @endforeach
-                    @else
-                        <tr>
-                            <td colspan="6">
-                                <p class="m-0 text-center text-danger">Không có dữ liệu</p>
-                            </td>
-                        </tr>
-                    @endif
-                    </tbody>
-                </table>
+                        @endif
+                        </tbody>
+                    </table>
+                </div>
             </div>
             <div class="d-flex justify-content-center">{{$listData->appends(request()->all())->links('pagination')}}</div>
         </div>
@@ -232,7 +237,7 @@
             $("#customer-gift-exchange").modal("show");
         });
         $('#checkPointCustomer input[name="phone"]').keyup(function(){
-            var length = $(this).val().length;            
+            var length = $(this).val().length;
             if(length == 10){
                 $(".loading").addClass('active');
                 $.ajax({

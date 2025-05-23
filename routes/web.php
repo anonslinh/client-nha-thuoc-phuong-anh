@@ -62,6 +62,7 @@ Route::middleware([CheckLogin::class])->group(function (){
         Route::post('update/{id}', [GiftController::class, 'update'])->name('update');
         Route::get('delete/{id}', [GiftController::class, 'delete'])->name('delete');
         Route::post('detail-product-kiotviet', [GiftController::class, 'detailProductKiotviet'])->name('detail-product');
+        Route::post('import', [GiftController::class, 'import'])->name('import');
     });
     Route::prefix('banner')->name('banner.')->group(function (){
        Route::get('list-data', [GiftController::class, 'banner'])->name('list-data');
@@ -188,6 +189,7 @@ Route::middleware([CheckLogin::class])->group(function (){
         Route::get('employee-detail/{id}', [EmployeeController::class, 'getEmployeeDetails'])->name('employee-detail');
         Route::get('employee-export/{id}', [EmployeeController::class, 'exportEmployeeRatings'])->name('employee-export');
         Route::get('ratings-invoice', [EmployeeController::class, 'getRatingsInvoice'])->name('ratings-invoice');
+        Route::get('export-ratings-invoice', [EmployeeController::class, 'exportRatingsInvoice'])->name('export-ratings-invoice');
     });
 
     //Cài đặt tự động
@@ -286,6 +288,13 @@ Route::middleware([CheckLogin::class])->group(function (){
     //CRM chăm sóc khách hàng
     Route::prefix('crm-customers')->name('crm-customers.')->group(function () {
         Route::get('task-management', [TaskManagementController::class, 'indexProductBy'])->name('task-management');
+        Route::get('detail-customer/{customer_id}', [TaskManagementController::class, 'detailCustomer'])->name('detail-customer');
+        Route::post('store-child', [TaskManagementController::class, 'storeChildCustomer'])->name('store-child');
+        Route::get('delete-child/{child_id}', [TaskManagementController::class, 'deleteChild'])->name('delete-child');
+        Route::post('store-customer-note', [TaskManagementController::class, 'storeCustomerNote'])->name('store-customer-note');
+        Route::post('update-note-item', [TaskManagementController::class, 'updateCustomerNoteItem'])->name('update-note-item');
+        Route::get('list-task-note', [TaskManagementController::class, 'listTaskNote'])->name('list-task-note');
+        Route::get('export-task-management', [TaskManagementController::class, 'excelIndexProductBy'])->name('export-task-management');
     });
 
     Route::get('logout', [HomeController::class, 'logout'])->name('logout');

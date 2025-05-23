@@ -48,60 +48,70 @@
                     </div>
                     <div class="mb-3 data-account d-none">
                         <label class="form-label">Mã phát hành voucher theo tài khoản</label>
-                        <table class="table table-bordered">
-                            <thead>
-                            <tr>
-                                <th>STT</th>
-                                <th>Tên chi nhánh</th>
-                                <th>Mã phát hành</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            @foreach($account_branches as $key => $value)
-                                <tr>
-                                    <td>{{$key + 1}}</td>
-                                    <td>{{$value->code}}</td>
-                                    <td>
-                                        <input name="voucher[{{$key}}][code]" value="{{$value->code}}" hidden>
-                                        <input name="voucher[{{$key}}][release_code]" type="text" class="form-control releaseCode">
-                                    </td>
-                                </tr>
-                            @endforeach
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="mb-3 data-branch">
-                        <label class="form-label">Cấu hình theo chi nhánh:</label>
-                        <div class="list-branch">
-                            <div class="d-flex align-items-center" style="margin-bottom: 15px">
-                                <input class="form-control" name="quantity_setup" placeholder="Số lương quà tặng" type="number" style="max-width: 250px;margin-right: 15px">
-                                <button class="btn btn-primary btnAddAll" type="button">Áp dụng cho tất cả</button>
-                                <button class="btn btn-primary btnAddProduct" type="button" style="margin-left: 15px">Đồng bộ với cửa hàng kiotviet</button>
-                            </div>
-                            <table class="table table-bordered">
+                        <div class="table-responsive">
+                            <table class="table table-bordered text-nowrap">
                                 <thead>
                                 <tr>
                                     <th>STT</th>
                                     <th>Tên chi nhánh</th>
-                                    <th>Địa chỉ</th>
-                                    <th>Số lượng quà</th>
+                                    <th>Mã phát hành</th>
                                 </tr>
                                 </thead>
                                 <tbody>
-                                @foreach($listBranch as $key => $item)
+                                @foreach($account_branches as $key => $value)
                                     <tr>
                                         <td>{{$key + 1}}</td>
-                                        <td>{{$item->branch_name}}</td>
-                                        <td>{{$item->address.'-'.$item->ward_name.'-'.$item->location_name}}</td>
+                                        <td>{{$value->code}}</td>
                                         <td>
-                                            <input  value="{{$item->kiotviet_id}}" hidden class="kiotviet_id">
-                                            <input name="branch[{{$key}}][id]" value="{{$item->id}}" hidden>
-                                            <input name="branch[{{$key}}][quantity]" type="number" class="form-control quantity">
+                                            <input name="voucher[{{$key}}][code]" value="{{$value->code}}" hidden>
+                                            <input name="voucher[{{$key}}][release_code]" type="text" class="form-control releaseCode">
                                         </td>
                                     </tr>
                                 @endforeach
                                 </tbody>
                             </table>
+                        </div>
+                    </div>
+                    <div class="mb-3 data-branch">
+                        <label class="form-label">Cấu hình theo chi nhánh:</label>
+                        <div class="list-branch">
+                            <div class="row">
+                                <div class="col-md-4 mb-2">
+                                    <input class="form-control" name="quantity_setup" placeholder="Số lương quà tặng" type="number">
+                                </div>
+                                <div class="col-md-4 mb-2">
+                                    <button class="btn btn-primary btnAddAll" type="button">Áp dụng cho tất cả</button>
+                                </div>
+                                <div class="col-md-4 mb-2">
+                                    <button class="btn btn-primary btnAddProduct" type="button">Đồng bộ với cửa hàng kiotviet</button>
+                                </div>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="table table-bordered text-nowrap">
+                                    <thead>
+                                    <tr>
+                                        <th>STT</th>
+                                        <th>Tên chi nhánh</th>
+                                        <th>Địa chỉ</th>
+                                        <th>Số lượng quà</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    @foreach($listBranch as $key => $item)
+                                        <tr>
+                                            <td>{{$key + 1}}</td>
+                                            <td>{{$item->branch_name}}</td>
+                                            <td>{{$item->address.'-'.$item->ward_name.'-'.$item->location_name}}</td>
+                                            <td>
+                                                <input  value="{{$item->kiotviet_id}}" hidden class="kiotviet_id">
+                                                <input name="branch[{{$key}}][id]" value="{{$item->id}}" hidden>
+                                                <input name="branch[{{$key}}][quantity]" type="number" class="form-control quantity">
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                     <div class="mb-3">

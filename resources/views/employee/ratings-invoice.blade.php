@@ -13,7 +13,7 @@
                             </div>
                         </div>
 
-                        <div class="hstack gap-9 mt-4 mt-md-0">
+                        <div class="hstack gap-9 mt-4 mt-md-0 flex-wrap">
                             <div class="d-flex align-items-center gap-2">
                                 <span class="d-block flex-shrink-0 round-8 bg-danger rounded-circle"></span>
                                 <span class="text-nowrap text-muted">⭐</span>
@@ -44,16 +44,16 @@
         </div>
         <div class="card">
             <div class="card-body">
-                <form action="{{route('employees.ratings-invoice')}}" method="get" class="d-flex align-items-end flex-wrap">
-                    <div class="col-md-2" style="margin-right: 10px">
+                <form action="{{route('employees.ratings-invoice')}}" method="get" class="row">
+                    <div class="col-md-3 mb-2">
                         <label>Từ ngày</label>
                         <input name="from_date" class="form-control" type="datetime-local" value="{{ request()->get('from_date') }}">
                     </div>
-                    <div class="col-md-2" style="margin-right: 10px">
+                    <div class="col-md-3 mb-2">
                         <label>Đến ngày</label>
                         <input name="to_date" class="form-control" type="datetime-local" value="{{ request()->get('to_date') }}">
                     </div>
-                    <div class="col-md-2" style="margin-right: 10px">
+                    <div class="col-md-3 mb-2">
                         <label>&nbsp;</label>
                         <select name="rating" class="form-control">
                             <option value="" {{ request()->get('rating') == '' ? 'selected' : '' }}>Lọc theo số sao</option>
@@ -64,43 +64,47 @@
                             <option value="1" {{ request()->get('rating') == '1' ? 'selected' : '' }}>⭐ (1 sao)</option>
                         </select>
                     </div>
-                    <div class="col-md-5 d-flex" style="gap: 10px">
+                    <div class="col-md-6">
                         <button class="btn btn-primary align-self-end">Tìm kiếm</button>
                         <a href="{{ route('employees.ratings-invoice') }}" class="btn btn-danger align-self-end">Hủy</a>
-                        {{--                        <a href="{{ route('employees.employee-export', ['id' => $employee->kiotviet_id, 'from_date' => request('from_date'), 'to_date' => request('to_date'), 'rating' => request('rating')]) }}" class="btn btn-warning align-self-end">Xuất Excel</a>--}}
+                        <a href="{{ route('employees.export-ratings-invoice', ['from_date' => request('from_date'), 'to_date' => request('to_date'), 'rating' => request('rating')]) }}"
+                           class="btn btn-danger align-self-end">
+                            <i class="ti ti-transition-right me-1 fs-4"></i>Xuất Excel</a>
                     </div>
                 </form>
-                <table class="table table-bordered mt-4">
-                    <thead>
-                    <tr>
-                        <th>STT</th>
-                        <th>Hoá đơn</th>
-                        <th>Sao</th>
-                        <th>Nội dung</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    @foreach($listData as $key => $item)
+                <div class="table-responsive mt-4">
+                    <table class="table table-bordered text-nowrap">
+                        <thead>
                         <tr>
-                            <td>{{ ($listData->currentPage() - 1) * $listData->perPage() + $key + 1 }}</td>
-                            <td>
-                                <span>{{ optional($item->invoice)->code }} - {{ number_format(optional($item->invoice)->total_payment) }}đ</span><br>
-                                <span>{{optional($item->invoice)->sold_by_name}}</span><br>
-                                <span>{{optional($item->invoice)->branch_name}}</span><br>
-{{--                                <span>{{ optional($item->invoice)->code }}</span><br>--}}
-
-                            </td>
-                            <td>
-                                @for ($i = 1; $i <= 5; $i++)
-                                    <i class="bi {{ $i <= $item->rating ? 'bi-star-fill text-warning' : 'bi-star text-secondary' }}"></i>
-                                @endfor
-                                    <br><span>{{date_format(date_create($item->created_at), 'h:s d/m/Y')}}</span>
-                            </td>
-                            <td>{{$item->comment}}</td>
+                            <th>STT</th>
+                            <th>Hoá đơn</th>
+                            <th>Sao</th>
+                            <th>Nội dung</th>
                         </tr>
-                    @endforeach
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                        @foreach($listData as $key => $item)
+                            <tr>
+                                <td>{{ ($listData->currentPage() - 1) * $listData->perPage() + $key + 1 }}</td>
+                                <td>
+                                    <span>{{ optional($item->invoice)->code }} - {{ number_format(optional($item->invoice)->total_payment) }}đ</span><br>
+                                    <span>{{optional($item->invoice)->sold_by_name}}</span><br>
+                                    <span>{{optional($item->invoice)->branch_name}}</span><br>
+    {{--                                <span>{{ optional($item->invoice)->code }}</span><br>--}}
+
+                                </td>
+                                <td>
+                                    @for ($i = 1; $i <= 5; $i++)
+                                        <i class="bi {{ $i <= $item->rating ? 'bi-star-fill text-warning' : 'bi-star text-secondary' }}"></i>
+                                    @endfor
+                                        <br><span>{{date_format(date_create($item->created_at), 'h:s d/m/Y')}}</span>
+                                </td>
+                                <td>{{$item->comment}}</td>
+                            </tr>
+                        @endforeach
+                        </tbody>
+                    </table>
+                </div>
             </div>
             <div class="d-flex justify-content-center">{{$listData->appends(request()->all())->links('pagination')}}</div>
         </div>

@@ -19,23 +19,29 @@
                 </div>
             </div>
             <div class="card-body">
-                <div class="d-flex justify-content-end align-items-center">
-                    <form action="{{route('events.list-product')}}" class="d-flex justify-content-end align-items-center w-75">
-                        <select class="form-control" name="point" style="border-radius: inherit;max-width: 250px;margin-right: 15px">
-                            <option value="">Tất cả</option>
-                            @foreach($point as $item)
-                                <option value="{{$item}}" @if(request()->get('point') == $item) selected @endif>SP tích {{$item}} điểm</option>
-                            @endforeach
-                        </select>
-                        <input class="form-control" style="border-radius: inherit;max-width: 250px;margin-right: 15px" value="{{request()->get('key_search')}}"
+                <div class="">
+                    <form action="{{route('events.list-product')}}" class="row">
+                        <div class="col-md-3 mb-2">
+                            <select class="form-control" name="point" style="border-radius: inherit;">
+                                <option value="">Tất cả</option>
+                                @foreach($point as $item)
+                                    <option value="{{$item}}" @if(request()->get('point') == $item) selected @endif>SP tích {{$item}} điểm</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="col-md-3 mb-2">
+                            <input class="form-control" style="border-radius: inherit;" value="{{request()->get('key_search')}}"
                                placeholder="Tìm kiếm..." name="key_search">
-                        <button class="btn btn-outline-success" style="border-radius: inherit;margin-right: 15px">Tìm kiếm</button>
-                        <a href="{{route('events.list-product')}}" style="border-radius: inherit" class="btn btn-outline-danger">Hủy</a>
+                        </div>
+                        <div class="col-md-3 mb-2">
+                            <button class="btn btn-outline-success" style="border-radius: inherit; margin-right:15px">Tìm kiếm</button>
+                            <a href="{{route('events.list-product')}}" style="border-radius: inherit" class="btn btn-outline-danger">Hủy</a>
+                        </div>
                     </form>
                 </div>
                 <div class="mt-4">
-                    <div class=table-responsive">
-                        <table class="table table-bordered">
+                    <div class="table-responsive">
+                        <table class="table table-bordered text-nowrap">
                             <thead>
                             <tr>
                                 <th class="align-middle">Tên / Mã SP</th>

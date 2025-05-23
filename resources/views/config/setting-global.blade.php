@@ -84,8 +84,8 @@
         </div>
 
         <div class="card">
-            <div class="card-body">
-                <table class="table table-bordered">
+            <div class="card-body table-responsive">
+                <table class="table table-bordered text-nowrap">
                     <thead>
                     <tr>
                         <th>STT</th>
@@ -137,7 +137,7 @@
                     <tr>
                         <td>{{$index}}</td>
                         <td>Trả dữ liệu đơn hàng</td>
-                        <td>Hệ thống sẽ trả dữ liệu đơn hàng cho khách hàng khi bạn bật tính năng và tự động trả rỗng khi bạn tắt tính năng</td>
+                        <td>Hệ thống sẽ trả dữ liệu đơn hàng cho khách hàng khi bạn bật tính năng và <br/> tự động trả rỗng khi bạn tắt tính năng</td>
                         <td>
                             <label class="switch">
                                 <input type="checkbox" name="type_invoice" @if($type_invoice == 1) checked @endif value="2">
@@ -148,8 +148,8 @@
                     <tr>
                         <td>{{$index + 1}}</td>
                         <td>Hình thức tính điểm</td>
-                        <td>Tính năng không tính điểm cho khách hàng khi mua hàng có sử dụng mã
-                            voucher hoặc giảm giá sản phẩm (Lưu ý: Hình thức này chỉ hoạt động khi ápp dụng <span class="fw-bolder">Tích điểm theo từng sản phẩm</span> )</td>
+                        <td>Tính năng không tính điểm cho khách hàng khi mua hàng <br/> có sử dụng mã
+                            voucher hoặc giảm giá sản phẩm <br/> (Lưu ý: Hình thức này chỉ hoạt động khi ápp dụng <br/> <span class="fw-bolder">Tích điểm theo từng sản phẩm</span> )</td>
                         <td>
                             <label class="switch">
                                 <input type="checkbox" name="calculator_point" @if($calculator_point == 1) checked @endif>
@@ -160,7 +160,7 @@
                     <tr>
                         <td>{{$index + 2}}</td>
                         <td>Tùy chọn xuất mã QR khi đổi quà</td>
-                        <td>Tính năng chọn hình thức xuất mã QR khi đổi quà: Bật khi sử dụng mã lịch sử đổi quà để thuận tiện ghi chú và đối soát kế toán và Tăt khi sử dụng mã sản phẩm để nhân viên bán hàng quét lấy hàng nhanh</td>
+                        <td>Tính năng chọn hình thức xuất mã <br/> QR khi đổi quà: Bật khi sử dụng mã lịch sử đổi quà để thuận tiện <br/> ghi chú và đối soát kế toán và Tăt khi sử dụng mã <br/> sản phẩm để nhân viên bán hàng quét lấy hàng nhanh</td>
                         <td>
                             <label class="switch">
                                 <input type="checkbox" name="gift_code" @if($giftCode == 1) checked @endif>
@@ -192,8 +192,8 @@
             </div>
         </div>
         <div class="card">
-            <div class="card-body">
-                <table class="table table-bordered">
+            <div class="card-body table-responsive">
+                <table class="table table-bordered text-nowrap">
                     <thead>
                     <tr>
                         <th>STT</th>
@@ -207,8 +207,8 @@
                         <tr>
                             <td class="align-middle">1</td>
                             <td class="align-middle">Tích điểm theo hóa đơn</td>
-                            <td class="align-middle">Cộng điểm dựa trên tổng giá trị đơn hàng . Tỷ lệ điểm do shop cài đặt (vd: 1% hoặc 1.000đ = 1 điểm).</td>
-                            <td class="align-middle">Khách mua đơn 500.000đ → Tích 1% → Nhận 5 điểm.</td>
+                            <td class="align-middle">Cộng điểm dựa trên tổng giá trị <br/> đơn hàng . Tỷ lệ điểm do shop cài đặt <br/> (vd: 1% hoặc 1.000đ = 1 điểm).</td>
+                            <td class="align-middle">Khách mua đơn 500.000đ <br/> → Tích 1% → Nhận 5 điểm.</td>
                             <td class="align-middle">
                                 <label class="switch">
                                     <input type="checkbox" name="type_point" @if($type_point == 1) checked @endif value="1">
@@ -219,7 +219,7 @@
                     <tr>
                         <td class="align-middle">2</td>
                         <td class="align-middle">Tích điểm theo từng sản phẩm</td>
-                        <td class="align-middle">Cộng điểm theo từng sản phẩm. Shop cài đặt số điểm riêng cho mỗi sản phẩm, khách mua sản phẩm nào nhận điểm sản phẩm đó.</td>
+                        <td class="align-middle">Cộng điểm theo từng sản phẩm.<br/> Shop cài đặt số điểm riêng <br/> cho mỗi sản phẩm, khách mua sản phẩm <br/> nào nhận điểm sản phẩm đó.</td>
                         <td class="align-middle">
                             <p class="m-0">- Sản phẩm A: 10 điểm.</p>
                             <p class="m-0">- Sản phẩm B: 5 điểm.</p>

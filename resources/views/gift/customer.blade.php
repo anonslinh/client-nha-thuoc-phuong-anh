@@ -21,14 +21,14 @@
         </div>
         <div class="card">
             <div class="card-body">
-                <form action="{{route('customer.exchange-gift')}}" method="get" class="d-flex">
-                    <div class="col-3" style="margin-right: 15px">
+                <form action="{{route('customer.exchange-gift')}}" method="get" class="row">
+                    <div class="col-md-3 mb-2">
                         <input name="key_search" class="form-control"
                                placeholder="Tìm theo tên, số điện thoại ..."
                                value="{{request()->get('key_search')}}"
                         >
                     </div>
-                    <div class="col-2" style="margin-right: 15px">
+                    <div class="col-md-3 mb-2">
                         <select name="status" class="form-control">
                             <option value="">Trạng thái</option>
                             <option value="pending" @if(request()->get('status') == 'pending') selected @endif>Chưa sử dụng</option>
@@ -36,66 +36,70 @@
                             <option value="cancelled" @if(request()->get('status') == 'cancelled') selected @endif>Đã hủy</option>
                         </select>
                     </div>
-                    <button class="btn btn-primary" style="margin-right: 15px">Tìm kiếm</button>
-                    <a href="{{route('customer.exchange-gift')}}" style="margin-right: 15px" class="btn btn-danger">Hủy</a>
-                    <a href="{{route('customer.export-exchange-gift')}}" class="btn btn-warning">Xuất Excel</a>
+                    <div class="col-md-6">
+                        <button class="btn btn-primary" style="margin-right: 15px">Tìm kiếm</button>
+                        <a href="{{route('customer.exchange-gift')}}" style="margin-right: 15px" class="btn btn-danger">Hủy</a>
+                        <a href="{{route('customer.export-exchange-gift')}}" class="btn btn-warning">Xuất Excel</a>
+                    </div>
                 </form>
-                <table class="table table-bordered mt-4">
-                    <thead>
-                    <tr>
-                        <th>STT</th>
-                        <th>Tiêu đề</th>
-                        <th>Hình ảnh</th>
-                        <th>Khách hàng</th>
-                        <th>Trạng thái</th>
-                        <th>Điểm quy đổi</th>
-                        <th>Hoàn Điểm</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    @if($listData->total() > 0)
-                        @foreach($listData as $key => $value)
+                <div class="table-responsive mt-4">
+                    <table class="table table-bordered text-nowrap">
+                        <thead>
+                        <tr>
+                            <th>STT</th>
+                            <th>Tiêu đề</th>
+                            <th>Hình ảnh</th>
+                            <th>Khách hàng</th>
+                            <th>Trạng thái</th>
+                            <th>Điểm quy đổi</th>
+                            <th>Hoàn Điểm</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        @if($listData->total() > 0)
+                            @foreach($listData as $key => $value)
+                                <tr>
+                                    <td class="align-middle">{{$key + 1}}</td>
+                                    <td class="align-middle">
+                                        <p class="m-0">Tên: {{$value->name}}</p>
+                                        <p class="m-0">Mã: {{$value->exchange_code}}</p>
+                                        <p class="m-0">Barcode: {{$value->code}}</p>
+                                    </td>
+                                    <td class="align-middle">
+                                        <img src="{{$value->image}}" style="width: 100px">
+                                    </td>
+                                    <td class="align-middle">
+                                        <p class="m-0">Tên: {{$value->name_customer}}</p>
+                                        <p class="m-0">SĐT: {{$value->contact_phone}}</p>
+                                    </td>
+                                    <td class="align-middle">
+                                        @if($value->status == 'pending')
+                                            <p class="m-0 text-primary">Chưa sử dụng</p>
+                                        @elseif($value->status == 'completed')
+                                            <p class="m-0 text-success">Đã sử dụng</p>
+                                        @else
+                                            <p class="m-0 text-danger">Đã hủy</p>
+                                        @endif
+                                    </td>
+                                    <td class="align-middle">{{$value->points_used}}</td>
+                                    <td class="align-middle">
+                                        @if($value->status == 'pending')
+                                            <a href="{{route('customer.exchange-gift-confirm',$value->id)}}" class="btn btn-info">Đã nhận</a>
+                                            <a href="{{route('customer.exchange-gift-return',$value->id)}}" class="btn btn-warning">Hoàn điểm</a>
+                                        @endif
+                                    </td>
+                                </tr>
+                            @endforeach
+                        @else
                             <tr>
-                                <td class="align-middle">{{$key + 1}}</td>
-                                <td class="align-middle">
-                                    <p class="m-0">Tên: {{$value->name}}</p>
-                                    <p class="m-0">Mã: {{$value->exchange_code}}</p>
-                                    <p class="m-0">Barcode: {{$value->code}}</p>
-                                </td>
-                                <td class="align-middle">
-                                    <img src="{{$value->image}}" style="width: 100px">
-                                </td>
-                                <td class="align-middle">
-                                    <p class="m-0">Tên: {{$value->name_customer}}</p>
-                                    <p class="m-0">SĐT: {{$value->contact_phone}}</p>
-                                </td>
-                                <td class="align-middle">
-                                    @if($value->status == 'pending')
-                                        <p class="m-0 text-primary">Chưa sử dụng</p>
-                                    @elseif($value->status == 'completed')
-                                        <p class="m-0 text-success">Đã sử dụng</p>
-                                    @else
-                                        <p class="m-0 text-danger">Đã hủy</p>
-                                    @endif
-                                </td>
-                                <td class="align-middle">{{$value->points_used}}</td>
-                                <td class="align-middle">
-                                    @if($value->status == 'pending')
-                                        <a href="{{route('customer.exchange-gift-confirm',$value->id)}}" class="btn btn-info mb-2">Đã nhận</a>
-                                        <a href="{{route('customer.exchange-gift-return',$value->id)}}" class="btn btn-warning">Hoàn điểm</a>
-                                    @endif
+                                <td colspan="6">
+                                    <p class="m-0 text-center text-danger">Không có dữ liệu</p>
                                 </td>
                             </tr>
-                        @endforeach
-                    @else
-                        <tr>
-                            <td colspan="6">
-                                <p class="m-0 text-center text-danger">Không có dữ liệu</p>
-                            </td>
-                        </tr>
-                    @endif
-                    </tbody>
-                </table>
+                        @endif
+                        </tbody>
+                    </table>
+                </div>
             </div>
             <div class="d-flex justify-content-center">{{$listData->appends(request()->all())->links('pagination')}}</div>
         </div>

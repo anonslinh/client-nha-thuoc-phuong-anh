@@ -171,4 +171,38 @@ class KiotVietService
         } while ($num > 0);
         return str_pad($str, $length, $characters[0], STR_PAD_LEFT);
     }
+
+    /**
+     * Lấy dữ liệu sản phẩm theo mã sản phẩm
+    **/
+    public function detailProduct ($product_code)
+    {
+        $data = [];
+        $personalAccessTokens = PersonalAccessTokens::whereNotNull('retailer')->get();
+        foreach ($personalAccessTokens as $value){
+            $tokens = $this->getAccessTokenAllBranches($value->access_token_code);
+            $accessToken = $tokens->access_token;
+            $retailer = $tokens->retailer;
+            $response = Http::withHeaders([
+                'Retailer'      => $retailer,
+                'Authorization' => 'Bearer ' . $accessToken,
+                'Content-Type'  => 'application/json',
+            ])->get($this->urlKiotViet()['url_detail_product'].$product_code);
+            $product = $response->json();
+            if (empty($product['responseStatus'])){
+                $data[] = $product;
+            }
+        }
+        return $data;
+    }
+    /**
+     * Lưu hình ảnh băng url
+    **/
+    public function saveImage ($url,$path)
+    {
+        $imgData = file_get_contents($url);
+        $filename = 'upload/'.$path.'/' . uniqid() . '.jpg';
+        file_put_contents($filename, $imgData);
+        return $filename;
+    }
 }
