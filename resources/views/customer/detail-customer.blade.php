@@ -97,7 +97,7 @@
         <div class="card">
             <div class="card-body">
                 <div class="d-flex flex-wrap gap-3 mb-9 justify-content-between align-items-center">
-                    <h5 class="card-title fw-semibold mb-0">Thông tin con</h5>
+                    <h5 class="card-title fw-semibold mb-0">Thông tin gia đình</h5>
                     <nav aria-label="breadcrumb" class="ms-auto">
                         <ol class="breadcrumb">
                             <li class="breadcrumb-item" aria-current="page">
@@ -109,59 +109,106 @@
                         </ol>
                     </nav>
                 </div>
-                <div class="tab-content mb-n3">
-                    <div class="tab-pane active" id="app" role="tabpanel">
-                        <div class="table-responsive" data-simplebar>
-                            <table class="table text-nowrap align-middle table-custom mb-0 last-items-borderless">
-                                <thead>
-                                <tr>
-                                    <th scope="col" class="fw-normal ps-0">STT</th>
-                                    <th scope="col" class="fw-normal">Tên bé</th>
-                                    <th scope="col" class="fw-normal">Thông tin</th>
-                                    <th scope="col" class="fw-normal">Ghi chú</th>
-                                    <th scope="col" class="fw-normal">Hành động</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                @foreach($children as $k => $_child)
-                                    <tr>
-                                        <td class="ps-0">{{$k+1}}</td>
-                                        <td>
-                                            <span>{{$_child->name}}</span><br>
-                                            <span>{{$_child->display_info}}</span><br>
-                                            @if($_child->status == 'pregnant') <span>Đang mang bầu</span> @endif
-                                            @if($_child->status == 'born') <span>Đã sinh</span> @endif
-                                        </td>
-                                        <td>
+                <table class="table text-nowrap align-middle table-custom mb-0 last-items-borderless">
+                    <thead>
+                    <tr>
+                        <th scope="col" class="fw-normal ps-0">STT</th>
+                        <th scope="col" class="fw-normal">Tên</th>
+                        <th scope="col" class="fw-normal">Thông tin</th>
+                        <th scope="col" class="fw-normal">Ghi chú</th>
+                        <th scope="col" class="fw-normal">Hành động</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    @foreach($children as $k => $_child)
+                        <tr>
+                            <td class="ps-0">{{$k+1}}</td>
+                            <td>
+                                <span>{{$_child->name}}</span><br>
+                                <span>{{$_child->display_info}}</span><br>
+                                @if($_child->status == 'pregnant') <span>Đang mang bầu</span> @endif
+                                @if($_child->status == 'born') <span>Đã sinh</span> @endif
+                            </td>
+                            <td>
                                             <span>
                                                 Giới tính:
                                                 @if($_child->gender == 'male') Bé trai @endif
                                                 @if($_child->gender == 'female') Bé gái @endif
                                                 @if($_child->gender == 'unknown') Không xác định @endif
                                             </span>
-                                            <br><span>
+                                <br><span>
                                                 Ngày sinh hoặc dư kiến:
                                             </span><br>
-                                            @if($_child->status == 'pregnant' && $_child->due_date)
-                                                <span>{{ \Carbon\Carbon::parse($_child->due_date)->format('d/m/Y') }}</span>
-                                            @endif
-                                            @if($_child->status == 'born' && $_child->dob)
-                                                <span>{{ \Carbon\Carbon::parse($_child->dob)->format('d/m/Y') }}</span>
-                                            @endif
-                                        </td>
-                                        <td>
-                                            <span>{{$_child->note}}</span>
-                                        </td>
-                                        <td>
-                                            <a class="dropdown-item text-danger btn-sa-confirm" href="{{route('crm-customers.delete-child', ['child_id' => $_child->id])}}">Xóa</a>
-                                        </td>
-                                    </tr>
-                                @endforeach
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
+                                @if($_child->status == 'pregnant' && $_child->due_date)
+                                    <span>{{ \Carbon\Carbon::parse($_child->due_date)->format('d/m/Y') }}</span>
+                                @endif
+                                @if($_child->status == 'born' && $_child->dob)
+                                    <span>{{ \Carbon\Carbon::parse($_child->dob)->format('d/m/Y') }}</span>
+                                @endif
+                            </td>
+                            <td>
+                                <span>{{$_child->note}}</span>
+                            </td>
+                            <td>
+
+                                <!-- Modal thêm con -->
+                                <div class="modal fade" id="modalUpdateChild{{$_child->id}}" tabindex="-1">
+                                    <div class="modal-dialog" role="document">
+                                        <div class="modal-content">
+                                            <div class="modal-header d-flex align-items-center">
+                                                <h4 class="modal-title" id="myLargeModalLabel">
+                                                    Cập nhật thông tin: {{$_child->name}}
+                                                </h4>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <form action="{{route('crm-customers.update-child', ['child_id' => $_child->id])}}" method="post" class="modal-content" enctype="multipart/form-data">
+                                                @csrf
+                                                <div class="modal-body">
+                                                    <div class="form-group mb-2">
+                                                        <label class="form-label">Tên</label>
+                                                        <input class="form-control" name="name" value="{{$_child->name}}" required>
+                                                    </div>
+                                                    <div class="form-group mb-2">
+                                                        <label class="form-label">Trạng thái</label>
+                                                        <select name="status" class="form-control">
+                                                            <option @if($_child->status == 'born') selected @endif value="born">Đã sinh</option>
+                                                            <option @if($_child->status == 'pregnant') selected @endif value="pregnant">Mang bầu</option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="form-group mb-2">
+                                                        <label class="form-label">Giới tính</label>
+                                                        <select name="gender" class="form-control ">
+                                                            <option @if($_child->gender == 'male') selected @endif value="male">Bé trai</option>
+                                                            <option @if($_child->gender == 'female') selected @endif value="female">Bé gái</option>
+                                                            <option @if($_child->gender == 'unknown') selected @endif value="unknown">Không xác định</option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="form-group mb-2">
+                                                        <label class="form-label">Ngày sinh hoặc dư kiến</label>
+                                                        <input class="form-control" name="date_of_birth" type="date" required
+                                                        @if($_child->status == 'pregnant' && $_child->due_date) value="{{$_child->due_date}}" @else value="{{$_child->dob}}" @endif
+                                                        >
+                                                    </div>
+                                                    <div class="form-group mb-2">
+                                                        <label class="form-label">Ghi chú</label>
+                                                        <textarea style="height: 150px" class="form-control" name="note" required>{{$_child->note}}</textarea>
+                                                    </div>
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                                                    <button class="btn btn-primary">Xác nhận</button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                                <a class="text-primary" data-bs-toggle="modal" data-bs-target="#modalUpdateChild{{$_child->id}}">Cập nhật</a><br>
+                                <a class="text-danger btn-sa-confirm" href="{{route('crm-customers.delete-child', ['child_id' => $_child->id])}}">Xóa</a>
+                            </td>
+                        </tr>
+                    @endforeach
+                    </tbody>
+                </table>
             </div>
         </div>
         <div class="card">
@@ -314,7 +361,7 @@
             <div class="modal-content">
                 <div class="modal-header d-flex align-items-center">
                     <h4 class="modal-title" id="myLargeModalLabel">
-                        Thêm con
+                        Thêm thông tin gia đình
                     </h4>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
@@ -322,7 +369,7 @@
                     @csrf
                     <div class="modal-body">
                         <div class="form-group mb-2">
-                            <label class="form-label">Tên con</label>
+                            <label class="form-label">Tên</label>
                             <input class="form-control" name="name" required>
                         </div>
                         <div class="form-group mb-2">
