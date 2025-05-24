@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('order_code')->index()->nullable();
             $table->string('order_id')->nullable();
             $table->string('title')->index();
-            $table->tinyInteger('point');
+            $table->integer('point');
             $table->timestamps();
         });
     }
