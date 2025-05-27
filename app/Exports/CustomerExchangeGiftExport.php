@@ -27,6 +27,9 @@ class CustomerExchangeGiftExport implements FromCollection, WithHeadings, WithCo
                 ->join('customers', 'customers.kiotviet_id', '=', 'gift_exchanges.customer_id')
                 ->select('gift_exchanges.*','customers.name as name_customer');
 
+        if (isset($this->request->status)){
+            $query = $query->where('gift_exchanges.status', $this->request->status);
+        }
         return $query->orderBy('customers.created_at', 'desc')->get()->map(function ($item) {
             $gift = Gift::find($item->gift_id);
             if ($item->status == 'pending'){
