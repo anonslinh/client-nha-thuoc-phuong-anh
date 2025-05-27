@@ -296,12 +296,17 @@ class RotationController extends HelperAdminController
                 return response()->json($dateReturn, Response::HTTP_OK);
             }
             $this->getInvoiceKiotviet($rotation, $customer);
-            $ruleID = HistoryInvoiceRotation::where('customer_id', $customer->id)->where('used', 0)->first()->rule_rotation_id??0;
+            $historyInvoice = HistoryInvoiceRotation::where('customer_id', $customer->id)->where('used', 0)->first();
             $countPlay = HistoryInvoiceRotation::where('customer_id', $customer->id)->where('used', 0)->count();
-            if ($ruleID > 0){
-                $listGift = GiftRotation::where('rule_rotation_id', $ruleID)->get();
+            if (isset($historyInvoice)){
+                $ruleID = $historyInvoice->rule_rotation_id;
+                $branchID = Branch::where('kiotviet_id', $historyInvoice->branch_id)->first()->id??0;
+                $giftID = GiftRotationQuantity::where('branches_id', $branchID)->pluck('gift_rotation_id')->toArray();
+                $listGift = GiftRotation::where('rule_rotation_id', $ruleID)->whereIn('id', $giftID)->get();
             }else{
-                $listGift = GiftRotation::where('rule_rotation_id', $ruleDefaultID)->get();
+                $branchID = Branch::where('kiotviet_id', $customer->branch_id)->first()->id??0;
+                $giftID = GiftRotationQuantity::where('branches_id', $branchID)->pluck('gift_rotation_id')->toArray();
+                $listGift = GiftRotation::where('rule_rotation_id', $ruleDefaultID)->whereIn('id', $giftID)->get();
             }
             $dateReturn = [
                 'status' => true,
