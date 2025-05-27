@@ -39,7 +39,7 @@
                     <div class="col-md-6">
                         <button class="btn btn-primary" style="margin-right: 15px">Tìm kiếm</button>
                         <a href="{{route('customer.exchange-gift')}}" style="margin-right: 15px" class="btn btn-danger">Hủy</a>
-                        <a href="{{route('customer.export-exchange-gift')}}" class="btn btn-warning">Xuất Excel</a>
+                        <a href="{{route('customer.export-exchange-gift', ['status' => request('status'), 'key_search' => request('key_search')])}}" class="btn btn-warning">Xuất Excel</a>
                     </div>
                 </form>
                 <div class="table-responsive mt-4">
