@@ -145,6 +145,11 @@ return [
                 'type' => 'title'
             ],
             [
+                'name' => 'Cài đặt',
+                'icon' => 'solar:settings-line-duotone',
+                'route' => 'rotation.gift_checkin.setting'
+            ],
+            [
                 'name' => 'DS quà tặng',
                 'icon' => 'solar:settings-line-duotone',
                 'route' => 'rotation.gift_checkin.index'
@@ -159,6 +164,11 @@ return [
                 'icon' => 'solar:settings-line-duotone',
                 'route' => 'rotation.gift_checkin.exchange-gift'
             ],
+            [
+                'name' => 'Khách hàng checkin',
+                'icon' => 'solar:settings-line-duotone',
+                'route' => 'rotation.gift_checkin.list-customer'
+            ]
         ]
     ],
     [

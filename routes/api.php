@@ -86,6 +86,9 @@ Route::prefix('rotation')->group(function (){
 Route::prefix('rotation-checkin')->group(function (){
     Route::post('list-gift', [RotationController::class, 'listGiftCheckinAPI']);
     Route::post('exchange-gift', [RotationController::class, 'exchangeGiftCheckinAPI']);
+    Route::get('setting', [RotationController::class, 'settingCheckin']);
+    Route::post('register', [RotationController::class, 'registerCheckin']);
+    Route::post('spin', [RotationController::class, 'spinCheckin']);
 });
 //Nhà thuốc
 Route::prefix('pharmacy')->group(function (){

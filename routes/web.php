@@ -250,6 +250,8 @@ Route::middleware([CheckLogin::class])->group(function (){
        Route::post('update-gift-2/{id}', [RotationController::class, 'updateGift2'])->name('update-gift-2');
        Route::get('delete-gift-2/{id}', [RotationController::class, 'deleteGiftSub'])->name('sub-gift.delete');
        Route::prefix('gift-checkin')->name('gift_checkin.')->group(function (){
+          Route::get('setting', [RotationController::class, 'settingRotationCheckin'])->name('setting');
+          Route::post('create_setting', [RotationController::class, 'createSettingCheckIn'])->name('create_setting');
           Route::get('', [RotationController::class, 'listGiftCheckin'])->name('index');
           Route::get('create', [RotationController::class, 'createGiftCheckin'])->name('create');
           Route::post('store', [RotationController::class, 'storedGiftCheckin'])->name('store');
@@ -258,6 +260,7 @@ Route::middleware([CheckLogin::class])->group(function (){
           Route::post('update/{id}', [RotationController::class, 'updateGiftCheckin'])->name('update');
           Route::get('exchange-gift', [RotationController::class, 'exchangeGiftCheckin'])->name('exchange-gift');
           Route::get('export-exchange-gift', [RotationController::class, 'exportExchangeGiftCheckin'])->name('export-exchange-gift');
+          Route::get('list-customer', [RotationController::class, 'listCustomerCheckin'])->name('list-customer');
        });
        Route::post('interface', [RotationController::class, 'interface'])->name('interface');
     });
