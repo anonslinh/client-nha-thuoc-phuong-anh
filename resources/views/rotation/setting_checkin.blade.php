@@ -41,11 +41,11 @@
                                 <i class="ti ti-send fs-4 me-2"></i>
                                 Cập nhật
                             </button>
-                            <a class="justify-content-center badge fw-medium fs-2 btn btn-rounded btn-danger d-flex align-items-center btn-sa-confirm"
+                            {{-- <a class="justify-content-center badge fw-medium fs-2 btn btn-rounded btn-danger d-flex align-items-center btn-sa-confirm"
                                 href="{{route('rotation.delete')}}">
                                 <i class="ti ti-send fs-4 me-2"></i>
                                 Xóa Qùa Tặng
-                            </a>
+                            </a> --}}
                         </div>
                     </div>
                 </form>
