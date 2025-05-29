@@ -49,7 +49,7 @@ function App() {
     const [currentRotate, setCurrentRotate] = useState(0)
     const [isRotating, setIsRotating] = useState(false)
     const [currentGift, setCurrentGift] = useState(null)
-    const [loading, setLoading] = useState(false)
+    const [loading, setLoading] = useState(true)
     const refT = useRef("")
     const [listGift, setListGift] = useState([])
     const [listMyGift, setListMyGift] = useState([])
@@ -63,6 +63,8 @@ function App() {
     const [rotationImage, setRotationImage] = React.useState('assets/static/backgroundSpinner.png')
     const [colorButton, setColorButton] = React.useState('#FF4D5C')
     const [colorGift, setColorGift] = React.useState('#eb5757')
+    const [colorText, setColorText] = React.useState('#fff')
+    const [colorButton2, setColorButton2] = React.useState('#FF4D5C')
  
     const rotateWheel = (currentRotate, index) => {
         refT.current = `rotate(${currentRotate - index * rotate - rotate / 2}deg)`
@@ -109,10 +111,20 @@ function App() {
                 if(res.data.color_gift){
                     setColorGift(res.data.color_gift);
                 }
+                if(res.data.color_text){
+                    setColorText(res.data.color_text);
+                }
+                if(res.data.color_button2){
+                    setColorButton2(res.data.color_button2);
+                }
             }
     }
-    useEffect(() => {        
+    useEffect(() => {  
+        const timeout = setTimeout(() => {
+            setLoading(false);
+        }, 800);      
         getInterface() 
+        return () => clearTimeout(timeout);
     }, [])
 
     const getListGift = async () => {
@@ -131,8 +143,6 @@ function App() {
             }
         } catch (error) {
             console.log(error)
-        } finally {
-            setLoading(false)
         }
     }
 
@@ -179,15 +189,12 @@ function App() {
             }
         } catch (error) {
             alert(error.msg)
-        } finally {
-            setLoading(false)
         }
         }
     }
 
     const getMyGift = async () => {
         try {
-            setLoading(true)
             const formData = new FormData()
             formData.append("phone", phoneUser)
             const res = await REQUEST_API({
@@ -203,8 +210,6 @@ function App() {
             }
         } catch (error) {
             alert(error.msg)
-        } finally {
-            setLoading(false)
         }
     }
 
@@ -411,7 +416,7 @@ function App() {
     };
 
 
-    const LoadingPage = () => <div>Đang tải...</div>
+    const LoadingPage = () => <div className="loading"><div className="loader"></div></div>
 
     const checkPercent =(length)=>{
         if(!length) return '80';
@@ -455,7 +460,7 @@ function App() {
             alt="logo"
             className="w-20 h-14 object-cover"
         />
-        <span className="text-xl text-center text-white font-bold mx-auto">
+        <span className="text-xl text-center font-bold mx-auto" style={{color:colorText}}>
         Bạn có {countSpin} lượt quay
     </span>
         <img src={"assets/static/firework.png"} alt="logo" className="w-20 h-14 object-cover"/>
@@ -490,9 +495,8 @@ function App() {
                                         <img
                                             // src="assets/static/iconGift.png"
                                             src={ `${baseUrl}` + item.image}
-                                            className=" mt-[30%] ratio"
                                             style={{
-                                                width:`${checkPercent(listGift.length)}%`
+                                                width:"90%"
                                             }}
                                         />
                                     </div>
@@ -522,32 +526,32 @@ function App() {
                 />
         </div> */}
         <div className="w-full flex flex-col items-center mt-6 justify-center">
-        <button
-    className="w-[90%] flex items-center justify-center rounded-[20px] mx-auto py-3" style={{background:colorButton}}
-    onClick={() =>startSpin()}
->
-<span className="text-base font-bold text-white uppercase">
-        Quay
-        </span>
-        </button>
+            <button
+                className="w-[90%] flex items-center justify-center rounded-[20px] mx-auto py-3" style={{background:colorButton}}
+                onClick={() =>startSpin()}
+            >
+                <span className="text-base font-bold text-white uppercase">
+                    Quay
+                </span>
+            </button>
         <div className="grid grid-cols-2 w-[90%] gap-x-2">
-        <button
-    className="flex items-center justify-center rounded-[20px] mt-4 py-3" style={{background:colorButton}}
-    onClick={() => getMyGift()}
->
-<span className="text-sm font-bold text-white uppercase">
-        Xem quà của tôi
-    </span>
-    </button>
-    <button
-    className="flex items-center justify-center rounded-[20px] mt-4 py-3" style={{background:colorButton}}
-    onClick={() => refModalShowListGift.current?.setShowModal(true)}
->
-<span className="text-sm font-bold text-white uppercase">
-        Xem danh sách quà
-    </span>
-    </button>
-    </div>
+            <button
+                className="flex items-center justify-center rounded-[20px] mt-4 py-3" style={{background:colorButton2}}
+                onClick={() => getMyGift()}
+            >
+            <span className="text-sm font-bold text-white uppercase">
+                Xem quà của tôi
+            </span>
+            </button>
+            <button
+            className="flex items-center justify-center rounded-[20px] mt-4 py-3" style={{background:colorButton2}}
+                onClick={() => refModalShowListGift.current?.setShowModal(true)}
+            >
+                <span className="text-sm font-bold text-white uppercase">
+                    Xem danh sách quà
+                </span>
+            </button>
+        </div>
     </div>
     </div>
     <ModalShowGift ref={refModalShowGift} currentGift={currentGift} />

@@ -849,13 +849,17 @@ class RotationController extends HelperAdminController
             $interface->rotation = $rotationImage??$interface->rotation;
             $interface->color_button = $request->get('color_button')??$interface->color_button;
             $interface->color_gift = $request->get('color_gift')??$interface->color_gift;
+            $interface->color_text = $request->get('color_text')??$interface->color_text;
+            $interface->color_button2 = $request->get('color_button2')??$interface->color_button;
         }else{
             $interface = new InterfaceRotation([
                 'logo' => $logo,
                 'background' => $background,
                 'rotation' => $rotationImage,
                 'color_button' => $request->get('color_button'),
-                'color_gift' => $request->get('color_gift')
+                'color_gift' => $request->get('color_gift'),
+                'color_text' => $request->get('color_text'),
+                'color_button2' => $request->get('color_button2')
             ]);
         }
         $interface->save();

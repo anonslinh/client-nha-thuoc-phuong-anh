@@ -15,6 +15,8 @@ return new class extends Migration
             $table->string('rotation')->nullable();
             $table->string('color_button')->nullable();
             $table->string('color_gift')->nullable();
+            $table->string('color_text')->nullable();
+            $table->string('color_button')->nullable();
         });
     }
 

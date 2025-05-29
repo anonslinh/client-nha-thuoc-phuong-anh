@@ -123,6 +123,8 @@
                         <th>Ảnh vòng quay</th>
                         <th>Màu nút button</th>
                         <th>Màu ô quà tặng</th>
+                        <th>Màu chữ lượt quay</th>
+                        <th>Màu 2 nút button dưới</th>
                         <th>Thao tác</th>
                     </tr>
                 </thead>
@@ -142,6 +144,12 @@
                         </td>
                         <td>
                             <button class="btn" style="background: {{$interface_rotation->color_gift??''}}"></button>
+                        </td>
+                        <td>
+                            <button class="btn" style="background: {{$interface_rotation->color_text??''}}"></button>
+                        </td>
+                        <td>
+                            <button class="btn" style="background: {{$interface_rotation->color_button2??''}}"></button>
                         </td>
                         <td>
                             <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#modalCreate">Cập nhật</button>
@@ -182,6 +190,14 @@
                         <div class="form-group mb-2">
                             <label class="form-label">Màu ô quà tặng</label>
                             <input class="form-control" type="color" value="{{$interface_rotation->color_gift??''}}" name="color_gift">
+                        </div>
+                        <div class="form-group mb-2">
+                            <label class="form-label">Màu chữ</label>
+                            <input class="form-control" type="color" value="{{$interface_rotation->color_text??''}}" name="color_text">
+                        </div>
+                        <div class="form-group mb-2">
+                            <label class="form-label">Màu 2 nút button dưới </label>
+                            <input class="form-control" type="color" value="{{$interface_rotation->color_button2??''}}" name="color_button2">
                         </div>
                     </div>
                     <div class="modal-footer">
