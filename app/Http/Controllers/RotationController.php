@@ -177,7 +177,7 @@ class RotationController extends HelperAdminController
             return back()->with(['error' => 'Vui lòng thêm số lượng quà tặng cho các chi nhánh']);
         }
         foreach ($request->get('branch') as $value){
-            if (isset($value['quantity']) && $value['quantity'] > 1){
+            if (isset($value['quantity']) && $value['quantity'] >= 1){
                 $checkQuantity = true;
             }
         }
