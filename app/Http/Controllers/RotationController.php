@@ -330,9 +330,7 @@ class RotationController extends HelperAdminController
     public function getInvoiceKiotviet($rotation, $customer)
     {
         // Lấy danh sách invoice theo số điện thoại và khoảng thời gian
-        $listInvoice = Invoice::where('contact_number', $customer->contact_number)
-            ->whereBetween('created_date', [$rotation->time_start, $rotation->time_end])
-            ->get();
+        $listInvoice = Invoice::where('contact_number', $customer->contact_number)->whereDate('created_date', '>=', $rotation->time_start)->whereDate('created_date', $rotation->time_end)->get();
 
         // Lấy các mã hóa đơn đã được ghi nhận trước đó để tránh duplicate
         $existingInvoiceCodes = HistoryInvoiceRotation::whereIn('invoice_code', $listInvoice->pluck('code'))->pluck('invoice_code')->toArray();
