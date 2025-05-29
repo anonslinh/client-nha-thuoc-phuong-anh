@@ -43,7 +43,7 @@ function App() {
     const [currentRotate, setCurrentRotate] = useState(0)
     const [isRotating, setIsRotating] = useState(false)
     const [currentGift, setCurrentGift] = useState(null)
-    const [loading, setLoading] = useState(false)
+    const [loading, setLoading] = useState(true)
     const refT = useRef("")
     const [listGift, setListGift] = useState([])
     const size = listGift.length
@@ -107,9 +107,13 @@ function App() {
         }
     }
     useEffect(()=>{
+        const timeout = setTimeout(() => {
+            setLoading(false);
+        }, 800);  
         getListBranch()
         getInterface()
-        getListGiftCheckin()
+        getListGiftCheckin()    
+        return () => clearTimeout(timeout);
     },[]);
 
     const getListBranch = async  () =>{
@@ -123,8 +127,6 @@ function App() {
             }
         }catch (e) {
             console.log(e)
-        }finally {
-            setLoading(false)
         }
     }
 
@@ -273,7 +275,7 @@ function App() {
     };
 
 
-    const LoadingPage = () => <div>Đang tải...</div>
+    const LoadingPage = () => <div className="loading"><div className="loader"></div></div>
 
     const checkPercent =(length)=>{
         if(!length) return '80';
@@ -346,9 +348,8 @@ function App() {
                                             <img
                                                 // src="assets/static/iconGift.png"
                                                 src={ `${baseUrl}` + item.image}
-                                                className=" mt-[30%] ratio"
                                                 style={{
-                                                    width:`${checkPercent(listGift.length)}%`
+                                                    width:"90%"
                                                 }}
                                             />
                                         </div>

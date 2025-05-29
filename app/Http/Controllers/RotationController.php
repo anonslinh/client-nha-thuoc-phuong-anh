@@ -915,9 +915,9 @@ class RotationController extends HelperAdminController
                 $file->move('upload/rotation/', $nameFile);
                 $rotationImage = 'upload/rotation/'.$nameFile;
             }
-            SettingRotationCheckin::updateOrCreate(
-                ['id' => 1],
-                [
+            $setting = SettingRotationCheckin::first();
+            if(empty($setting)){
+                $setting = new SettingRotationCheckin([
                     'title' => $request->get('title'),
                     'time_start' => $request->get('time_start'),
                     'time_end' => $request->get('time_end'),
@@ -926,8 +926,20 @@ class RotationController extends HelperAdminController
                     'logo' => $logo,
                     'background' => $background,
                     'rotation' => $rotationImage
-                ]
-            );
+                ]);
+                $setting->save();
+            }else{
+                SettingRotationCheckin::where('id', $setting->id)->update([
+                    'title' => $request->get('title')??$setting->title,
+                    'time_start' => $request->get('time_start')??$setting->time_start,
+                    'time_end' => $request->get('time_end')??$setting->time_end,
+                    'color_button' => $request->get('color_button')??$setting->color_button,
+                    'color_gift' => $request->get('color_gift')??$setting->color_gift,
+                    'logo' => $logo??$setting->logo,
+                    'background' => $background??$setting->background,
+                    'rotation' => $rotationImage??$setting->rotation
+                ]);
+            }
             return back()->with(['success' => 'Cài đặt thành công']);
         }catch(Exception $exception){
             return back()->with(['error' => $exception->getMessage()]);
