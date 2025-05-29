@@ -86,6 +86,8 @@
      display: flex;
      justify-content: center;
      align-items: center;
+     max-width: 500px;
+     max-height: 500px;
  }
  /* .main-wheel::after {
      content: "";
@@ -105,6 +107,8 @@
      border-radius: 50%;
      background-color: #fff;
      transition: cubic-bezier(0.075, 0.82, 0.165, 1) 7s;
+     max-width: 430px;
+     max-height: 430px;
  }
 
  li {
