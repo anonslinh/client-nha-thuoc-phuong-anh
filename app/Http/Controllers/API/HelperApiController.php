@@ -156,7 +156,12 @@ class HelperApiController extends Controller
                 $calculatorPoint = GeneralSettings::where('code', 'calculator_point')->first()->value?? 0;
                 $pointCustomer = 0;
                 $orderIDCustomer = HistoryPointCustomer::where('phone_customer', $customer['contactNumber'])->pluck('order_id');
-                $invoice = Invoice::whereNotIn('kiotviet_id', $orderIDCustomer)->where('contact_number', $customer['contactNumber'])->get();
+                $timeSetting = GeneralSettings::where('code', 'time_point')->first();
+                $invoice = Invoice::query();
+                if(isset($timeSetting)){
+                    $invoice = $invoice->where('purchase_date', '>=', $timeSetting->value);
+                }
+                $invoice = $invoice->whereNotIn('kiotviet_id', $orderIDCustomer)->where('contact_number', $customer['contactNumber'])->get();
                 foreach ($invoice as $value){
                     $invoiceDetail = InvoiceDetail::where('invoice_id', $value->id)->get();
                     foreach ($invoiceDetail as $detail){
@@ -266,10 +271,8 @@ class HelperApiController extends Controller
     */
     public function getInvoicesDataKiotViet($customerSyncLog){
         try{
-            $timeSetting = GeneralSettings::where('code', 'time_point')->first();
-            $firstDayOfYear = $timeSetting->value??Carbon::now()->subYear()->addDay()->toDateString();
             $lastDayOfYear = Carbon::now()->addDay()->toDateString(); // Ngày hôm nay + 1 ngày
-//            $firstDayOfYear = Carbon::now()->subYear()->addDay()->toDateString(); // Ngày hôm nay - 1 năm + 1 ngày
+            $firstDayOfYear = Carbon::now()->subYear()->addDay()->toDateString(); // Ngày hôm nay - 1 năm + 1 ngày
 
             $pageSize = 100;
             $currentItem = 0;

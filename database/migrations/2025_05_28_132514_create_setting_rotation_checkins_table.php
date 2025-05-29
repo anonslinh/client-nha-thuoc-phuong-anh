@@ -11,12 +11,17 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('interface_rotation', function (Blueprint $table) {
+        Schema::create('setting_rotation_checkins', function (Blueprint $table) {
+            $table->id();
+            $table->string('title');
+            $table->date('time_start');
+            $table->date('time_end');
+            $table->string('logo')->nullable();
+            $table->string('background')->nullable();
             $table->string('rotation')->nullable();
             $table->string('color_button')->nullable();
             $table->string('color_gift')->nullable();
-            $table->string('color_text')->nullable();
-            $table->string('color_button')->nullable();
+            $table->timestamps();
         });
     }
 
@@ -25,8 +30,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('interface_rotation', function (Blueprint $table) {
-            //
-        });
+        Schema::dropIfExists('setting_rotation_checkins');
     }
 };

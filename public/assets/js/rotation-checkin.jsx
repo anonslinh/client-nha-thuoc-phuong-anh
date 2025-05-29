@@ -8,7 +8,9 @@ const API = {
     exchangeGift: () => baseUrl + "api/rotation-checkin/exchange-gift",
     getBranch: () => baseUrl + "api/branches",
     listGiftCheckRotationCheck: ()=>baseUrl+'api/rotation-checkin/list-gift',
-    interface: () => baseUrl + "api/rotation/interface"
+    interface: () => baseUrl + "api/rotation-checkin/setting",
+    register : () => baseUrl + "api/rotation-checkin/register",
+    spin: () => baseUrl + "api/rotation-checkin/spin"
 }
 
 // Hàm gọi API với Axios
@@ -32,8 +34,8 @@ const REQUEST_API = async ({ url, method, data }) => {
 // Component App
 function App() {
 
-    const [phoneUser,setPhoneUser]=useState("");
-    const [showLogin,setShowLogin]=useState(true);
+    const [phoneUser,setPhoneUser]=useState(localStorage.getItem("phone_user"));
+    const [showLogin,setShowLogin]=useState(false);
     const [messageAlert, setMessageAlert] = useState("")
     const [countSpin, setCountSpin] = useState(0)
     const refModalShowGift = useRef(null)
@@ -54,8 +56,11 @@ function App() {
     const [imageCheckin, setImageCheckin] = React.useState(null);
     const [selectedFile, setSelectedFile] = React.useState(null);
     const [showModalAlert, setShowModalAlert] = useState(false)
-    const [logo, setLogo] = React.useState('assets/static/logo.png')
-    const [background, setBackground] = React.useState('assets/static/background.png')
+    const [logo, setLogo] = React.useState('assets/static/logo.png');
+    const [background, setBackground] = React.useState('assets/static/background.png');
+    const [rotationImage, setRotationImage] = React.useState('assets/static/backgroundSpinner.png');
+    const [colorButton, setColorButton] = React.useState('#FF4D5C');
+    const [colorGift, setColorGift] = React.useState('#eb5757');
 
     const fileCheckinInputRef = React.useRef(null);
 
@@ -71,27 +76,41 @@ function App() {
                 data: null
             })
             if(res.status){                
-                setLogo(res.data.logo);
-                setBackground(res.data.background)
-            }
+                if(res.data.logo){
+                    setLogo(res.data.logo);
+                }
+                if(res.data.rotation){
+                    setRotationImage(res.data.rotation);
+                }
+                if(res.data.background){
+                    setBackground(res.data.background)
+                }
+                if(res.data.color_button){
+                    setColorButton(res.data.color_button);
+                }
+                if(res.data.color_gift){
+                    setColorGift(res.data.color_gift);
+                }
+        }
+    }
+
+    const getListGiftCheckin = async () => {
+        var formData = new FormData();
+        formData.append('phone', phoneUser);
+        const res = await REQUEST_API({
+            url: API.listGiftCheckRotationCheck(),
+            method: "post",
+            data: formData
+        })
+        if(res.status){
+            setListGift(res.data);                
+        }
     }
     useEffect(()=>{
         getListBranch()
         getInterface()
+        getListGiftCheckin()
     },[]);
-
-    const getGift = () => {
-        const randomNumber = Math.random()
-        let currentPercent = 0
-        const list = []
-        listGift.forEach((item, index) => {
-            currentPercent += Number(item.percent)
-            if (randomNumber <= currentPercent) {
-                list.push({ ...item, index })
-            }
-        })
-        return list[0]
-    }
 
     const getListBranch = async  () =>{
         try {
@@ -121,42 +140,47 @@ function App() {
     }
 
     const startSpin = async () => {
-        if (countSpin < 1){
-            setMessageAlert('Bạn đã hết lượt quay');
-            setShowModalAlert(true);
+        if(!phoneUser){
+            setShowLogin(true);
             return false;
         }
         if (!isRotating){
             setIsRotating(true)
-            const gift = getGift();
-            const newCurrentRotate = currentRotate + 360 * 10;
-            rotateWheel(newCurrentRotate, gift.index);
-            setCurrentRotate(newCurrentRotate);
-            try {
-                const formData = new FormData()
-                formData.append("phone", phoneUser)
-                formData.append("gift_id", gift.id)
-                formData.append("branch_id", branch_id)
-                const res = await REQUEST_API({
-                    url: API.exchangeGift(),
-                    method: "post",
-                    data: formData
-                })
-                if(res.status){
-                    showGift(gift)
-                    setCountSpin(0);
+            var formData = new FormData();
+            formData.append('phone', phoneUser);
+            const res = await REQUEST_API({
+                url: API.spin(),
+                method: "post",
+                data: formData
+            });
+            if(res.status){
+                setListBranch(res.data);
+                const gift = res.data;
+                const newCurrentRotate = currentRotate + 360 * 10;
+                rotateWheel(newCurrentRotate, gift.index);
+                setCurrentRotate(newCurrentRotate);
+                showGift(gift);
+            }else{
+                if (res?.login === true) {
+                    setShowLogin(true);
                 }else{
-                    const timer = setTimeout(() => {
+                    if(res?.data){
+                        const gift = res.data;
+                        const newCurrentRotate = currentRotate + 360 * 10;
+                        rotateWheel(newCurrentRotate, gift.index);
+                        setCurrentRotate(newCurrentRotate);
+                        const timer = setTimeout(() => {
+                            setIsRotating(false)
+                            clearTimeout(timer)
+                            setMessageAlert(res.msg);
+                            setShowModalAlert(true);
+                        }, timeRotate)
+                    }else{
                         setIsRotating(false)
-                        clearTimeout(timer)
                         setMessageAlert(res.msg);
                         setShowModalAlert(true);
-                    }, timeRotate)
+                    }
                 }
-            } catch (error) {
-                alert(error.msg)
-            } finally {
-                setLoading(false)
             }
         }
     }
@@ -231,12 +255,12 @@ function App() {
             formData.append("branch_id", branch_id)
             formData.append("image", selectedFile)
             const res = await REQUEST_API({
-                url: API.listGiftCheckRotationCheck(),
+                url: API.register(),
                 method: "post",
                 data: formData
             })
             if(res.status){
-                setListGift(res.data);
+                localStorage.setItem("phone_user", phoneUser);
                 setShowLogin(false)
                 setCountSpin(1)
             }else{
@@ -281,6 +305,9 @@ function App() {
                         className="w-64 h-auto object-cover"
                     />
                 </div>
+                {/* <span className="text-xl text-center text-white font-bold mx-auto">
+                    Bạn có {countSpin} lượt quay
+                </span> */}
                 <div className="flex items-center justify-between w-full pt-2 relative">
                     <img
                         src={"assets/static/firework.png"}
@@ -289,7 +316,7 @@ function App() {
                     />
                     <img src={"assets/static/firework.png"} alt="logo" className="w-20 h-14 object-cover"/>
                 </div>
-                <div className="main-wheel">
+                <div className="main-wheel" style={{ backgroundImage: `url(${rotationImage})`}}>
                     <ul className="wheel" style={{ transform: refT.current }}>
                         {!!listGift &&
                         !!listGift.length &&
@@ -309,6 +336,7 @@ function App() {
                                             transform: `skewY(${skewY}deg) rotate(${
                                                 rotate / 2
                                             }deg)`,
+                                            backgroundColor: index % 2 == 0 ? colorGift : "#FFFFFF"
                                         }}
                                         className={`${
                                             index % 2 == 0 ? "text-item even" : "text-item"
@@ -351,7 +379,7 @@ function App() {
                 </div>
                 <div className="w-full flex flex-col items-center mt-6 justify-center">
                     <button
-                        className="bg-[#FF4D5C] w-[90%] flex items-center justify-center rounded-[20px] mx-auto py-3"
+                        className="w-[90%] flex items-center justify-center rounded-[20px] mx-auto py-3" style={{backgroundColor: colorButton}}
                         onClick={() =>startSpin()}
                     >
                     <span className="text-base font-bold text-white uppercase">
@@ -377,15 +405,6 @@ function App() {
                             <div className="px-2 w-full overflow-y-scroll ">
 
                                 <div className="bg-white p-2 w-full rounded-md">
-                                    <div className=" w-full mt-5 flex justify-center ">
-                                        <img
-                                            src={logo}
-                                            alt="logo"
-                                            style={{width: "200px"}}
-                                            className="w-64 h-auto object-cover"
-                                        />
-                                    </div>
-
                                     <label  className="text-sm text-gray-60">Số điện thoại </label>
                                     <input type="text" id="first_name"
                                            onChange={(e)=>{

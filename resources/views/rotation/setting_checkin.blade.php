@@ -5,7 +5,7 @@
             <div class="row align-items-center">
                 <div class="col-12">
                     <div class="d-sm-flex align-items-center justify-space-between">
-                        <h4 class="mb-4 mb-sm-0 card-title">Cài đặt vòng quay may mắn</h4>
+                        <h4 class="mb-4 mb-sm-0 card-title">Cài đặt vòng quay checkin</h4>
                         <nav aria-label="breadcrumb" class="ms-auto">
                             <ol class="breadcrumb">
                                 <li class="breadcrumb-item d-flex align-items-center">
@@ -21,85 +21,31 @@
         </div>
         <div class="card">
             <div class="card-body">
-                <form action="{{route('rotation.create')}}" method="post" class="row">
+                <form action="{{route('rotation.gift_checkin.create_setting')}}" method="post" class="row">
                     @csrf
                     <div class="col-lg-4 col-12">
                         <label>Tiêu đề</label>
-                        <input name="title" value="{{$rotation->title??''}}" class="form-control" required>
+                        <input name="title" value="{{$setting->title??''}}" class="form-control" required>
                     </div>
                     <div class="col-lg-4 col-12">
                         <label>Thời gian bắt đầu</label>
-                        <input name="time_start" value="{{$rotation->time_start??''}}" type="date" class="form-control" required>
+                        <input name="time_start" value="{{$setting->time_start??''}}" type="date" class="form-control" required>
                     </div>
                     <div class="col-lg-4 col-12">
                         <label>Thời gian kết thúc</label>
-                        <input name="time_end" value="{{$rotation->time_end??''}}" type="date" class="form-control" required>
+                        <input name="time_end" value="{{$setting->time_end??''}}" type="date" class="form-control" required>
                     </div>
                     <div class="col-12 mt-4">
-                        <div class="d-flex align-items-center">
-                            <p class="mb-0 text-success fw-bolder" style="margin-right: 15px">Cấu hình giá trị đơn hàng: </p>
-                            <button type="button" class="justify-content-center badge fw-medium fs-2 btn btn-rounded btn-danger d-flex align-items-center btnAddRule">
-                                <i class="ti ti-send fs-4 me-2"></i>
-                                Thêm giá trị đơn hàng
-                            </button>
-                        </div>
-                        <div class="list-rule row mt-4">
-                            @if(count($dataRule))
-                                @foreach($dataRule as $key => $value)
-                                    <div class="col-lg-6 col-12 item-rule">
-                                        <input name="data[{{$key}}][rule_id]" hidden value="{{$value->id}}"/>
-                                        <div class="row">
-                                            <div class="col-6">
-                                                <label>Giá trị đơn hàng từ (vnđ)</label>
-                                                <input name="data[{{$key}}][money_invoice_1]" type="number" class="form-control money_invoice_1" required value="{{$value->money_invoice_1}}">
-                                            </div>
-                                            <div class="col-6">
-                                                <label>Giá trị đơn hàng đến (vnđ)</label>
-                                                <input name="data[{{$key}}][money_invoice_2]" type="number" class="form-control money_invoice_2" required value="{{$value->money_invoice_2}}">
-                                            </div>
-                                        </div>
-                                    </div>
-                                @endforeach
-                                @else
-                                <div class="col-lg-6 col-12 item-rule">
-                                    <div class="row">
-                                        <div class="col-6">
-                                            <label>Giá trị đơn hàng từ (vnđ)</label>
-                                            <input name="data[0][money_invoice_1]" type="number" class="form-control money_invoice_1" value="0">
-                                        </div>
-                                        <div class="col-6">
-                                            <label>Giá trị đơn hàng đến (vnđ)</label>
-                                            <input name="data[0][money_invoice_2]" type="number" class="form-control money_invoice_2" required>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-lg-6 col-12 item-rule">
-                                    <div class="row">
-                                        <div class="col-6">
-                                            <label>Giá trị đơn hàng từ (vnđ)</label>
-                                            <input name="data[1][money_invoice_1]" type="number" class="form-control money_invoice_1" required value="0">
-                                        </div>
-                                        <div class="col-6">
-                                            <label>Giá trị đơn hàng đến (vnđ)</label>
-                                            <input name="data[1][money_invoice_2]" type="number" class="form-control money_invoice_2" required>
-                                        </div>
-                                    </div>
-                                </div>
-                            @endif
-                        </div>
-                        <p class="text-center mt-3">Ví dụ: Bạn đang có chương trình vòng quay cho khách hàng đơn từ 300k trở xuống và đơn trên 300k.
-                            Bạn điền vào các ô lần lượt từ trái qua phải là: 0 - 300000 ; 300001 - số bất kỳ lớn hơn 300001  </p>
-                    </div>
-                    <div class="col-12">
                         <div class="d-flex align-items-center">
                             <button class="justify-content-center badge fw-medium fs-2 btn btn-rounded btn-success d-flex align-items-center" style="margin-right: 15px">
                                 <i class="ti ti-send fs-4 me-2"></i>
                                 Cập nhật
                             </button>
-                            <a class="justify-content-center badge fw-medium fs-2 btn btn-rounded btn-danger d-flex align-items-center btn-sa-confirm" href="{{route('rotation.delete')}}">
+                            {{-- <a class="justify-content-center badge fw-medium fs-2 btn btn-rounded btn-danger d-flex align-items-center btn-sa-confirm"
+                                href="{{route('rotation.delete')}}">
                                 <i class="ti ti-send fs-4 me-2"></i>
-                                Reset
-                            </a>
+                                Xóa Qùa Tặng
+                            </a> --}}
                         </div>
                     </div>
                 </form>
@@ -109,7 +55,7 @@
             <div class="row align-items-center">
                 <div class="col-12">
                     <div class="d-sm-flex align-items-center justify-space-between">
-                        <h4 class="mb-4 mb-sm-0 card-title">Cài đặt giao diện vòng quay may mắn</h4>
+                        <h4 class="mb-4 mb-sm-0 card-title">Cài đặt giao diện vòng quay checkin</h4>
                     </div>
                 </div>
             </div>
@@ -123,33 +69,25 @@
                         <th>Ảnh vòng quay</th>
                         <th>Màu nút button</th>
                         <th>Màu ô quà tặng</th>
-                        <th>Màu chữ lượt quay</th>
-                        <th>Màu 2 nút button dưới</th>
                         <th>Thao tác</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr>
                         <td>
-                            <img src="{{$interface_rotation->logo??''}}" style="width: 150px"/>
+                            <img src="{{$setting->logo??''}}" style="width: 150px"/>
                         </td>
                         <td>
-                            <img src="{{$interface_rotation->background??''}}" style="width: 150px"/>
+                            <img src="{{$setting->background??''}}" style="width: 150px"/>
                         </td>
                         <td>
-                            <img src="{{$interface_rotation->rotation??''}}" style="width: 150px"/>
+                            <img src="{{$setting->rotation??''}}" style="width: 150px"/>
                         </td>
                         <td>
-                            <button class="btn" style="background: {{$interface_rotation->color_button??''}}"></button>
+                            <button class="btn" style="background: {{$setting->color_button??''}}"></button>
                         </td>
                         <td>
-                            <button class="btn" style="background: {{$interface_rotation->color_gift??''}}"></button>
-                        </td>
-                        <td>
-                            <button class="btn" style="background: {{$interface_rotation->color_text??''}}"></button>
-                        </td>
-                        <td>
-                            <button class="btn" style="background: {{$interface_rotation->color_button2??''}}"></button>
+                            <button class="btn" style="background: {{$setting->color_gift??''}}"></button>
                         </td>
                         <td>
                             <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#modalCreate">Cập nhật</button>
@@ -168,8 +106,11 @@
                     </h4>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <form action="{{route('rotation.interface')}}" method="post" class="modal-content" enctype="multipart/form-data">
+                <form action="{{route('rotation.gift_checkin.create_setting')}}" method="post" class="modal-content" enctype="multipart/form-data">
                     @csrf
+                    <input name="title" value="{{$setting->title??''}}" hidden/>
+                    <input name="time_start" value="{{$setting->time_start??''}}" hidden/>
+                    <input name="time_end" value="{{$setting->time_end??''}}" hidden/>
                     <div class="modal-body">
                         <div class="form-group mb-2">
                             <label class="form-label">Logo(Tỷ lệ 2:1 1200x600px)</label>
@@ -190,14 +131,6 @@
                         <div class="form-group mb-2">
                             <label class="form-label">Màu ô quà tặng</label>
                             <input class="form-control" type="color" value="{{$interface_rotation->color_gift??''}}" name="color_gift">
-                        </div>
-                        <div class="form-group mb-2">
-                            <label class="form-label">Màu chữ</label>
-                            <input class="form-control" type="color" value="{{$interface_rotation->color_text??''}}" name="color_text">
-                        </div>
-                        <div class="form-group mb-2">
-                            <label class="form-label">Màu 2 nút button dưới </label>
-                            <input class="form-control" type="color" value="{{$interface_rotation->color_button2??''}}" name="color_button2">
                         </div>
                     </div>
                     <div class="modal-footer">

@@ -25,6 +25,9 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use App\Http\Controllers\API\HelperApiController;
 use App\Models\InterfaceRotation;
+use App\Models\SettingRotationCheckin;
+use Carbon\Carbon;
+use Exception;
 use Maatwebsite\Excel\Facades\Excel;
 
 class RotationController extends HelperAdminController
@@ -174,7 +177,7 @@ class RotationController extends HelperAdminController
             return back()->with(['error' => 'Vui lòng thêm số lượng quà tặng cho các chi nhánh']);
         }
         foreach ($request->get('branch') as $value){
-            if (isset($value['quantity']) && $value['quantity'] > 1){
+            if (isset($value['quantity']) && $value['quantity'] >= 1){
                 $checkQuantity = true;
             }
         }
@@ -327,9 +330,7 @@ class RotationController extends HelperAdminController
     public function getInvoiceKiotviet($rotation, $customer)
     {
         // Lấy danh sách invoice theo số điện thoại và khoảng thời gian
-        $listInvoice = Invoice::where('contact_number', $customer->contact_number)
-            ->whereBetween('created_date', [$rotation->time_start, $rotation->time_end])
-            ->get();
+        $listInvoice = Invoice::where('contact_number', $customer->contact_number)->whereDate('created_date', '>=', $rotation->time_start)->whereDate('created_date', $rotation->time_end)->get();
 
         // Lấy các mã hóa đơn đã được ghi nhận trước đó để tránh duplicate
         $existingInvoiceCodes = HistoryInvoiceRotation::whereIn('invoice_code', $listInvoice->pluck('code'))->pluck('invoice_code')->toArray();
@@ -691,7 +692,7 @@ class RotationController extends HelperAdminController
     /**
      * Đăng ký và lấy danh sách quà vòng quay checkin
     **/
-    public function listGiftCheckinAPI (Request $request)
+    public function registerCheckin (Request $request)
     {
         $rule = [
             'phone' => [
@@ -723,7 +724,15 @@ class RotationController extends HelperAdminController
         if ($validation->fails()){
             return \response()->json(['status' => false, 'msg' => $validation->errors()->first()], 200);
         }
-        $rotation = RotationCheckin::where('phone', $request->get('phone'))->first();
+        $setting = SettingRotationCheckin::first();
+        if(empty($setting)){
+            return response()->json(['status' => false, 'msg' => 'Đã hết thời gian sự kiện. Vui lòng đăng ký vào sự kiện sắp tới'], 200);
+        }else{
+            if(strtotime($setting->time_end) < strtotime(date('Y/m/d'))){
+                return response()->json(['status' => false, 'msg' => 'Đã hết thời gian sự kiện. Vui lòng đăng ký vào sự kiện sắp tới'], 200);
+            }
+        }
+        $rotation = RotationCheckin::where('phone', $request->get('phone'))->whereDate('created_at', '>=', $setting->time_start)->whereDate('created_at', '<=', $setting->time_end)->first();
         $file = $request->file('image');
         if (empty($rotation)){
             $nameFile = 'customer-checkin'.time().Str::random(10).'.'.$file->getClientOriginalExtension();
@@ -737,7 +746,7 @@ class RotationController extends HelperAdminController
             $rotation->save();
         }else{
             if ($rotation->use == 1){
-                return \response()->json(['status' => false, 'msg' => 'Mỗi người chỉ được đăng ký một lần và một lượt quay. Trân trọng cảm ơn'], 200);
+                return \response()->json(['status' => false, 'msg' => 'Quý khách đã check in. Xin trân trọng cảm ơn'], 200);
             }
             $nameFile = 'customer-checkin'.time().Str::random(10).'.'.$file->getClientOriginalExtension();
             $file->move('upload/gift-rotation/', $nameFile);
@@ -745,7 +754,22 @@ class RotationController extends HelperAdminController
             $rotation->image = $image;
             $rotation->save();
         }
-        $listGift = GiftCheckin::all();
+        return response()->json(['status' => true, 'msg' => 'Đăng ký thành công'], 200);
+    }
+    public function listGiftCheckinAPI (Request $request)
+    {
+        $setting = SettingRotationCheckin::first();
+        if(empty($setting)){
+            $listGift = GiftCheckin::all();
+        }else{
+            $rotation = RotationCheckin::where('phone', $request->get('phone'))->whereDate('created_at', '>=', $setting->time_start)->whereDate('created_at', '<=', $setting->time_end)->first();
+            if(isset($rotation)){
+                $giftID = QuantityGiftCheckin::where('branch_id', $rotation->branch_id)->pluck('gift_checkin_id')->toArray();
+                $listGift = GiftCheckin::whereIn('id', $giftID)->orderBy('created_at', 'asc')->get();
+            }else{
+                $listGift = GiftCheckin::all();
+            }
+        }
         return \response()->json(['status' => true, 'data' => $listGift], 200);
     }
     /**
@@ -825,13 +849,17 @@ class RotationController extends HelperAdminController
             $interface->rotation = $rotationImage??$interface->rotation;
             $interface->color_button = $request->get('color_button')??$interface->color_button;
             $interface->color_gift = $request->get('color_gift')??$interface->color_gift;
+            $interface->color_text = $request->get('color_text')??$interface->color_text;
+            $interface->color_button2 = $request->get('color_button2')??$interface->color_button;
         }else{
             $interface = new InterfaceRotation([
                 'logo' => $logo,
                 'background' => $background,
                 'rotation' => $rotationImage,
                 'color_button' => $request->get('color_button'),
-                'color_gift' => $request->get('color_gift')
+                'color_gift' => $request->get('color_gift'),
+                'color_text' => $request->get('color_text'),
+                'color_button2' => $request->get('color_button2')
             ]);
         }
         $interface->save();
@@ -842,5 +870,150 @@ class RotationController extends HelperAdminController
     {
         $interface = InterfaceRotation::first();
         return response()->json(['status' => true, 'data' => $interface], 200);
+    }
+
+    public function settingRotationCheckin (Request $request)
+    {
+        $setting = SettingRotationCheckin::first();
+        return view('rotation.setting_checkin', compact('setting'));   
+    }
+    public function createSettingCheckIn (Request $request)
+    {
+        try{
+            $rule = [
+                'title' => 'required',
+                'time_start' => 'required',
+                'time_end' => 'required'
+            ];
+            $message = [
+                'title.required' => 'Vui lòng thêm tiêu đề sự kiện',
+                'time_start.required' => 'Vui lòng thêm thời gian bắt đầu sự kiện',
+                'time_end.required' => 'Vui lòng thêm thời gian kết thúc sự kiện'
+            ];
+            $validator = Validator::make($request->all(), $rule, $message);
+            if($validator->fails()){
+                return back()->with(['error' => $validator->errors()->first()]);
+            }
+            $logo = null;
+            if($request->hasFile('logo')){
+                $file = $request->file('logo');
+                $nameFile = 'logo'.time().Str::random(10).'.'.$file->getClientOriginalExtension();
+                $file->move('upload/rotation/', $nameFile);
+                $logo = 'upload/rotation/'.$nameFile;
+            }
+            $background = null;
+            if($request->hasFile('background')){
+                $file = $request->file('background');
+                $nameFile = 'background'.time().Str::random(10).'.'.$file->getClientOriginalExtension();
+                $file->move('upload/rotation/', $nameFile);
+                $background = 'upload/rotation/'.$nameFile;
+            }
+            $rotationImage = null;
+            if($request->hasFile('rotation')){
+                $file = $request->file('rotation');
+                $nameFile = 'rotation'.time().Str::random(10).'.'.$file->getClientOriginalExtension();
+                $file->move('upload/rotation/', $nameFile);
+                $rotationImage = 'upload/rotation/'.$nameFile;
+            }
+            SettingRotationCheckin::updateOrCreate(
+                ['id' => 1],
+                [
+                    'title' => $request->get('title'),
+                    'time_start' => $request->get('time_start'),
+                    'time_end' => $request->get('time_end'),
+                    'color_button' => $request->get('color_button'),
+                    'color_gift' => $request->get('color_gift'),
+                    'logo' => $logo,
+                    'background' => $background,
+                    'rotation' => $rotationImage
+                ]
+            );
+            return back()->with(['success' => 'Cài đặt thành công']);
+        }catch(Exception $exception){
+            return back()->with(['error' => $exception->getMessage()]);
+        }
+    }
+
+    public function settingCheckin (Request $request)
+    {
+        $setting = SettingRotationCheckin::first();
+        if(isset($setting)){
+            $status = true;
+        }else{
+            $status = false;
+        }
+        return response()->json(['status' => $status, 'data' => $setting], 200);
+    }
+
+    public function spinCheckin (Request $request)
+    {
+        $setting = SettingRotationCheckin::first();
+        if(empty($setting)){
+            return response()->json(['status' => false, 'msg' => 'Đã hết thời gian sự kiện. Vui lòng đăng ký vào sự kiện sắp tới'], 200);
+        }else{
+            if(strtotime($setting->time_end) < strtotime(date('Y/m/d'))){
+                return response()->json(['status' => false, 'msg' => 'Đã hết thời gian sự kiện. Vui lòng đăng ký vào sự kiện sắp tới'], 200);
+            }
+        }
+        $rotation = RotationCheckin::where('phone', $request->get('phone'))->whereDate('created_at', '>=', $setting->time_start)->whereDate('created_at', '<=', $setting->time_end)->lockForUpdate()->first();
+        if(empty($rotation)){
+            return response()->json(['status' => false, 'msg' => 'Vui lòng đăng ký sự kiện', 'login' => true], 200);
+        }
+        if($rotation->use == 1){
+            return \response()->json(['status' => false, 'msg' => 'Quý khách đã check in. Xin trân trọng cảm ơn'], 200);
+        }
+        $listGift = GiftCheckin::all()->toArray();
+        $totalPercent = array_sum(array_column($listGift, 'percent'));
+        $rand = rand(1, $totalPercent*100);
+        $current = 0;
+        foreach ($listGift as $key => $gift) {
+            $percent = $gift['percent'] * 100;
+            $current += $percent;
+            if ($rand <= $current) {
+                $gift['index'] = $key;
+                $quantityGift = QuantityGiftCheckin::where('gift_checkin_id', $gift['id'])->where('branch_id', $rotation->branch_id)->lockForUpdate()->first();
+                if(empty($quantityGift->quantity) || $quantityGift->quantity < 1){
+                    return response()->json(['status' => false, 'msg' => 'Quà tặng '.$gift['title'].' đã hết. Xin vui lòng quay và nhận quà khác', 'data' => $gift], 200);
+                }
+                $branch = Branch::find($rotation->branch_id);
+                CustomerGiftCheckin::insert([
+                    'phone' => $request->get('phone'),
+                    'gift_name' => $gift['title'],
+                    'gift_code' => $gift['code'],
+                    'gift_image' => $gift['image'],
+                    'branch_id' => $rotation->branch_id,
+                    'branch_name' => $branch->branch_name,
+                    'created_at' => now(),
+                    'updated_at' => now()
+                ]);
+                $quantityGift->quantity -= 1;
+                $quantityGift->save();
+                $rotation->use = 1;
+                $rotation->save();
+                return response()->json(['status' => true, 'data' => $gift], 200);
+            }
+        }
+        return response()->json(['status' => false, 'msg' => 'Đã có lỗi xảy ra. Xin vui lòng thử lại'], 200);
+    }
+
+    public function listCustomerCheckin (Request $request)
+    {
+        $listData = RotationCheckin::query();
+        if(isset($request->key_search)){
+            $listData = $listData->where('phone', 'like', '%'.$request->key_search.'%');
+        }
+        if(isset($request->time_start) && isset($request->time_end)){
+            $listData = $listData->whereDate('created_at', '>=', $request->time_start)->whereDate('created_at', '<=', $request->time_end);
+        }
+        if(isset($request->branch_id)){
+            $listData = $listData->where('branch_id', $request->branch_id);
+        }
+        $listData = $listData->orderBy('created_at', 'desc')->paginate(40);
+        foreach($listData as $value){
+            $branch = Branch::find($value->branch_id);
+            $value['branch_name'] = $branch->branch_name??'';
+        }
+        $dataBranch = Branch::all();
+        return view('rotation.list_customer', compact('listData', 'dataBranch'));
     }
 }
