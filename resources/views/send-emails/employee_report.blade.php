@@ -1,5 +1,5 @@
 <div style="text-align: center; margin-bottom: 20px;">
-    <img style="max-width: 150px; height: auto;" src="https://baseminiapp.winwingroup.vn/assets/images/logos/logo_win_baby_login.png" alt="Win Baby Logo"/>
+    <img style="max-width: 150px; height: auto;" src="https://baseminiapp.winwingroup.vn/assets/images/logos/logo_outtech.png" alt="Win Baby Logo"/>
     <h2 style="margin: 10px 0;">Báo cáo KPI Nhân Viên</h2>
     <span style="font-size: 14px; color: #555;">Báo cáo nhân viên tháng {{ now()->month }}/{{ now()->year }}</span>
 </div>

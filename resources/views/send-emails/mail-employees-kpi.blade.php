@@ -15,7 +15,7 @@
 <body>
 <div class="container">
     <div class="header">
-        <img style="max-width: 150px; height: auto;" src="https://baseminiapp.winwingroup.vn/assets/images/logos/logo_win_baby_login.png" alt="Win Baby Logo"/>
+        <img style="max-width: 150px; height: auto;" src="https://baseminiapp.winwingroup.vn/assets/images/logos/logo_outtech.png" alt="Win Baby Logo"/>
         <h2>Cảnh báo KPI Nhân Viên</h2>
         <span>Ngày gửi: {{ now()->format('H:i d/m/Y') }}</span>
     </div>

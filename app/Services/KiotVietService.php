@@ -41,6 +41,7 @@ class KiotVietService
             'url_detail_product' => 'https://public.kiotapi.com/products/code/', //  Chi tiết sản phẩm theo mã
             'url_category' => 'https://public.kiotapi.com/categories?', // Danh sách danh mục
             'url_list_product' => 'https://public.kiotapi.com/products?', // Danh sách sản phẩm
+            'url_trademark' => 'https://public.kiotapi.com/trademark?',
         ];
 
         return $data_return;

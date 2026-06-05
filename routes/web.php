@@ -20,8 +20,193 @@ use App\Http\Controllers\Admin\ProductCertificateController;
 use App\Http\Controllers\Admin\PharmacyController;
 use App\Http\Controllers\Admin\InvoicesController;
 use App\Http\Controllers\Admin\TaskManagementController;
+use App\Http\Controllers\Client\HomeClientController;
+use App\Http\Controllers\Client\ImagesRoomsController;
+use App\Http\Controllers\Client\RoomsClientController;
+use App\Http\Controllers\Client\RoomsController;
+use App\Http\Controllers\Client\MenusController;
+use App\Http\Controllers\Client\UtilitiesController;
 
-Route::get('login', [LoginController::class, 'login'])->name('login');
+use App\Http\Controllers\Frontend\RoomClientController;
+use App\Http\Controllers\Client\BookingController;
+use App\Http\Controllers\Client\BookingCalendarController;
+use App\Http\Controllers\Client\BookingClientController;
+use App\Http\Controllers\Frontend\BookingClientFEController;
+use App\Http\Controllers\Client\BookingFEController;
+use App\Http\Controllers\Client\BlogController;
+
+
+use App\Http\Controllers\Admin\BlogPostController;
+use App\Http\Controllers\Admin\BlogCategoryController;
+
+use App\Services\KiotVietService;
+/*
+|--------------------------------------------------------------------------
+| Web Routes
+|--------------------------------------------------------------------------
+|
+| Danh sách các route website 
+|
+*/
+use App\Http\Controllers\NhaThuocPhuongAnh\HomeWebsiteController;
+use App\Http\Controllers\NhaThuocPhuongAnh\SearchController;
+use App\Http\Controllers\NhaThuocPhuongAnh\TextSeoHeaderClientController;
+use App\Http\Controllers\NhaThuocPhuongAnh\WebisteMainCategoryV1Controller;
+use App\Http\Controllers\NhaThuocPhuongAnh\WebsiteProductV1Controller;
+use App\Http\Controllers\NhaThuocPhuongAnh\WebsiteCartV1Controller;
+use App\Http\Controllers\NhaThuocPhuongAnh\WebsiteCheckoutV1Controller;
+use App\Http\Controllers\NhaThuocPhuongAnh\WebsiteGuestCustomerController;
+use App\Http\Controllers\NhaThuocPhuongAnh\SeasonDiseaseWebsiteController;
+use App\Http\Controllers\NhaThuocPhuongAnh\WebsiteMyOrderV1Controller;
+use App\Http\Controllers\NhaThuocPhuongAnh\WebsiteCategoryController;
+use App\Http\Controllers\NhaThuocPhuongAnh\WebsiteTrademarkController;
+use App\Http\Controllers\NhaThuocPhuongAnh\WebsiteBannerController;
+use App\Http\Controllers\NhaThuocPhuongAnh\WebsiteSearchController;
+use App\Http\Controllers\NhaThuocPhuongAnh\WebsitePrescriptionRequestV1Controller;
+use App\Http\Controllers\NhaThuocPhuongAnh\WebsitePharmacistConsultV1Controller;
+use App\Http\Controllers\NhaThuocPhuongAnh\WebsiteLoyaltyPointV1Controller;
+use App\Http\Controllers\NhaThuocPhuongAnh\WebsitePurchasedMedicineV1Controller;
+use App\Http\Controllers\NhaThuocPhuongAnh\WebsiteRewardExchangeV1Controller;
+
+// Trang chủ
+Route::get('', [HomeWebsiteController::class, 'index'])->name('index');
+
+//Tìm kiếm
+Route::get('/tim-kiem', [SearchController::class, 'index'])->name('website.search');
+Route::get('/tim-kiem/tu-khoa/{id}', [SearchController::class, 'keywordDetail'])->name('website.search.keyword');
+
+// Chi tiết thông tin nổi bật
+Route::get('/thong-tin-noi-bat/{id}', [TextSeoHeaderClientController::class, 'textSeoHeaderDetail'])
+    ->name('website.text_seo_header.show');
+
+Route::get('abc', [HomeWebsiteController::class, 'abc123'])->name('abc123');
+Route::prefix('home')->name('home.')->group(function () {
+});
+
+// Danh mục tổng
+Route::get('/danh-muc-tong/{id}', [WebisteMainCategoryV1Controller::class, 'show'])
+    ->name('website.main-category-v1.show');
+
+// Chi tiết sản phẩm
+Route::get('/san-pham/{id}', [WebsiteProductV1Controller::class, 'show'])
+    ->name('website.product-v1.show');
+
+// Giỏ hàng
+Route::prefix('gio-hang')->name('website.cart.')->group(function () {
+    Route::get('/', [WebsiteCartV1Controller::class, 'index'])->name('index');
+    Route::get('/tom-tat', [WebsiteCartV1Controller::class, 'summary'])->name('summary');
+
+    Route::post('/them', [WebsiteCartV1Controller::class, 'add'])->name('add');
+    Route::post('/cap-nhat', [WebsiteCartV1Controller::class, 'update'])->name('update');
+    Route::post('/xoa', [WebsiteCartV1Controller::class, 'remove'])->name('remove');
+    Route::post('/xoa-tat-ca', [WebsiteCartV1Controller::class, 'clear'])->name('clear');
+});
+
+// Đặt hàng & Thanh toán
+Route::prefix('dat-hang')->name('website.checkout.')->group(function () {
+    Route::get('/', [WebsiteCheckoutV1Controller::class, 'index'])->name('index');
+    Route::post('/tao-don', [WebsiteCheckoutV1Controller::class, 'store'])->name('store');
+    Route::get('/thanh-cong/{orderCode}', [WebsiteCheckoutV1Controller::class, 'success'])->name('success');
+});
+
+// Lưu thông tin khách hàng khi đặt hàng không cần đăng nhập
+Route::post('/khach-hang/luu-session', [WebsiteGuestCustomerController::class, 'store'])
+    ->name('website.guest-customer.store');
+Route::post('/khach-hang/xoa-session', [WebsiteGuestCustomerController::class, 'clear'])
+    ->name('website.guest-customer.clear');
+
+//Chi tiết bệnh theo mùa
+Route::get('/benh-theo-mua/{id}', [SeasonDiseaseWebsiteController::class, 'show'])
+    ->name('website.season-disease.show');
+
+// Góc sức khoẻ
+Route::get('/goc-suc-khoe', [HomeWebsiteController::class, 'healthCornerIndex'])
+    ->name('website.health-corner.index');
+
+Route::get('/goc-suc-khoe/{category}/{article}', [HomeWebsiteController::class, 'healthCornerShow'])
+    ->name('website.health-corner.show');
+
+// Đơn hàng của tôi
+Route::get('/don-hang-cua-toi', [WebsiteMyOrderV1Controller::class, 'index'])
+    ->name('website.my-order.index');
+
+// Danh mục sản phẩm
+Route::get('/danh-muc/{id}', [WebsiteCategoryController::class, 'show'])
+    ->name('website.category.show');
+
+// Chi nhánh gần tôi
+Route::get('/chi-nhanh-gan-toi', [HomeWebsiteController::class, 'nearBranches'])
+    ->name('website.near-branches');
+    
+// Flash sale
+Route::get('/flash-sale', [HomeWebsiteController::class, 'flashSaleIndex'])
+    ->name('website.flash-sale.index');
+
+// Thương hiệu
+Route::get('/thuong-hieu/{id}', [WebsiteTrademarkController::class, 'show'])
+    ->name('website.trademark.show');
+
+// Banner
+Route::get('/banner/{id}', [WebsiteBannerController::class, 'show'])
+    ->name('website.banner.show');
+
+// Tìm kiếm
+Route::get('/tim-kiem', [WebsiteSearchController::class, 'index'])
+    ->name('website.search.index');
+
+// Bệnh
+Route::get('/benh/{category}', [HomeWebsiteController::class, 'diseaseCategoryShow'])
+    ->name('website.disease.category');
+
+Route::get('/benh/{category}/{article}', [HomeWebsiteController::class, 'diseaseArticleShow'])
+    ->name('website.disease.article');
+
+// Yêu cầu đơn thuốc
+Route::prefix('can-mua-thuoc')->name('website.prescription_request_v1.')->group(function () {
+    Route::get('/', [WebsitePrescriptionRequestV1Controller::class, 'index'])->name('index');
+    Route::post('/gui-yeu-cau', [WebsitePrescriptionRequestV1Controller::class, 'store'])->name('store');
+});
+
+// Tư vấn dược sĩ
+Route::get('/tu-van-duoc-si', [WebsitePharmacistConsultV1Controller::class, 'index'])
+    ->name('website.pharmacist_consult_v1.index');
+
+// Điểm thưởng
+Route::get('/tich-diem-doi-qua', [WebsiteLoyaltyPointV1Controller::class, 'index'])
+    ->name('website.loyalty_point_v1.index');
+
+// Đơn thuốc đã mua
+Route::get('/don-thuoc-da-mua', [WebsitePurchasedMedicineV1Controller::class, 'index'])
+    ->name('website.purchased_medicine_v1.index');
+    
+// Đổi quà
+Route::get('/doi-qua', [WebsiteRewardExchangeV1Controller::class, 'index'])
+    ->name('website.reward_exchange_v1.index');
+/*
+|--------------------------------------------------------------------------
+| Web Routes
+|--------------------------------------------------------------------------
+|
+| Danh sách các route admin
+|
+*/
+use App\Http\Controllers\NhaThuocPhuongAnhAdmin\ProductV1Controller;
+use App\Http\Controllers\NhaThuocPhuongAnhAdmin\CategoryV1Controller;
+use App\Http\Controllers\NhaThuocPhuongAnhAdmin\TrademarkV1Controller;
+use App\Http\Controllers\NhaThuocPhuongAnhAdmin\FlashSaleV1Controller;
+use App\Http\Controllers\NhaThuocPhuongAnhAdmin\BestSellerV1Controller;
+use App\Http\Controllers\NhaThuocPhuongAnhAdmin\FavoriteTrademarkV1Controller;
+use App\Http\Controllers\NhaThuocPhuongAnhAdmin\SearchKeywordV1Controller;
+use App\Http\Controllers\NhaThuocPhuongAnhAdmin\SeasonDiseaseCategoryV1Controller;
+use App\Http\Controllers\NhaThuocPhuongAnhAdmin\HealthCornerV1Controller;
+use App\Http\Controllers\NhaThuocPhuongAnhAdmin\DiseaseV1Controller;
+use App\Http\Controllers\NhaThuocPhuongAnhAdmin\TextSeoHeaderController;
+use App\Http\Controllers\NhaThuocPhuongAnhAdmin\BannerV1Controller;
+use App\Http\Controllers\NhaThuocPhuongAnhAdmin\MainCategoryV1Controller;
+use App\Http\Controllers\NhaThuocPhuongAnhAdmin\OrderV1Controller;
+use App\Http\Controllers\NhaThuocPhuongAnhAdmin\PrescriptionRequestV1Controller;
+
+Route::get('gINNtanfKE2buXB/login', [LoginController::class, 'login'])->name('login');
 Route::get('authentication-forgot-password', [LoginController::class, 'forgotPassword'])->name('authentication-forgot-password');
 Route::post('store-forgot-password', [LoginController::class, 'storeForgotPassword'])->name('store-forgot-password');
 Route::get('/reset-password', [LoginController::class, 'showResetForm'])->name('password.reset');
@@ -35,8 +220,224 @@ Route::get('login/zalo', [LoginZaloController::class, 'loginZalo']);
 Route::get('zalo', [LoginZaloController::class, 'zaloUser']);
 
 Route::middleware([CheckLogin::class])->group(function (){
-    Route::get('', [DashboardController::class, 'index'])->name('index');
+    Route::get('admin', [DashboardController::class, 'index1'])->name('index1');
 
+    Route::prefix('catalog-v1')->name('catalog_v1.')->group(function () {
+        // CATEGORY
+        // Route::prefix('categories')->name('categories.')->group(function () {
+        //     Route::get('/', [CategoryV1Controller::class, 'index'])->name('index');
+        //     Route::post('store', [CategoryV1Controller::class, 'store'])->name('store');
+        //     Route::post('update/{id}', [CategoryV1Controller::class, 'update'])->name('update');
+        //     Route::get('delete/{id}', [CategoryV1Controller::class, 'destroy'])->name('destroy');
+
+        //     Route::get('{id}/products', [CategoryV1Controller::class, 'products'])->name('products');
+
+        //     Route::get('{id}/attach-products', [CategoryV1Controller::class, 'attachProductsPage'])->name('attach.products.page');
+        //     Route::post('{id}/attach-products', [CategoryV1Controller::class, 'attachProductsStore'])->name('attach.products.store');
+        //     Route::post('{id}/detach-products', [CategoryV1Controller::class, 'detachProducts'])->name('detach.products');
+
+        //     Route::get('{id}/attach-kiotviet', [CategoryV1Controller::class, 'attachKiotPage'])->name('attach.kiot.page');
+        //     Route::post('{id}/attach-kiotviet', [CategoryV1Controller::class, 'attachKiotStore'])->name('attach.kiot.store');
+        // });
+        Route::prefix('categories')->name('categories.')->group(function () {
+            Route::get('/', [CategoryV1Controller::class, 'index'])->name('index');
+            Route::post('store', [CategoryV1Controller::class, 'store'])->name('store');
+            Route::post('update/{id}', [CategoryV1Controller::class, 'update'])->name('update');
+            Route::get('delete/{id}', [CategoryV1Controller::class, 'destroy'])->name('destroy');
+
+            Route::get('sync-all-kiot', [CategoryV1Controller::class, 'syncAllKiot'])->name('sync.all.kiot');
+            Route::get('{id}/sync-kiot', [CategoryV1Controller::class, 'syncCategoryKiot'])->name('sync.kiot');
+
+            Route::get('{id}/products', [CategoryV1Controller::class, 'products'])->name('products');
+
+            Route::get('{id}/attach-products', [CategoryV1Controller::class, 'attachProductsPage'])->name('attach.products.page');
+            Route::post('{id}/attach-products', [CategoryV1Controller::class, 'attachProductsStore'])->name('attach.products.store');
+            Route::post('{id}/detach-products', [CategoryV1Controller::class, 'detachProducts'])->name('detach.products');
+
+            Route::get('{id}/attach-kiotviet', [CategoryV1Controller::class, 'attachKiotPage'])->name('attach.kiot.page');
+            Route::post('{id}/attach-kiotviet', [CategoryV1Controller::class, 'attachKiotStore'])->name('attach.kiot.store');
+        });
+        
+        //MAIN CATEGORIES
+        Route::prefix('main-categories')->name('main_categories.')->group(function () {
+            Route::get('/', [MainCategoryV1Controller::class, 'index'])->name('index');
+            Route::post('store', [MainCategoryV1Controller::class, 'store'])->name('store');
+            Route::post('update/{id}', [MainCategoryV1Controller::class, 'update'])->name('update');
+            Route::get('delete/{id}', [MainCategoryV1Controller::class, 'destroy'])->name('destroy');
+
+            Route::get('{id}/categories', [MainCategoryV1Controller::class, 'categories'])->name('categories');
+            Route::get('{id}/attach', [MainCategoryV1Controller::class, 'attachPage'])->name('attach.page');
+            Route::post('{id}/attach', [MainCategoryV1Controller::class, 'attachStore'])->name('attach.store');
+            Route::post('{id}/detach', [MainCategoryV1Controller::class, 'detachCategories'])->name('detach');
+        });
+        // TRADEMARK
+        Route::prefix('trademarks')->name('trademarks.')->group(function () {
+            Route::get('/', [TrademarkV1Controller::class, 'index'])->name('index');
+            Route::post('store', [TrademarkV1Controller::class, 'store'])->name('store');
+            Route::post('update/{id}', [TrademarkV1Controller::class, 'update'])->name('update');
+            Route::get('delete/{id}', [TrademarkV1Controller::class, 'destroy'])->name('destroy');
+
+            Route::get('{id}/products', [TrademarkV1Controller::class, 'products'])->name('products');
+            Route::get('{id}/attach', [TrademarkV1Controller::class, 'attachPage'])->name('attach.page');
+            Route::post('{id}/attach', [TrademarkV1Controller::class, 'attachProducts'])->name('attach');
+            Route::post('{id}/detach', [TrademarkV1Controller::class, 'detachProducts'])->name('detach');
+        });
+
+        // PRODUCTS
+        Route::prefix('products')->name('products.')->group(function () {
+            Route::get('/', [ProductV1Controller::class, 'index'])->name('index');
+            Route::get('show/{id}', [ProductV1Controller::class, 'show'])->name('show');
+            Route::post('store', [ProductV1Controller::class, 'store'])->name('store');
+            Route::post('update/{id}', [ProductV1Controller::class, 'update'])->name('update');
+            Route::get('delete/{id}', [ProductV1Controller::class, 'destroy'])->name('destroy');
+
+            // Sync from KiotViet (page + import)
+            Route::get('kiotviet', [ProductV1Controller::class, 'kiotviet'])->name('kiotviet');
+            Route::post('kiotviet/import', [ProductV1Controller::class, 'kiotvietImport'])->name('kiotviet.import');
+        });
+
+        // FLASHSALES
+        Route::prefix('flashsales')->name('flashsales.')->group(function () {
+            Route::get('/', [FlashSaleV1Controller::class, 'index'])->name('index');
+            Route::post('store', [FlashSaleV1Controller::class, 'store'])->name('store');
+            Route::post('update/{id}', [FlashSaleV1Controller::class, 'update'])->name('update');
+            Route::get('delete/{id}', [FlashSaleV1Controller::class, 'destroy'])->name('destroy');
+
+            // quản lý sản phẩm trong 1 khung giờ
+            Route::get('{id}/items', [FlashSaleV1Controller::class, 'items'])->name('items');
+            Route::post('{id}/items/store', [FlashSaleV1Controller::class, 'itemsStore'])->name('items.store');
+            Route::post('{id}/items/update/{item_id}', [FlashSaleV1Controller::class, 'itemsUpdate'])->name('items.update');
+            Route::get('{id}/items/delete/{item_id}', [FlashSaleV1Controller::class, 'itemsDestroy'])->name('items.destroy');
+        });
+
+        //BESTSELLER
+        Route::prefix('best-sellers')->name('best_sellers.')->group(function () {
+            Route::get('/', [BestSellerV1Controller::class, 'index'])->name('index');
+
+            Route::post('store', [BestSellerV1Controller::class, 'store'])->name('store');
+            Route::post('update/{id}', [BestSellerV1Controller::class, 'update'])->name('update');
+            Route::get('delete/{id}', [BestSellerV1Controller::class, 'destroy'])->name('destroy');
+
+            // chọn sản phẩm từ product_v1
+            Route::get('attach', [BestSellerV1Controller::class, 'attachPage'])->name('attach.page');
+            Route::post('attach', [BestSellerV1Controller::class, 'attachStore'])->name('attach.store');
+        });
+
+        //FAVORITE READEMARKS
+        Route::prefix('favorite-trademarks')->name('favorite_trademarks.')->group(function () {
+            Route::get('/', [FavoriteTrademarkV1Controller::class, 'index'])->name('index');
+
+            Route::post('update/{id}', [FavoriteTrademarkV1Controller::class, 'update'])->name('update');
+            Route::get('delete/{id}', [FavoriteTrademarkV1Controller::class, 'destroy'])->name('destroy');
+
+            // chọn thương hiệu từ trademark_v1
+            Route::get('attach', [FavoriteTrademarkV1Controller::class, 'attachPage'])->name('attach.page');
+            Route::post('attach', [FavoriteTrademarkV1Controller::class, 'attachStore'])->name('attach.store');
+        });
+
+        //KEYSEARCH
+        Route::prefix('search-keywords')->name('search_keywords.')->group(function () {
+            Route::get('/', [SearchKeywordV1Controller::class, 'index'])->name('index');
+            Route::post('store', [SearchKeywordV1Controller::class, 'store'])->name('store');
+            Route::post('update/{id}', [SearchKeywordV1Controller::class, 'update'])->name('update');
+            Route::get('delete/{id}', [SearchKeywordV1Controller::class, 'destroy'])->name('destroy');
+
+            // cấu hình sản phẩm ưu tiên
+            Route::get('{id}/products', [SearchKeywordV1Controller::class, 'products'])->name('products');
+            Route::get('{id}/attach', [SearchKeywordV1Controller::class, 'attachPage'])->name('attach.page');
+            Route::post('{id}/attach', [SearchKeywordV1Controller::class, 'attachProducts'])->name('attach');
+            Route::post('{id}/detach', [SearchKeywordV1Controller::class, 'detachProducts'])->name('detach');
+            Route::post('{id}/product/update/{map_id}', [SearchKeywordV1Controller::class, 'updateMapItem'])->name('product.update');
+        });
+
+        //DISEASE CATEGORY
+        Route::prefix('season-disease-categories')->name('season_disease_categories.')->group(function () {
+            Route::get('/', [SeasonDiseaseCategoryV1Controller::class, 'index'])->name('index');
+            Route::post('store', [SeasonDiseaseCategoryV1Controller::class, 'store'])->name('store');
+            Route::post('update/{id}', [SeasonDiseaseCategoryV1Controller::class, 'update'])->name('update');
+            Route::get('delete/{id}', [SeasonDiseaseCategoryV1Controller::class, 'destroy'])->name('destroy');
+
+            Route::get('{id}/products', [SeasonDiseaseCategoryV1Controller::class, 'products'])->name('products');
+            Route::get('{id}/attach', [SeasonDiseaseCategoryV1Controller::class, 'attachPage'])->name('attach.page');
+            Route::post('{id}/attach', [SeasonDiseaseCategoryV1Controller::class, 'attachStore'])->name('attach.store');
+
+            Route::post('{id}/product/update/{map_id}', [SeasonDiseaseCategoryV1Controller::class, 'updateProductItem'])->name('product.update');
+            Route::get('{id}/product/delete/{map_id}', [SeasonDiseaseCategoryV1Controller::class, 'destroyProductItem'])->name('product.destroy');
+        });
+
+        //HEALTH CORNER
+        Route::prefix('health-corner')->name('health_corner.')->group(function () {
+        // categories
+            Route::get('categories', [HealthCornerV1Controller::class, 'categories'])->name('categories');
+            Route::post('categories/store', [HealthCornerV1Controller::class, 'storeCategory'])->name('categories.store');
+            Route::post('categories/update/{id}', [HealthCornerV1Controller::class, 'updateCategory'])->name('categories.update');
+            Route::get('categories/delete/{id}', [HealthCornerV1Controller::class, 'destroyCategory'])->name('categories.destroy');
+            
+            Route::get('categories/{category_id}/articles/show/{id}', [HealthCornerV1Controller::class, 'showArticle'])->name('articles.show');
+            // articles by category
+            Route::get('categories/{category_id}/articles', [HealthCornerV1Controller::class, 'articles'])->name('articles');
+            Route::post('categories/{category_id}/articles/store', [HealthCornerV1Controller::class, 'storeArticle'])->name('articles.store');
+            Route::post('categories/{category_id}/articles/update/{id}', [HealthCornerV1Controller::class, 'updateArticle'])->name('articles.update');
+            Route::get('categories/{category_id}/articles/delete/{id}', [HealthCornerV1Controller::class, 'destroyArticle'])->name('articles.destroy');
+        });
+
+        //DISEASES
+        Route::prefix('diseases')->name('diseases.')->group(function () {
+        // categories
+            Route::get('categories', [DiseaseV1Controller::class, 'categories'])->name('categories');
+            Route::post('categories/store', [DiseaseV1Controller::class, 'storeCategory'])->name('categories.store');
+            Route::post('categories/update/{id}', [DiseaseV1Controller::class, 'updateCategory'])->name('categories.update');
+            Route::get('categories/delete/{id}', [DiseaseV1Controller::class, 'destroyCategory'])->name('categories.destroy');
+
+            // disease list by category
+            Route::get('categories/{category_id}/items', [DiseaseV1Controller::class, 'items'])->name('items');
+            Route::post('categories/{category_id}/items/store', [DiseaseV1Controller::class, 'storeItem'])->name('items.store');
+            Route::post('categories/{category_id}/items/update/{id}', [DiseaseV1Controller::class, 'updateItem'])->name('items.update');
+            Route::get('categories/{category_id}/items/delete/{id}', [DiseaseV1Controller::class, 'destroyItem'])->name('items.destroy');
+
+            // preview
+            Route::get('categories/{category_id}/items/show/{id}', [DiseaseV1Controller::class, 'showItem'])->name('items.show');
+        }); 
+        
+        //TEXT SEO HEADER
+        Route::prefix('text-seo-header')->name('text_seo_header.')->group(function () {
+            Route::get('/', [TextSeoHeaderController::class, 'index'])->name('index');
+            Route::post('store', [TextSeoHeaderController::class, 'store'])->name('store');
+            Route::post('update/{id}', [TextSeoHeaderController::class, 'update'])->name('update');
+            Route::get('delete/{id}', [TextSeoHeaderController::class, 'destroy'])->name('destroy');
+            Route::get('show/{id}', [TextSeoHeaderController::class, 'show'])->name('show');
+
+            Route::get('{id}/products', [TextSeoHeaderController::class, 'products'])->name('products');
+            Route::get('{id}/attach', [TextSeoHeaderController::class, 'attachPage'])->name('attach.page');
+            Route::post('{id}/attach', [TextSeoHeaderController::class, 'attachStore'])->name('attach.store');
+            Route::post('{id}/detach', [TextSeoHeaderController::class, 'detachProducts'])->name('detach');
+            Route::post('{id}/product/update/{map_id}', [TextSeoHeaderController::class, 'updateProductItem'])->name('product.update');
+        });
+
+        //BANNERS
+        Route::prefix('banners')->name('banners.')->group(function () {
+            Route::get('/', [BannerV1Controller::class, 'index'])->name('index');
+            Route::post('store', [BannerV1Controller::class, 'store'])->name('store');
+            Route::post('update/{id}', [BannerV1Controller::class, 'update'])->name('update');
+            Route::get('delete/{id}', [BannerV1Controller::class, 'destroy'])->name('destroy');
+            Route::get('show/{id}', [BannerV1Controller::class, 'show'])->name('show');
+        });
+
+        //ORDER
+        Route::prefix('admin/catalog-v1/order-v1')->name('admin.order_v1.')->group(function () {
+            Route::get('/', [OrderV1Controller::class, 'index'])->name('index');
+            Route::get('/{id}', [OrderV1Controller::class, 'show'])->name('show');
+            Route::post('/{id}/update', [OrderV1Controller::class, 'update'])->name('update');
+        });
+        
+        //prescription request
+        Route::prefix('admin/catalog-v1/prescription-request-v1')->name('prescription_request_v1.')->group(function () {
+            Route::get('/', [PrescriptionRequestV1Controller::class, 'index'])->name('index');
+            Route::get('/{id}', [PrescriptionRequestV1Controller::class, 'show'])->name('show');
+            Route::post('/{id}/update', [PrescriptionRequestV1Controller::class, 'update'])->name('update');
+        });
+
+    });
     //Cài đặt tài khoản Admin
     Route::prefix('account-admin')->name('account-admin.')->group(function (){
         Route::get('new-user-and-password', [LoginController::class, 'settingAccount'])->name('new-user-and-password');
@@ -302,6 +703,76 @@ Route::middleware([CheckLogin::class])->group(function (){
     });
 
     Route::get('logout', [HomeController::class, 'logout'])->name('logout');
+
+    // Quản lý phòng - Ảnh phòng
+    Route::prefix('images-room')->name('images-room.')->group(function () {
+        // Quản lý ảnh phòng
+        Route::get('list-data', [ImagesRoomsController::class, 'listDataImagesRoom'])->name('listDataImagesRoom');
+        Route::post('store', [ImagesRoomsController::class, 'storeImagesRoom'])->name('storeImagesRoom');
+        Route::post('update/{id}', [ImagesRoomsController::class, 'updateImagesRoom'])->name('updateImagesRoom');
+        Route::get('delete/{id}', [ImagesRoomsController::class, 'deleteImagesRoom'])->name('ImagesRoom'); // theo đúng tên bạn đưa
+    });
+    // Quản lý phòng
+    Route::prefix('rooms')->name('rooms.')->group(function () {
+        Route::get('list-data', [RoomsController::class, 'listDataRooms'])->name('listDataRooms');
+        Route::post('store',     [RoomsController::class, 'storeRoom'])->name('storeRoom');
+        Route::post('update/{id}', [RoomsController::class, 'updateRoom'])->name('updateRoom');
+        Route::get('delete/{id}',  [RoomsController::class, 'deleteRoom'])->name('deleteRoom');
+    });
+    // Quản lý thực đơn
+    Route::prefix('menus')->name('menus.')->group(function () {
+        Route::get('list-data',   [MenusController::class, 'listDataMenus'])->name('listDataMenus');
+        Route::post('store',      [MenusController::class, 'storeMenu'])->name('storeMenu');
+        Route::post('update/{id}',[MenusController::class, 'updateMenu'])->name('updateMenu');
+        Route::get('delete/{id}', [MenusController::class, 'deleteMenu'])->name('deleteMenu');
+    });
+    // Quản lý tiện ích
+    Route::prefix('utilities')->name('utilities.')->group(function () {
+        Route::get('list-data',    [UtilitiesController::class, 'listDataUtilities'])->name('listDataUtilities');
+        Route::post('store',       [UtilitiesController::class, 'storeUtility'])->name('storeUtility');
+        Route::post('update/{id}', [UtilitiesController::class, 'updateUtility'])->name('updateUtility');
+        Route::get('delete/{id}',  [UtilitiesController::class, 'deleteUtility'])->name('deleteUtility');
+    });
+    // Đặt phòng (Admin)
+    Route::prefix('booking')->name('booking.')->group(function () {
+
+        // 1) Cấu hình lịch phòng theo ngày
+        Route::prefix('calendar')->name('calendar.')->group(function () {
+            Route::get('list-data',     [BookingCalendarController::class, 'listData'])->name('listData');
+            Route::post('seed-month',   [BookingCalendarController::class, 'seedMonth'])->name('seedMonth');
+            Route::post('bulk-update',  [BookingCalendarController::class, 'bulkUpdate'])->name('bulkUpdate');
+            Route::post('update/{id}',  [BookingCalendarController::class, 'update'])->name('update');
+            Route::get('delete/{id}',   [BookingCalendarController::class, 'delete'])->name('delete');
+        });
+
+        // 2) Quản lý đặt phòng
+        Route::prefix('bookings')->name('bookings.')->group(function () {
+            Route::get('list-data',     [BookingController::class, 'listData'])->name('listData');
+            Route::post('store',        [BookingController::class, 'store'])->name('store');
+            Route::post('update/{id}',  [BookingController::class, 'update'])->name('update');
+
+            Route::post('confirm/{id}', [BookingController::class, 'confirm'])->name('confirm');
+            Route::post('cancel/{id}',  [BookingController::class, 'cancel'])->name('cancel');
+
+            Route::get('delete/{id}',   [BookingController::class, 'delete'])->name('delete');
+        });
+        
+    });
+    // 3) Trang chi tiết đặt phòng
+    Route::prefix('blog')->name('blog.')->group(function () {
+        Route::get('/posts', [BlogPostController::class, 'index'])->name('posts.index');
+        Route::post('/posts/store', [BlogPostController::class, 'store'])->name('posts.store');
+        Route::post('/posts/update/{id}', [BlogPostController::class, 'update'])->name('posts.update');
+        Route::post('/posts/toggle/{id}', [BlogPostController::class, 'toggle'])->name('posts.toggle');
+        Route::get('/posts/delete/{id}', [BlogPostController::class, 'delete'])->name('posts.delete');
+
+        Route::get('/categories', [BlogCategoryController::class, 'index'])->name('categories.index');
+        Route::post('/categories/store', [BlogCategoryController::class, 'store'])->name('categories.store');
+        Route::post('/categories/update/{id}', [BlogCategoryController::class, 'update'])->name('categories.update');
+        Route::post('/categories/toggle/{id}', [BlogCategoryController::class, 'toggle'])->name('categories.toggle');
+        Route::get('/categories/delete/{id}', [BlogCategoryController::class, 'delete'])->name('categories.delete');
+    });
+    
 });
 // Giao diện vòng quay
 Route::get('play-rotation', [RotationController::class, 'playRotation']);
@@ -311,3 +782,46 @@ Route::get('lucky-wheel', function (){
 Route::get('rotation-checkin', function (){
    return view('rotation-checkin');
 });
+//Get Token Kiotviet
+Route::get('get-token-kiotviet', [KiotVietService::class, 'playRotation']);
+
+// // Website Phong Hoa
+// Route::prefix('/')->group(function (){
+// Route::get('', [HomeClientController::class, 'index'])->name('index1');;
+
+//Phòng
+// Route::prefix('phong')->name('phong.')->group(function () {
+//     Route::get('', [RoomsClientController::class, 'index'])->name('index');
+//     Route::get('detail/{id}', [RoomsClientController::class, 'detailRooms'])->name('detail');
+// });
+
+// Trang danh sách phòng (client)
+Route::get('/phong', [RoomClientController::class, 'index'])->name('client.rooms.index');
+
+// Trang chi tiết phòng theo code_url (SEO)
+Route::get('/phong/{code_url}', [RoomClientController::class, 'show'])->name('client.rooms.show');
+// });
+// Trang danh sách phòng theo bộ lọc (client)
+Route::get('/phong-booking', [BookingClientController::class, 'indexBookingClient'])->name('client.rooms.indexBookingClient');
+
+Route::get('/api/rooms/availability', [RoomClientController::class, 'availability'])->name('client.rooms.availability');
+
+
+// API check phòng trống (JS gọi)
+Route::get('/api/bookings/check', [BookingFEController::class, 'check'])
+    ->name('client.bookings.check');
+
+// Submit đặt phòng (lưu vào admin)
+Route::post('/dat-phong', [BookingFEController::class, 'store'])
+    ->name('client.bookings.store');
+
+// // Danh sách blog
+// Route::get('/blog', [BlogController::class, 'indexBlog'])
+//     ->name('client.blog.index');
+//     // Chi tiết blog
+// Route::get('/blog/show', [BlogController::class, 'showBlog'])
+//     ->name('client.blog.show');
+    
+// Trang blog
+Route::get('/bai-viet', [BlogController::class, 'index'])->name('client.blog.index');
+Route::get('/bai-viet/{post:slug}', [BlogController::class, 'show'])->name('client.blog.show');

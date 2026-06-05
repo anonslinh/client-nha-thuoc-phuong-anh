@@ -14,7 +14,7 @@
     <!-- Core Css -->
     <link rel="stylesheet" href="assets/css/styles.css" />
 
-    <title>Win 🍼👶 Baby</title>
+    <title>Quản trị</title>
 </head>
 
 <body>
@@ -31,7 +31,7 @@
                     <div class="min-vh-100 bg-body row justify-content-center align-items-center p-5">
                         <div class="col-12 auth-card">
                             <a href="/" class="text-nowrap logo-img d-block w-100">
-                                <img style="width: 368px; height: auto;" src="../assets/images/logos/logo_win_baby_login.svg"/>
+                                <img style="width: 368px; height: auto;" src="../assets/images/logos/logo_outtech.png"/>
                             </a>
                             <h2 class="mb-2 mt-4 fs-7 fw-bolder">Sign In</h2>
                             @if (session('success'))
@@ -115,7 +115,7 @@
                         <div class="row justify-content-center w-100">
                             <div class="col-lg-6">
                                 <h5 class="text-white">
-                                    Win Baby – Nơi kết nối công nghệ hiện đại với yêu thương chân thành.
+                                    Dự án Out Care - Khẳng định vị trí công nghệ trong thời đại chuyển đổi số
                                 </h5></br>
                                 <span class="opacity-75 fs-4 text-white d-block mb-3">
                                     Chúng tôi tin rằng mỗi cửa hàng mẹ và bé xứng đáng được trang bị những công cụ đột phá,

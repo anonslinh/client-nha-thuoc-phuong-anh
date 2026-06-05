@@ -27,8 +27,10 @@
             </div>
             <div class="sidebarmenu">
                 <div class="brand-logo d-flex align-items-center nav-logo">
-                    <a href="{{route('index')}}" class="text-nowrap logo-img">
-                        <img src="../assets/images/logos/logo_win_baby.svg" alt="Logo" />
+                    <a href="{{route('index1')}}" class="text-nowrap logo-img">
+                        <img src="../assets/images/logos/logo_outtech.png" alt="Logo"  style="
+    width: 174px;
+"/>
                     </a>
                 </div>
                 @foreach(config('menu') as $key => $value)

@@ -130,9 +130,10 @@ class LoginController extends Controller
             'email' => $bodyData['email'],
             'password' => $bodyData['password'],
         ];
+        // dd($dataAttemptAdmin);
         if (Auth::guard('users')->attempt($dataAttemptAdmin, $request->get('remember', false))) {
 
-            return redirect()->route('index');
+            return redirect()->route('catalog_v1.flashsales.index');
         }
         return redirect()->route('login')->withErrors(['Tài khoản hoặc mật khẩu không chính xác']);
     }

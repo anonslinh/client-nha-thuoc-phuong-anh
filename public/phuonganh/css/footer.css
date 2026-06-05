@@ -1,0 +1,231 @@
+.lc-footer {
+    margin-top: 40px;
+    font-size: 13px;
+    color: #111827;
+}
+
+.lc-footer-top {
+    background: linear-gradient(135deg, #07a9bf, #0f60e0);
+    color: #f9fafb;
+    padding: 12px 0;
+}
+
+.lc-footer-top-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.lc-footer-top-left {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.lc-footer-top-left-icon {
+    width: 26px;
+    height: 26px;
+    border-radius: 999px;
+    background: #0f172a;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+}
+
+.lc-footer-top-btn {
+    padding: 8px 18px;
+    border-radius: 999px;
+    border: none;
+    background: #ffffff;
+    color: #07a9bf;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 10px 22px rgba(15, 23, 42, 0.45);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    white-space: nowrap;
+}
+
+.lc-footer-top-btn span:last-child {
+    font-size: 15px;
+    transform: translateY(1px);
+}
+
+.lc-footer-top-btn:hover {
+    background: #f9fafb;
+}
+
+.lc-footer-main {
+    background: #f9fafb;
+    border-top: 1px solid #e5e7eb;
+    padding: 28px 0 36px;
+}
+
+.lc-footer-grid {
+    display: grid;
+    grid-template-columns: 1.8fr 1.6fr 1.6fr 2.2fr;
+    gap: 28px;
+    align-items: flex-start;
+}
+
+.lc-footer-col-title {
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: #374151;
+    margin-bottom: 10px;
+}
+
+.lc-footer-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.lc-footer-list li a {
+    text-decoration: none;
+    color: #4b5563;
+}
+
+.lc-footer-list li a:hover {
+    color: #07a9bf;
+}
+
+.lc-footer-contact-block {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.lc-footer-hotline-title {
+    font-size: 13px;
+    font-weight: 700;
+    margin-bottom: 4px;
+    color: #111827;
+}
+
+.lc-footer-hotline-row {
+    font-size: 13px;
+    color: #111827;
+}
+
+.lc-footer-hotline-row span:first-child {
+    font-weight: 700;
+    color: #07a9bf;
+}
+
+.lc-footer-hotline-row span:last-child {
+    color: #6b7280;
+    margin-left: 4px;
+}
+
+.lc-footer-social {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.lc-footer-social-icons {
+    display: inline-flex;
+    gap: 8px;
+    margin-top: 4px;
+}
+
+.lc-footer-social-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 999px;
+    background: #07a9bf;
+    color: #f9fafb;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+.lc-footer-qr {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.lc-footer-qr-box {
+    width: 90px;
+    height: 90px;
+    border-radius: 12px;
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    color: #6b7280;
+}
+
+.lc-footer-badges {
+    margin-top: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.lc-footer-cert-row,
+.lc-footer-pay-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.lc-footer-badge-label {
+    font-size: 12px;
+    color: #6b7280;
+    min-width: 110px;
+}
+
+.lc-footer-cert-icons,
+.lc-footer-pay-icons {
+    display: inline-flex;
+    gap: 6px;
+    flex-wrap: wrap;
+}
+
+.lc-footer-cert-pill,
+.lc-footer-pay-pill {
+    padding: 4px 10px;
+    border-radius: 999px;
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    font-size: 11px;
+    color: #4b5563;
+    white-space: nowrap;
+}
+
+@media (max-width: 1024px) {
+    .lc-footer-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 768px) {
+    .lc-footer-grid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    .lc-footer-top-inner {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+}
