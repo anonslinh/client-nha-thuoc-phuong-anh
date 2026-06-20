@@ -122,6 +122,7 @@ Route::post('/khach-hang/xoa-session', [WebsiteGuestCustomerController::class, '
 Route::prefix('khach-hang')->name('website.auth.')->group(function () {
     Route::post('gui-otp', [WebsiteAuthV1Controller::class, 'sendOtp'])->name('send-otp');
     Route::post('xac-thuc-otp', [WebsiteAuthV1Controller::class, 'verifyOtp'])->name('verify-otp');
+    Route::post('dang-nhap-ma-bi-mat', [WebsiteAuthV1Controller::class, 'loginWithSecretCode'])->name('secret-login');
     Route::post('cap-nhat-thong-tin', [WebsiteAuthV1Controller::class, 'updateProfile'])->name('update-profile');
     Route::post('dang-xuat', [WebsiteAuthV1Controller::class, 'logout'])->name('logout');
     Route::get('thong-tin', [WebsiteAuthV1Controller::class, 'me'])->name('me');

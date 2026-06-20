@@ -338,6 +338,44 @@
                     Gửi mã OTP qua Zalo
                 </button>
             </div>
+
+            <button type="button" class="lc-auth-link-btn" id="lcAuthGoToSecretBtn">
+                <i class="ri-key-2-line" aria-hidden="true"></i>
+                Đăng nhập bằng mã bí mật (nội bộ)
+            </button>
+        </div>
+
+        {{-- BƯỚC 1b: NHẬP MÃ BÍ MẬT (NỘI BỘ) --}}
+        <div class="lc-auth-step" id="lcAuthStepSecret" style="display:none;">
+            <div class="lc-guest-form-group">
+                <label>
+                    <i class="ri-key-2-line" aria-hidden="true"></i>
+                    Mã bí mật
+                </label>
+
+                <input
+                    type="text"
+                    id="lcAuthSecretInput"
+                    inputmode="numeric"
+                    maxlength="10"
+                    placeholder="Nhập mã bí mật 10 số"
+                    autocomplete="off"
+                >
+            </div>
+
+            <div class="lc-guest-error" id="lcAuthSecretError"></div>
+
+            <div class="lc-guest-popup-actions">
+                <button type="button" class="lc-guest-btn lc-guest-btn-primary" id="lcAuthVerifySecretBtn">
+                    <i class="ri-check-line" aria-hidden="true"></i>
+                    Đăng nhập
+                </button>
+            </div>
+
+            <button type="button" class="lc-auth-link-btn" id="lcAuthBackToPhoneFromSecretBtn">
+                <i class="ri-arrow-left-line" aria-hidden="true"></i>
+                Quay lại đăng nhập bằng số điện thoại
+            </button>
         </div>
 
         {{-- BƯỚC 2: NHẬP MÃ OTP --}}
@@ -1712,6 +1750,7 @@
 
         function showAuthStep(step, keepFlashDesc) {
             document.getElementById('lcAuthStepPhone').style.display = step === 'phone' ? 'block' : 'none';
+            document.getElementById('lcAuthStepSecret').style.display = step === 'secret' ? 'block' : 'none';
             document.getElementById('lcAuthStepOtp').style.display = step === 'otp' ? 'block' : 'none';
             document.getElementById('lcAuthStepAccount').style.display = step === 'account' ? 'block' : 'none';
 
@@ -1744,6 +1783,7 @@
         (function setupAuthFlow() {
             const SEND_OTP_URL = @json(route('website.auth.send-otp'));
             const VERIFY_OTP_URL = @json(route('website.auth.verify-otp'));
+            const SECRET_LOGIN_URL = @json(route('website.auth.secret-login'));
             const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
 
             const phoneInput = document.getElementById('lcAuthPhoneInput');
@@ -1757,6 +1797,12 @@
             const otpNameInput = document.getElementById('lcAuthOtpNameInput');
             const verifyOtpBtn = document.getElementById('lcAuthVerifyOtpBtn');
             const backToPhoneBtn = document.getElementById('lcAuthBackToPhoneBtn');
+
+            const goToSecretBtn = document.getElementById('lcAuthGoToSecretBtn');
+            const backToPhoneFromSecretBtn = document.getElementById('lcAuthBackToPhoneFromSecretBtn');
+            const secretInput = document.getElementById('lcAuthSecretInput');
+            const secretError = document.getElementById('lcAuthSecretError');
+            const verifySecretBtn = document.getElementById('lcAuthVerifySecretBtn');
 
             let currentPhone = '';
 
@@ -1812,6 +1858,54 @@
 
             backToPhoneBtn?.addEventListener('click', function () {
                 showAuthStep('phone');
+            });
+
+            goToSecretBtn?.addEventListener('click', function () {
+                secretError.textContent = '';
+                secretInput.value = '';
+                showAuthStep('secret');
+                secretInput.focus();
+            });
+
+            backToPhoneFromSecretBtn?.addEventListener('click', function () {
+                showAuthStep('phone');
+            });
+
+            secretInput?.addEventListener('keydown', function (event) {
+                if (event.key === 'Enter') {
+                    event.preventDefault();
+                    verifySecretBtn?.click();
+                }
+            });
+
+            verifySecretBtn?.addEventListener('click', async function () {
+                const code = (secretInput.value || '').trim();
+                secretError.textContent = '';
+
+                if (!code) {
+                    secretError.textContent = 'Vui lòng nhập mã bí mật.';
+                    return;
+                }
+
+                verifySecretBtn.disabled = true;
+                const oldText = verifySecretBtn.innerHTML;
+                verifySecretBtn.innerHTML = 'Đang đăng nhập...';
+
+                try {
+                    const result = await postJson(SECRET_LOGIN_URL, { code: code });
+
+                    if (!result.status) {
+                        secretError.textContent = result.msg || 'Mã bí mật không đúng.';
+                        return;
+                    }
+
+                    window.location.reload();
+                } catch (e) {
+                    secretError.textContent = 'Có lỗi xảy ra, vui lòng thử lại.';
+                } finally {
+                    verifySecretBtn.disabled = false;
+                    verifySecretBtn.innerHTML = oldText;
+                }
             });
 
             verifyOtpBtn?.addEventListener('click', async function () {

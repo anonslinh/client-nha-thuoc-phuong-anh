@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\NhaThuocPhuongAnh;
 
 use App\Http\Controllers\Controller;
+use App\Models\GeneralSettings;
 use App\Models\WebsiteCustomerV1;
 use App\Services\WebsiteCustomerOtpV1Service;
 use Illuminate\Http\Request;
@@ -10,6 +11,8 @@ use Illuminate\Support\Facades\Auth;
 
 class WebsiteAuthV1Controller extends Controller
 {
+    const SECRET_LOGIN_CODE_SETTING = 'secret_login_code';
+
     public function sendOtp(Request $request, WebsiteCustomerOtpV1Service $otpService)
     {
         $request->validate([
@@ -62,6 +65,44 @@ class WebsiteAuthV1Controller extends Controller
         if ($request->filled('name') && empty($customer->name)) {
             $customer->update(['name' => $request->input('name')]);
         }
+
+        $customer->update(['last_login_at' => now()]);
+
+        Auth::guard('website_customer')->login($customer, true);
+
+        $this->syncGuestSessionFromCustomer($customer);
+
+        return response()->json([
+            'status' => true,
+            'msg' => 'Đăng nhập thành công.',
+            'customer' => $this->formatCustomer($customer),
+        ]);
+    }
+
+    /**
+     * Đăng nhập bằng "mã bí mật" (dành cho nội bộ) - bỏ qua bước gửi/xác thực OTP qua Zalo.
+     * Giá trị mã lấy từ bảng general_setting (code = secret_login_code), nếu chưa cấu hình
+     * thì fallback sang biến môi trường SECRET_LOGIN_CODE_DEFAULT trong .env.
+     */
+    public function loginWithSecretCode(Request $request)
+    {
+        $request->validate([
+            'code' => ['required', 'string'],
+        ], [
+            'code.required' => 'Vui lòng nhập mã bí mật.',
+        ]);
+
+        $secretCode = GeneralSettings::where('code', self::SECRET_LOGIN_CODE_SETTING)->value('value')
+            ?: env('SECRET_LOGIN_CODE_DEFAULT');
+
+        if (trim($request->input('code')) !== trim((string) $secretCode)) {
+            return response()->json(['status' => false, 'msg' => 'Mã bí mật không đúng.']);
+        }
+
+        $customer = WebsiteCustomerV1::query()->firstOrCreate(
+            ['phone' => $secretCode],
+            ['name' => 'Tài khoản nội bộ', 'is_active' => 1]
+        );
 
         $customer->update(['last_login_at' => now()]);
 
