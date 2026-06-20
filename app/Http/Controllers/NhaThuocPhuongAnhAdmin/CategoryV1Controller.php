@@ -227,7 +227,7 @@ class CategoryV1Controller extends Controller
         $page = max((int)$request->get('page', 1), 1);
         $currentItem = ($page - 1) * $pageSize;
 
-        $response = Http::withHeaders($headers)->get(
+        $response = $this->kiotHttp($headers)->get(
             $kiot->urlKiotviet()['url_category'] . http_build_query([
                 'includeTotal' => 'true',
                 'pageSize' => $pageSize,
@@ -285,7 +285,7 @@ class CategoryV1Controller extends Controller
 
         // Lấy toàn bộ danh mục Kiot để map tên
         $categoryNamesMap = [];
-        $allCategories = Http::withHeaders($headers)->get(
+        $allCategories = $this->kiotHttp($headers)->get(
             $kiot->urlKiotviet()['url_category'] . http_build_query([
                 'includeTotal' => 'false',
                 'pageSize' => 500,
@@ -413,7 +413,7 @@ class CategoryV1Controller extends Controller
             $pageSize = 100;
 
             do {
-                $response = Http::withHeaders($headers)->get(
+                $response = $this->kiotHttp($headers)->get(
                     $kiot->urlKiotviet()['url_list_product'] . http_build_query([
                         'includeTotal' => 'false',
                         'pageSize' => $pageSize,
@@ -468,7 +468,7 @@ class CategoryV1Controller extends Controller
         $productCode = $p['code'] ?? null;
         if (!empty($productCode)) {
             try {
-                $detailResponse = Http::withHeaders($headers)->get(
+                $detailResponse = $this->kiotHttp($headers)->get(
                     $kiot->urlKiotviet()['url_detail_product'] . $productCode
                 );
 
@@ -579,6 +579,18 @@ class CategoryV1Controller extends Controller
             'Authorization' => 'Bearer ' . $token->access_token,
             'Content-Type' => 'application/json',
         ];
+    }
+
+    private function kiotHttp(array $headers)
+    {
+        $request = Http::withHeaders($headers);
+
+        $verifySsl = filter_var(
+            env('KIOTVIET_SSL_VERIFY', !app()->environment('local')),
+            FILTER_VALIDATE_BOOLEAN
+        );
+
+        return $verifySsl ? $request : $request->withoutVerifying();
     }
 
     private function saveUploaded($file, $folder)

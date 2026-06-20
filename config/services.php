@@ -35,4 +35,9 @@ return [
         ],
     ],
 
+    'outtech_otp' => [
+        'url' => env('OUTTECH_OTP_URL', 'https://outtech.io.vn/api/get-otp'),
+        'api_key' => env('OUTTECH_OTP_API_KEY'),
+    ],
+
 ];

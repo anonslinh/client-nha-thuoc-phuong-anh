@@ -72,7 +72,7 @@ class KiotVietService
     {
 
         $url_connect_token = $this->urlKiotViet();
-        $response = Http::asForm()->post($url_connect_token['url_connect_token'], [
+        $response = $this->kiotHttp()->asForm()->post($url_connect_token['url_connect_token'], [
             'scopes'       => 'PublicApi.Access',
             'grant_type'   => 'client_credentials',
             'client_id'    => $clientId,
@@ -96,6 +96,18 @@ class KiotVietService
         );
 
         return $personalAccessTokens;
+    }
+
+    private function kiotHttp()
+    {
+        $request = Http::baseUrl('');
+
+        $verifySsl = filter_var(
+            env('KIOTVIET_SSL_VERIFY', !app()->environment('local')),
+            FILTER_VALIDATE_BOOLEAN
+        );
+
+        return $verifySsl ? $request : $request->withoutVerifying();
     }
 
     /**

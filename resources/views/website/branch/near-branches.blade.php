@@ -3,8 +3,28 @@
 @section('style')
 <style>
     .near-branch-page{
+        --pa-branch-ink: #0b2430;
+        --pa-branch-deep: #073f45;
+        --pa-branch-teal: #0f8b7c;
+        --pa-branch-teal-2: #0a6466;
+        --pa-branch-mint: #e8f7f1;
+        --pa-branch-soft: #f4faf8;
+        --pa-branch-line: rgba(9, 47, 48, .12);
+        --pa-branch-gold: #C8A45D;
+        --pa-branch-shadow: 0 20px 50px rgba(9, 47, 48, .12);
+    }
+
+    .near-branch-page{
         padding: 28px 0 56px;
-        background: #f6f8fc;
+        background:
+            radial-gradient(circle at 12% 0%, rgba(15, 139, 124, .08), transparent 28%),
+            linear-gradient(180deg, #f4faf8 0%, #ffffff 42%, #f4faf8 100%);
+        overflow-x: hidden;
+    }
+
+    .near-branch-page,
+    .near-branch-page *{
+        box-sizing: border-box;
     }
 
     .near-branch-container{
@@ -19,12 +39,13 @@
         gap: 8px;
         margin-bottom: 18px;
         font-size: 14px;
-        color: #667085;
+        color: #5f7280;
     }
 
     .near-branch-breadcrumb a{
-        color: #0ea5c6;
+        color: var(--pa-branch-teal);
         text-decoration: none;
+        font-weight: 800;
     }
 
     .near-branch-breadcrumb a:hover{
@@ -32,12 +53,16 @@
     }
 
     .near-branch-hero{
-        background: linear-gradient(135deg, #12b8d4 0%, #1687cb 100%);
+        background:
+            radial-gradient(circle at 92% 10%, rgba(255,255,255,.18), transparent 32%),
+            linear-gradient(135deg, var(--pa-branch-deep) 0%, var(--pa-branch-teal-2) 58%, var(--pa-branch-teal) 100%);
         border-radius: 28px;
         padding: 34px 36px;
         color: #fff;
         margin-bottom: 22px;
-        box-shadow: 0 24px 50px rgba(20, 144, 207, .18);
+        box-shadow: var(--pa-branch-shadow);
+        border: 1px solid rgba(255,255,255,.18);
+        overflow: hidden;
     }
 
     .near-branch-hero-badge{
@@ -46,7 +71,8 @@
         gap: 8px;
         padding: 8px 14px;
         border-radius: 999px;
-        background: rgba(255,255,255,.18);
+        background: rgba(255,255,255,.14);
+        border: 1px solid rgba(255,255,255,.18);
         font-size: 13px;
         font-weight: 700;
         margin-bottom: 14px;
@@ -57,6 +83,7 @@
         font-size: 40px;
         line-height: 1.2;
         font-weight: 800;
+        color: #ffffff;
     }
 
     .near-branch-hero p{
@@ -65,6 +92,7 @@
         font-size: 17px;
         line-height: 1.8;
         color: rgba(255,255,255,.93);
+        overflow-wrap: anywhere;
     }
 
     .near-branch-toolbar{
@@ -79,7 +107,8 @@
         background: #fff;
         border-radius: 18px;
         padding: 14px 18px;
-        box-shadow: 0 14px 32px rgba(15, 23, 42, 0.07);
+        border: 1px solid var(--pa-branch-line);
+        box-shadow: 0 14px 32px rgba(9, 47, 48, 0.07);
         color: #475467;
         font-size: 15px;
         line-height: 1.6;
@@ -98,9 +127,9 @@
     }
 
     .near-branch-btn--primary{
-        background: linear-gradient(135deg, #12b8d4 0%, #1687cb 100%);
+        background: linear-gradient(135deg, var(--pa-branch-teal) 0%, var(--pa-branch-deep) 100%);
         color: #fff;
-        box-shadow: 0 12px 24px rgba(20, 144, 207, .18);
+        box-shadow: 0 12px 24px rgba(9, 47, 48, .18);
     }
 
     .near-branch-btn--primary:hover{
@@ -109,13 +138,13 @@
 
     .near-branch-btn--light{
         background: #fff;
-        color: #0f172a;
-        border: 1px solid #dbe5ef;
+        color: var(--pa-branch-ink);
+        border: 1px solid var(--pa-branch-line);
     }
 
     .near-branch-btn--light:hover{
-        border-color: #0ea5c6;
-        color: #0ea5c6;
+        border-color: rgba(15, 139, 124, .38);
+        color: var(--pa-branch-teal);
     }
 
     .near-branch-layout{
@@ -129,14 +158,15 @@
     .near-branch-list-card{
         background: #fff;
         border-radius: 24px;
-        box-shadow: 0 16px 36px rgba(15, 23, 42, 0.08);
+        border: 1px solid var(--pa-branch-line);
+        box-shadow: 0 16px 36px rgba(9, 47, 48, 0.08);
         overflow: hidden;
     }
 
     .near-branch-map-head,
     .near-branch-list-head{
         padding: 20px 22px;
-        border-bottom: 1px solid #edf2f7;
+        border-bottom: 1px solid rgba(9, 47, 48, .10);
     }
 
     .near-branch-map-head h2,
@@ -145,7 +175,7 @@
         font-size: 24px;
         line-height: 1.3;
         font-weight: 800;
-        color: #0f172a;
+        color: var(--pa-branch-ink);
     }
 
     .near-branch-map-head p,
@@ -159,7 +189,59 @@
     #nearBranchMap{
         width: 100%;
         height: 720px;
-        background: #eef3f8;
+        background: var(--pa-branch-soft);
+    }
+
+    .near-branch-map-marker{
+        width: 38px;
+        height: 48px;
+        position: relative;
+        transform: translateY(-6px);
+        filter: drop-shadow(0 10px 14px rgba(7, 63, 69, .26));
+    }
+
+    .near-branch-map-marker__pin{
+        position: absolute;
+        left: 3px;
+        top: 0;
+        width: 32px;
+        height: 32px;
+        border-radius: 50% 50% 50% 6px;
+        transform: rotate(-45deg);
+        background: linear-gradient(135deg, var(--pa-branch-teal), var(--pa-branch-deep));
+        border: 2px solid #ffffff;
+        box-shadow: inset 0 0 0 1px rgba(255,255,255,.18);
+    }
+
+    .near-branch-map-marker__logo{
+        position: absolute;
+        left: 8px;
+        top: 5px;
+        width: 22px;
+        height: 22px;
+        border-radius: 8px;
+        background: #ffffff;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2px;
+        z-index: 2;
+    }
+
+    .near-branch-map-marker__logo img{
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        display: block;
+    }
+
+    .near-branch-user-marker{
+        width: 22px;
+        height: 22px;
+        border-radius: 999px;
+        background: #ffffff;
+        border: 6px solid var(--pa-branch-gold);
+        box-shadow: 0 0 0 5px rgba(200, 164, 93, .18), 0 8px 18px rgba(9, 47, 48, .18);
     }
 
     .near-branch-list-wrap{
@@ -176,7 +258,7 @@
     }
 
     .near-branch-item{
-        border: 1px solid #e7eef5;
+        border: 1px solid var(--pa-branch-line);
         border-radius: 20px;
         padding: 16px;
         background: #fff;
@@ -188,14 +270,14 @@
     }
 
     .near-branch-item:hover{
-        box-shadow: 0 16px 32px rgba(15, 23, 42, 0.08);
+        box-shadow: 0 16px 32px rgba(9, 47, 48, 0.08);
         transform: translateY(-2px);
     }
 
     .near-branch-item--active{
-        border-color: #16a3cf;
-        box-shadow: 0 16px 34px rgba(20, 144, 207, 0.12);
-        background: linear-gradient(180deg, #ffffff 0%, #f8fdff 100%);
+        border-color: rgba(15, 139, 124, .45);
+        box-shadow: 0 16px 34px rgba(9, 47, 48, 0.12);
+        background: linear-gradient(180deg, #ffffff 0%, #f4faf8 100%);
     }
 
     .near-branch-item-top{
@@ -211,14 +293,14 @@
         height: 34px;
         min-width: 34px;
         border-radius: 50%;
-        background: linear-gradient(135deg, #12b8d4 0%, #1687cb 100%);
+        background: linear-gradient(135deg, var(--pa-branch-teal) 0%, var(--pa-branch-deep) 100%);
         color: #fff;
         display: inline-flex;
         align-items: center;
         justify-content: center;
         font-size: 14px;
         font-weight: 800;
-        box-shadow: 0 8px 18px rgba(20, 144, 207, .22);
+        box-shadow: 0 8px 18px rgba(9, 47, 48, .18);
     }
 
     .near-branch-distance{
@@ -228,8 +310,8 @@
         white-space: nowrap;
         padding: 8px 12px;
         border-radius: 999px;
-        background: #eaf9fd;
-        color: #0ea5c6;
+        background: var(--pa-branch-mint);
+        color: var(--pa-branch-deep);
         font-size: 13px;
         font-weight: 800;
     }
@@ -239,7 +321,7 @@
         font-size: 20px;
         line-height: 1.4;
         font-weight: 800;
-        color: #0f172a;
+        color: var(--pa-branch-ink);
     }
 
     .near-branch-code{
@@ -263,7 +345,7 @@
     }
 
     .near-branch-meta-item strong{
-        color: #0f172a;
+        color: var(--pa-branch-ink);
     }
 
     .near-branch-actions{
@@ -287,15 +369,15 @@
     }
 
     .near-branch-link--primary{
-        background: linear-gradient(135deg, #12b8d4 0%, #1687cb 100%);
+        background: linear-gradient(135deg, var(--pa-branch-teal) 0%, var(--pa-branch-deep) 100%);
         color: #fff;
-        box-shadow: 0 10px 22px rgba(20, 144, 207, 0.16);
+        box-shadow: 0 10px 22px rgba(9, 47, 48, 0.16);
     }
 
     .near-branch-link--secondary{
-        background: #f7fafc;
-        border: 1px solid #dbe5ef;
-        color: #0f172a;
+        background: #f7fbfa;
+        border: 1px solid var(--pa-branch-line);
+        color: var(--pa-branch-ink);
     }
 
     .near-branch-link:hover{
@@ -307,7 +389,8 @@
         padding: 14px 16px;
         border-radius: 16px;
         background: #fff;
-        box-shadow: 0 14px 32px rgba(15, 23, 42, 0.06);
+        border: 1px solid var(--pa-branch-line);
+        box-shadow: 0 14px 32px rgba(9, 47, 48, 0.06);
         color: #667085;
         font-size: 14px;
         line-height: 1.7;
@@ -333,12 +416,15 @@
         }
 
         .near-branch-container{
-            width: min(100%, calc(100% - 20px));
+            width: min(calc(100% - 20px), 370px);
+            max-width: min(calc(100% - 20px), 370px);
+            overflow: hidden;
         }
 
         .near-branch-hero{
             padding: 22px 18px;
             border-radius: 22px;
+            max-width: 100%;
         }
 
         .near-branch-hero h1{
@@ -347,6 +433,7 @@
 
         .near-branch-hero p{
             font-size: 15px;
+            max-width: 100%;
         }
 
         .near-branch-toolbar{
@@ -356,6 +443,12 @@
         .near-branch-map-head,
         .near-branch-list-head{
             padding: 18px;
+        }
+
+        .near-branch-map-card,
+        .near-branch-list-card,
+        .near-branch-note{
+            max-width: 100%;
         }
 
         .near-branch-map-head h2,
@@ -482,6 +575,7 @@
         const statusEl = document.getElementById('nearBranchStatus');
         const btnGetLocation = document.getElementById('btnGetLocation');
         const btnReset = document.getElementById('btnResetBranches');
+        const branchLogoUrl = @json(asset('phuonganh/img/lg.png'));
 
         if (!rawData || !listEl) return;
 
@@ -514,6 +608,29 @@
         let branchMarkersLayer = L.layerGroup().addTo(map);
         let userMarker = null;
         let currentUserLatLng = null;
+
+        const branchIcon = L.divIcon({
+            className: 'near-branch-leaflet-icon',
+            html: `
+                <span class="near-branch-map-marker" aria-hidden="true">
+                    <span class="near-branch-map-marker__pin"></span>
+                    <span class="near-branch-map-marker__logo">
+                        <img src="${branchLogoUrl}" alt="">
+                    </span>
+                </span>
+            `,
+            iconSize: [38, 48],
+            iconAnchor: [19, 42],
+            popupAnchor: [0, -40]
+        });
+
+        const userIcon = L.divIcon({
+            className: 'near-branch-user-leaflet-icon',
+            html: '<span class="near-branch-user-marker" aria-hidden="true"></span>',
+            iconSize: [22, 22],
+            iconAnchor: [11, 11],
+            popupAnchor: [0, -14]
+        });
 
         function escapeHtml(str) {
             return String(str || '')
@@ -555,22 +672,22 @@
 
             return `
                 <div style="min-width:220px">
-                    <div style="font-weight:800;font-size:16px;color:#0f172a;margin-bottom:8px;">
+                    <div style="font-weight:800;font-size:16px;color:#0b2430;margin-bottom:8px;">
                         ${escapeHtml(item.branch_name)}
                     </div>
                     <div style="font-size:13px;line-height:1.6;color:#475467;margin-bottom:8px;">
                         ${escapeHtml(item.full_address || '')}
                     </div>
-                    <div style="font-size:13px;line-height:1.6;color:#0ea5c6;font-weight:700;margin-bottom:10px;">
+                    <div style="font-size:13px;line-height:1.6;color:#0f8b7c;font-weight:700;margin-bottom:10px;">
                         Khoảng cách: ${escapeHtml(formatKm(item.distance_km))}
                     </div>
                     <div style="display:flex;gap:8px;flex-wrap:wrap;">
                         <a href="${directionLink}" target="_blank" rel="noopener noreferrer"
-                           style="text-decoration:none;background:#12b8d4;color:#fff;padding:8px 12px;border-radius:10px;font-size:12px;font-weight:800;">
+                           style="text-decoration:none;background:linear-gradient(135deg,#0f8b7c,#073f45);color:#fff;padding:8px 12px;border-radius:10px;font-size:12px;font-weight:800;">
                            Chỉ đường
                         </a>
                         <a href="${mapLink}" target="_blank" rel="noopener noreferrer"
-                           style="text-decoration:none;background:#f4f8fb;color:#0f172a;padding:8px 12px;border-radius:10px;font-size:12px;font-weight:800;border:1px solid #dbe5ef;">
+                           style="text-decoration:none;background:#f4faf8;color:#0b2430;padding:8px 12px;border-radius:10px;font-size:12px;font-weight:800;border:1px solid rgba(9,47,48,.12);">
                            Xem bản đồ
                         </a>
                     </div>
@@ -586,7 +703,10 @@
             const bounds = [];
 
             data.forEach((item, index) => {
-                const marker = L.marker([item.lat, item.lng]).addTo(branchMarkersLayer);
+                const marker = L.marker([item.lat, item.lng], {
+                    icon: branchIcon,
+                    title: item.branch_name || 'Nhà thuốc Phương Anh'
+                }).addTo(branchMarkersLayer);
                 marker.bindPopup(buildPopupHtml(item));
 
                 marker.on('click', function () {
@@ -746,6 +866,7 @@
                     }
 
                     userMarker = L.marker([userLat, userLng], {
+                        icon: userIcon,
                         title: 'Vị trí của bạn'
                     }).addTo(map).bindPopup('Bạn đang ở đây').openPopup();
 

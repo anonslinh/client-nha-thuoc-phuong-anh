@@ -47,7 +47,7 @@
         }
 
         .lc-container {
-            width: var(--container-width);
+            width: min(1320px, calc(100% - 32px));
             margin: 0 auto;
             max-width: 1320px;
         }

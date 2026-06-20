@@ -1109,6 +1109,15 @@
             padding: 14px 0 16px;
         }
 
+        .lc-header .lc-container{
+            width: calc(100vw - 20px) !important;
+            max-width: calc(100vw - 20px) !important;
+            margin-left: auto !important;
+            margin-right: auto !important;
+            padding-left: 0 !important;
+            padding-right: 0 !important;
+        }
+
         .lc-header-top{
             display: none !important;
         }
@@ -1333,6 +1342,22 @@
     @media (min-width: 768px){
         .lc-mobile-menu{
             display: none !important;
+        }
+    }
+
+    @media (max-width: 767px){
+        .lc-header .lc-container{
+            width: calc(100vw - 16px) !important;
+            max-width: calc(100vw - 16px) !important;
+            margin-left: 8px !important;
+            margin-right: 8px !important;
+        }
+
+        .lc-header-main,
+        .lc-search-wrap,
+        .lc-search-bar{
+            width: 100% !important;
+            max-width: 100% !important;
         }
     }
 </style>

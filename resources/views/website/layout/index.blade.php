@@ -7,6 +7,9 @@
     <title>@yield('title', 'Nhà thuốc Phương Anh')</title>
 
     <link rel="shortcut icon" href="{{ asset('phuonganh/img/logo-pa.png') }}">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800;900&family=Manrope:wght@600;700;800&display=swap" rel="stylesheet">
 
     {{-- css dùng chung --}}
     <link rel="stylesheet" href="{{ asset('phuonganh/css/header.css') }}">
@@ -15,6 +18,7 @@
     {{-- css riêng từng trang --}}
     @yield('style')
     @stack('styles')
+    @include('website.partials.luxury-theme')
 </head>
 <body>
     @include('website.partials.header')
@@ -43,6 +47,7 @@
     </script>
 
     {{-- js riêng từng trang --}}
+    @include('website.partials.luxury-theme-scripts')
     @yield('script')
     @stack('scripts')
 </body>

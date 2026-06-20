@@ -32,6 +32,11 @@ return [
                 'route' => 'employees.employees'
             ],
             [
+                'name' => 'Popup thử nghiệm',
+                'icon' => 'solar:chat-square-like-line-duotone', // Biểu tượng popup/thông báo
+                'route' => 'catalog_v1.popup_test.index'
+            ],
+            [
                 'name' => 'Quản lý Footer',
                 'icon' => null,
                 'route' => null,
@@ -92,6 +97,22 @@ return [
                 'name' => 'Danh sách yêu cầu',
                 'icon' => 'solar:chat-round-dots-line-duotone', // Phương án 1: Bong bóng chat (Rất hợp cho tư vấn)
                 'route' => 'catalog_v1.prescription_request_v1.index'
+            ],
+            [
+                'name' => 'Vận chuyển & Khuyến mãi',
+                'icon' => null,
+                'route' => null,
+                'type' => 'title'
+            ],
+            [
+                'name' => 'Cấu hình phí vận chuyển',
+                'icon' => 'solar:delivery-line-duotone',
+                'route' => 'catalog_v1.shipping_fee.index'
+            ],
+            [
+                'name' => 'Voucher & Mã giảm giá',
+                'icon' => 'solar:ticket-sale-line-duotone',
+                'route' => 'catalog_v1.discount_code.index'
             ],
             // [
             //     'name' => 'Quản lý phòng',

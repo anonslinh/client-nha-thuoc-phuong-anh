@@ -2,6 +2,7 @@
     <meta charset="UTF-8" />
     <title>Nhà thuốc Phương Anh - Cao Bằng</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <!-- Favicon -->
     <link href="phuonganh/img/logo-pa.png" rel="icon">
     <style>
@@ -43,7 +44,7 @@
         }
 
         .lc-container {
-            width: var(--container-width);
+            width: min(1320px, calc(100% - 32px));
             margin: 0 auto;
             max-width: 1320px;
         }

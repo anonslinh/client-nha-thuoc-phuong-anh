@@ -3,8 +3,10 @@
 @endonce
 
 @php
+    $loggedInCustomer = auth('website_customer')->user();
     $guestCheckoutInfo = session('guest_checkout_info', []);
-    $guestDisplayName = $guestCheckoutInfo['customer_name'] ?? '';
+    $guestDisplayName = $loggedInCustomer->name ?? ($guestCheckoutInfo['customer_name'] ?? '');
+    $isCustomerLoggedIn = !empty($loggedInCustomer);
 
     $headerSearchKeywords = $headerSearchKeywords ?? collect();
     $listMainCategory = $listMainCategory ?? collect();
@@ -90,6 +92,18 @@
                     </div>
                 </a>
 
+                <div class="pa-mobile-header-actions" aria-label="Thao tác nhanh mobile">
+                    <button type="button" data-pa-mobile-user aria-label="Thông tin khách hàng">
+                        <i class="ri-user-3-line" aria-hidden="true"></i>
+                    </button>
+                    <a href="{{ route('website.cart.index') }}" aria-label="Giỏ hàng">
+                        <i class="ri-shopping-cart-2-line" aria-hidden="true"></i>
+                    </a>
+                    <button type="button" data-pa-mobile-menu aria-label="Mở menu">
+                        <i class="ri-menu-3-line" aria-hidden="true"></i>
+                    </button>
+                </div>
+
                 <div class="lc-search-wrap">
                     <form method="GET" action="{{ route('website.search.index') }}" class="lc-search-bar">
                         <div class="lc-search-input-wrap">
@@ -128,7 +142,7 @@
                 </div>
 
                 <div class="lc-header-actions">
-                    <button type="button" class="lc-link-user" id="lcOpenGuestPopupHeader">
+                    <button type="button" class="lc-link-user" id="lcOpenGuestPopupHeader" data-logged-in="{{ $isCustomerLoggedIn ? '1' : '0' }}">
                         <span class="lc-link-user-icon">
                             <i class="ri-user-3-line" aria-hidden="true"></i>
                         </span>
@@ -274,7 +288,7 @@
     </aside>
 </div>
 
-<div class="lc-guest-popup" id="lcGuestPopupHeader">
+<div class="lc-guest-popup" id="lcGuestPopupHeader" data-initial-step="{{ $isCustomerLoggedIn ? 'account' : 'phone' }}">
     <div class="lc-guest-popup-backdrop" id="lcGuestPopupBackdropHeader"></div>
 
     <div class="lc-guest-popup-dialog">
@@ -288,142 +302,213 @@
             </div>
 
             <div>
-                <h3>Thông tin khách hàng</h3>
-                <p>Lưu nhanh thông tin để đặt hàng thuận tiện hơn ở các bước tiếp theo.</p>
+                <h3 id="lcGuestPopupTitle">{{ $isCustomerLoggedIn ? 'Tài khoản của bạn' : 'Đăng nhập' }}</h3>
+                <p id="lcGuestPopupDesc">
+                    @if(session('open_login_popup') && session('error'))
+                        {{ session('error') }}
+                    @else
+                        {{ $isCustomerLoggedIn ? 'Quản lý thông tin tài khoản dùng cho đặt hàng.' : 'Đăng nhập bằng số điện thoại, xác thực OTP qua Zalo.' }}
+                    @endif
+                </p>
             </div>
         </div>
 
-        <form method="POST" action="{{ route('website.guest-customer.store') }}" class="lc-guest-form">
-            @csrf
+        {{-- BƯỚC 1: NHẬP SỐ ĐIỆN THOẠI --}}
+        <div class="lc-auth-step" id="lcAuthStepPhone">
+            <div class="lc-guest-form-group">
+                <label>
+                    <i class="ri-phone-line" aria-hidden="true"></i>
+                    Số điện thoại
+                </label>
 
-            <div class="lc-guest-form-grid">
-                <div class="lc-guest-form-group">
-                    <label>
-                        <i class="ri-user-line" aria-hidden="true"></i>
-                        Họ và tên *
-                    </label>
-
-                    <input
-                        type="text"
-                        name="customer_name"
-                        value="{{ old('customer_name', $guestCheckoutInfo['customer_name'] ?? '') }}"
-                        placeholder="Nhập họ và tên"
-                    >
-
-                    @error('customer_name')
-                        <div class="lc-guest-error">{{ $message }}</div>
-                    @enderror
-                </div>
-
-                <div class="lc-guest-form-group">
-                    <label>
-                        <i class="ri-phone-line" aria-hidden="true"></i>
-                        Số điện thoại *
-                    </label>
-
-                    <input
-                        type="text"
-                        name="customer_phone"
-                        value="{{ old('customer_phone', $guestCheckoutInfo['customer_phone'] ?? '') }}"
-                        placeholder="Nhập số điện thoại"
-                    >
-
-                    @error('customer_phone')
-                        <div class="lc-guest-error">{{ $message }}</div>
-                    @enderror
-                </div>
-
-                <div class="lc-guest-form-group full">
-                    <label>
-                        <i class="ri-mail-line" aria-hidden="true"></i>
-                        Email
-                    </label>
-
-                    <input
-                        type="text"
-                        name="customer_email"
-                        value="{{ old('customer_email', $guestCheckoutInfo['customer_email'] ?? '') }}"
-                        placeholder="Nhập email nếu có"
-                    >
-
-                    @error('customer_email')
-                        <div class="lc-guest-error">{{ $message }}</div>
-                    @enderror
-                </div>
-
-                <div class="lc-guest-form-group">
-                    <label>
-                        <i class="ri-map-pin-2-line" aria-hidden="true"></i>
-                        Tỉnh / Thành
-                    </label>
-
-                    <input
-                        type="text"
-                        name="province_name"
-                        value="{{ old('province_name', $guestCheckoutInfo['province_name'] ?? 'Cao Bằng') }}"
-                        placeholder="Tỉnh / thành"
-                    >
-                </div>
-
-                <div class="lc-guest-form-group">
-                    <label>
-                        <i class="ri-map-2-line" aria-hidden="true"></i>
-                        Quận / Huyện
-                    </label>
-
-                    <input
-                        type="text"
-                        name="district_name"
-                        value="{{ old('district_name', $guestCheckoutInfo['district_name'] ?? '') }}"
-                        placeholder="Quận / huyện"
-                    >
-                </div>
-
-                <div class="lc-guest-form-group">
-                    <label>
-                        <i class="ri-community-line" aria-hidden="true"></i>
-                        Phường / Xã
-                    </label>
-
-                    <input
-                        type="text"
-                        name="ward_name"
-                        value="{{ old('ward_name', $guestCheckoutInfo['ward_name'] ?? '') }}"
-                        placeholder="Phường / xã"
-                    >
-                </div>
-
-                <div class="lc-guest-form-group full">
-                    <label>
-                        <i class="ri-home-5-line" aria-hidden="true"></i>
-                        Địa chỉ chi tiết
-                    </label>
-
-                    <textarea
-                        name="address_detail"
-                        placeholder="Số nhà, xóm, tổ dân phố..."
-                    >{{ old('address_detail', $guestCheckoutInfo['address_detail'] ?? '') }}</textarea>
-                </div>
+                <input
+                    type="tel"
+                    id="lcAuthPhoneInput"
+                    value="{{ $guestCheckoutInfo['customer_phone'] ?? '' }}"
+                    placeholder="VD: 0912345678"
+                    autocomplete="tel"
+                >
             </div>
+
+            <div class="lc-guest-error" id="lcAuthPhoneError"></div>
 
             <div class="lc-guest-popup-actions">
-                <button type="submit" class="lc-guest-btn lc-guest-btn-primary">
-                    <i class="ri-save-3-line" aria-hidden="true"></i>
-                    Lưu thông tin
+                <button type="button" class="lc-guest-btn lc-guest-btn-primary" id="lcAuthSendOtpBtn">
+                    <i class="ri-shield-keyhole-line" aria-hidden="true"></i>
+                    Gửi mã OTP qua Zalo
                 </button>
             </div>
-        </form>
+        </div>
 
-        @if(!empty($guestCheckoutInfo))
-            <form method="POST" action="{{ route('website.guest-customer.clear') }}" style="margin-top:12px;">
+        {{-- BƯỚC 2: NHẬP MÃ OTP --}}
+        <div class="lc-auth-step" id="lcAuthStepOtp" style="display:none;">
+            <p class="lc-auth-otp-hint">
+                Mã OTP đã được gửi qua Zalo tới số <strong id="lcAuthOtpPhoneLabel"></strong>. Hiệu lực trong 5 phút.
+            </p>
+
+            <div class="lc-guest-form-group">
+                <label>
+                    <i class="ri-shield-keyhole-line" aria-hidden="true"></i>
+                    Mã OTP
+                </label>
+
+                <input
+                    type="text"
+                    id="lcAuthOtpInput"
+                    inputmode="numeric"
+                    maxlength="4"
+                    placeholder="Nhập mã 4 số"
+                    autocomplete="one-time-code"
+                >
+            </div>
+
+            <div class="lc-guest-form-group" id="lcAuthOtpNameGroup" style="display:none;">
+                <label>
+                    <i class="ri-user-line" aria-hidden="true"></i>
+                    Họ và tên
+                </label>
+
+                <input type="text" id="lcAuthOtpNameInput" placeholder="Nhập họ và tên của bạn">
+            </div>
+
+            <div class="lc-guest-error" id="lcAuthOtpError"></div>
+
+            <div class="lc-guest-popup-actions">
+                <button type="button" class="lc-guest-btn lc-guest-btn-primary" id="lcAuthVerifyOtpBtn">
+                    <i class="ri-check-line" aria-hidden="true"></i>
+                    Xác nhận
+                </button>
+            </div>
+
+            <button type="button" class="lc-auth-link-btn" id="lcAuthBackToPhoneBtn">
+                <i class="ri-arrow-left-line" aria-hidden="true"></i>
+                Đổi số điện thoại / Gửi lại mã
+            </button>
+        </div>
+
+        {{-- BƯỚC 3: THÔNG TIN TÀI KHOẢN (đã đăng nhập) --}}
+        <div class="lc-auth-step" id="lcAuthStepAccount" style="display:none;">
+            <form method="POST" action="{{ route('website.auth.update-profile') }}" class="lc-guest-form">
+                @csrf
+
+                <div class="lc-guest-form-grid">
+                    <div class="lc-guest-form-group">
+                        <label>
+                            <i class="ri-user-line" aria-hidden="true"></i>
+                            Họ và tên *
+                        </label>
+
+                        <input
+                            type="text"
+                            name="customer_name"
+                            value="{{ old('customer_name', $guestCheckoutInfo['customer_name'] ?? '') }}"
+                            placeholder="Nhập họ và tên"
+                        >
+
+                        @error('customer_name')
+                            <div class="lc-guest-error">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <div class="lc-guest-form-group">
+                        <label>
+                            <i class="ri-phone-line" aria-hidden="true"></i>
+                            Số điện thoại
+                        </label>
+
+                        <input type="text" value="{{ $guestCheckoutInfo['customer_phone'] ?? '' }}" disabled>
+                    </div>
+
+                    <div class="lc-guest-form-group full">
+                        <label>
+                            <i class="ri-mail-line" aria-hidden="true"></i>
+                            Email
+                        </label>
+
+                        <input
+                            type="text"
+                            name="customer_email"
+                            value="{{ old('customer_email', $guestCheckoutInfo['customer_email'] ?? '') }}"
+                            placeholder="Nhập email nếu có"
+                        >
+
+                        @error('customer_email')
+                            <div class="lc-guest-error">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <div class="lc-guest-form-group">
+                        <label>
+                            <i class="ri-map-pin-2-line" aria-hidden="true"></i>
+                            Tỉnh / Thành
+                        </label>
+
+                        <input
+                            type="text"
+                            name="province_name"
+                            value="{{ old('province_name', $guestCheckoutInfo['province_name'] ?? 'Cao Bằng') }}"
+                            placeholder="Tỉnh / thành"
+                        >
+                    </div>
+
+                    <div class="lc-guest-form-group">
+                        <label>
+                            <i class="ri-map-2-line" aria-hidden="true"></i>
+                            Quận / Huyện
+                        </label>
+
+                        <input
+                            type="text"
+                            name="district_name"
+                            value="{{ old('district_name', $guestCheckoutInfo['district_name'] ?? '') }}"
+                            placeholder="Quận / huyện"
+                        >
+                    </div>
+
+                    <div class="lc-guest-form-group">
+                        <label>
+                            <i class="ri-community-line" aria-hidden="true"></i>
+                            Phường / Xã
+                        </label>
+
+                        <input
+                            type="text"
+                            name="ward_name"
+                            value="{{ old('ward_name', $guestCheckoutInfo['ward_name'] ?? '') }}"
+                            placeholder="Phường / xã"
+                        >
+                    </div>
+
+                    <div class="lc-guest-form-group full">
+                        <label>
+                            <i class="ri-home-5-line" aria-hidden="true"></i>
+                            Địa chỉ chi tiết
+                        </label>
+
+                        <textarea
+                            name="address_detail"
+                            placeholder="Số nhà, xóm, tổ dân phố..."
+                        >{{ old('address_detail', $guestCheckoutInfo['address_detail'] ?? '') }}</textarea>
+                    </div>
+                </div>
+
+                <div class="lc-guest-popup-actions">
+                    <button type="submit" class="lc-guest-btn lc-guest-btn-primary">
+                        <i class="ri-save-3-line" aria-hidden="true"></i>
+                        Lưu thông tin
+                    </button>
+                </div>
+            </form>
+
+            <form method="POST" action="{{ route('website.auth.logout') }}" style="margin-top:12px;">
                 @csrf
 
                 <button type="submit" class="lc-guest-btn lc-guest-btn-light" style="width:100%;">
-                    <i class="ri-delete-bin-6-line" aria-hidden="true"></i>
-                    Xóa thông tin đã lưu
+                    <i class="ri-logout-box-r-line" aria-hidden="true"></i>
+                    Đăng xuất
                 </button>
             </form>
-        @endif
+        </div>
     </div>
 </div>
 
@@ -439,6 +524,7 @@
     }
 
     .lc-header i,
+    .pa-mobile-header-actions i,
     .lc-mobile-menu i,
     .lc-guest-popup i{
         line-height: 1;
@@ -472,6 +558,10 @@
         font-size: 15px;
         color: currentColor;
         opacity: .92;
+    }
+
+    .pa-mobile-header-actions{
+        display: none;
     }
 
     .lc-search-input-wrap .lc-search-submit-btn,
@@ -1064,6 +1154,51 @@
         flex-wrap: wrap;
     }
 
+    .lc-auth-step .lc-guest-popup-actions{
+        justify-content: stretch;
+    }
+
+    .lc-auth-step .lc-guest-popup-actions .lc-guest-btn{
+        width: 100%;
+        justify-content: center;
+    }
+
+    .lc-auth-otp-hint{
+        margin: 0 0 14px;
+        font-size: 13px;
+        color: #64748b;
+        line-height: 1.6;
+    }
+
+    .lc-auth-otp-hint strong{
+        color: #0c585c;
+    }
+
+    #lcAuthOtpInput{
+        letter-spacing: 6px;
+        font-size: 20px;
+        font-weight: 800;
+        text-align: center;
+    }
+
+    .lc-auth-link-btn{
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        margin-top: 14px;
+        background: transparent;
+        border: 0;
+        color: #0c8f75;
+        font-size: 13px;
+        font-weight: 700;
+        cursor: pointer;
+        padding: 0;
+    }
+
+    .lc-auth-link-btn:hover{
+        text-decoration: underline;
+    }
+
     .lc-guest-btn{
         min-height: 46px;
         padding: 0 18px;
@@ -1103,6 +1238,15 @@
 
         .lc-header-hero{
             padding: 1px 0 1px !important;
+        }
+
+        .lc-header .lc-container{
+            width: calc(100vw - 20px) !important;
+            max-width: calc(100vw - 20px) !important;
+            margin-left: auto !important;
+            margin-right: auto !important;
+            padding-left: 0 !important;
+            padding-right: 0 !important;
         }
 
         .lc-header-top{
@@ -1234,6 +1378,61 @@
             order: 3;
             margin: 0 !important;
             padding: 0 !important;
+        }
+
+        .lc-header-main{
+            grid-template-columns: minmax(0, 1fr) !important;
+            position: relative !important;
+        }
+
+        .lc-logo{
+            grid-column: 1 !important;
+            grid-row: 1 !important;
+        }
+
+        .lc-header-actions{
+            display: none !important;
+        }
+
+        .pa-mobile-header-actions{
+            position: absolute !important;
+            top: 0 !important;
+            right: 0 !important;
+            width: 126px;
+            min-width: 126px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 6px;
+            z-index: 2;
+        }
+
+        .pa-mobile-header-actions a,
+        .pa-mobile-header-actions button{
+            width: 38px;
+            height: 38px;
+            min-width: 38px;
+            border: 0;
+            border-radius: 999px;
+            padding: 0;
+            background: rgba(255,255,255,.94);
+            color: var(--pa-brand);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            box-shadow: 0 10px 22px rgba(3,40,44,.14);
+        }
+
+        .pa-mobile-header-actions a i,
+        .pa-mobile-header-actions button i{
+            font-size: 18px;
+        }
+
+        .lc-search-wrap{
+            grid-column: 1 / -1 !important;
+            grid-row: 2 !important;
+            margin-top: 10px !important;
         }
 
         .lc-search-bar{
@@ -1474,6 +1673,26 @@
             display: none !important;
         }
     }
+
+    @media (max-width: 767px){
+        .lc-header .lc-container{
+            width: calc(100vw - 16px) !important;
+            max-width: calc(100vw - 16px) !important;
+            margin-left: 8px !important;
+            margin-right: 8px !important;
+        }
+
+        .lc-header-main,
+        .lc-search-wrap,
+        .lc-search-bar{
+            width: 100% !important;
+            max-width: 100% !important;
+        }
+
+        .pa-mobile-header-actions{
+            right: 0 !important;
+        }
+    }
 </style>
 @endonce
 
@@ -1491,15 +1710,144 @@
         const closeMobileMenuBtn = document.getElementById('lcCloseMobileMenuHeader');
         const mobileMenuBackdrop = document.getElementById('lcMobileMenuBackdropHeader');
 
+        function showAuthStep(step, keepFlashDesc) {
+            document.getElementById('lcAuthStepPhone').style.display = step === 'phone' ? 'block' : 'none';
+            document.getElementById('lcAuthStepOtp').style.display = step === 'otp' ? 'block' : 'none';
+            document.getElementById('lcAuthStepAccount').style.display = step === 'account' ? 'block' : 'none';
+
+            const title = document.getElementById('lcGuestPopupTitle');
+            const desc = document.getElementById('lcGuestPopupDesc');
+
+            if (step === 'account') {
+                title.textContent = 'Tài khoản của bạn';
+                if (!keepFlashDesc) desc.textContent = 'Quản lý thông tin tài khoản dùng cho đặt hàng.';
+            } else {
+                title.textContent = 'Đăng nhập';
+                if (!keepFlashDesc) desc.textContent = 'Đăng nhập bằng số điện thoại, xác thực OTP qua Zalo.';
+            }
+        }
+
+        let lcAuthFirstOpen = true;
+
         function openPopup() {
             popup?.classList.add('show');
             document.body.style.overflow = 'hidden';
+            showAuthStep(popup?.getAttribute('data-initial-step') || 'phone', lcAuthFirstOpen);
+            lcAuthFirstOpen = false;
         }
 
         function closePopup() {
             popup?.classList.remove('show');
             document.body.style.overflow = '';
         }
+
+        (function setupAuthFlow() {
+            const SEND_OTP_URL = @json(route('website.auth.send-otp'));
+            const VERIFY_OTP_URL = @json(route('website.auth.verify-otp'));
+            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+
+            const phoneInput = document.getElementById('lcAuthPhoneInput');
+            const phoneError = document.getElementById('lcAuthPhoneError');
+            const sendOtpBtn = document.getElementById('lcAuthSendOtpBtn');
+
+            const otpInput = document.getElementById('lcAuthOtpInput');
+            const otpError = document.getElementById('lcAuthOtpError');
+            const otpPhoneLabel = document.getElementById('lcAuthOtpPhoneLabel');
+            const otpNameGroup = document.getElementById('lcAuthOtpNameGroup');
+            const otpNameInput = document.getElementById('lcAuthOtpNameInput');
+            const verifyOtpBtn = document.getElementById('lcAuthVerifyOtpBtn');
+            const backToPhoneBtn = document.getElementById('lcAuthBackToPhoneBtn');
+
+            let currentPhone = '';
+
+            async function postJson(url, body) {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken,
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify(body)
+                });
+
+                return response.json();
+            }
+
+            sendOtpBtn?.addEventListener('click', async function () {
+                const phone = (phoneInput.value || '').trim();
+                phoneError.textContent = '';
+
+                if (!/^0[0-9]{9}$/.test(phone)) {
+                    phoneError.textContent = 'Số điện thoại không hợp lệ (VD: 0912345678).';
+                    return;
+                }
+
+                sendOtpBtn.disabled = true;
+                const oldText = sendOtpBtn.innerHTML;
+                sendOtpBtn.innerHTML = 'Đang gửi...';
+
+                try {
+                    const result = await postJson(SEND_OTP_URL, { phone: phone });
+
+                    if (!result.status) {
+                        phoneError.textContent = result.msg || 'Không thể gửi OTP.';
+                        return;
+                    }
+
+                    currentPhone = phone;
+                    otpPhoneLabel.textContent = phone;
+                    otpInput.value = '';
+                    otpError.textContent = '';
+                    otpNameGroup.style.display = result.is_new_customer ? 'block' : 'none';
+                    showAuthStep('otp');
+                    otpInput.focus();
+                } catch (e) {
+                    phoneError.textContent = 'Có lỗi xảy ra, vui lòng thử lại.';
+                } finally {
+                    sendOtpBtn.disabled = false;
+                    sendOtpBtn.innerHTML = oldText;
+                }
+            });
+
+            backToPhoneBtn?.addEventListener('click', function () {
+                showAuthStep('phone');
+            });
+
+            verifyOtpBtn?.addEventListener('click', async function () {
+                const otp = (otpInput.value || '').trim();
+                otpError.textContent = '';
+
+                if (!otp) {
+                    otpError.textContent = 'Vui lòng nhập mã OTP.';
+                    return;
+                }
+
+                verifyOtpBtn.disabled = true;
+                const oldText = verifyOtpBtn.innerHTML;
+                verifyOtpBtn.innerHTML = 'Đang xác thực...';
+
+                try {
+                    const result = await postJson(VERIFY_OTP_URL, {
+                        phone: currentPhone,
+                        otp: otp,
+                        name: otpNameInput ? otpNameInput.value : ''
+                    });
+
+                    if (!result.status) {
+                        otpError.textContent = result.msg || 'Mã OTP không đúng.';
+                        return;
+                    }
+
+                    window.location.reload();
+                } catch (e) {
+                    otpError.textContent = 'Có lỗi xảy ra, vui lòng thử lại.';
+                } finally {
+                    verifyOtpBtn.disabled = false;
+                    verifyOtpBtn.innerHTML = oldText;
+                }
+            });
+        })();
 
         function openMobileMenu() {
             mobileMenu?.classList.add('show');
@@ -1512,6 +1860,9 @@
         }
 
         openBtn?.addEventListener('click', openPopup);
+
+        document.querySelector('[data-pa-mobile-user]')?.addEventListener('click', openPopup);
+        document.querySelector('[data-pa-mobile-menu]')?.addEventListener('click', openMobileMenu);
 
         openBtnFromMobile?.addEventListener('click', function () {
             closeMobileMenu();
@@ -1542,7 +1893,7 @@
             }
         });
 
-        @if($errors->has('customer_name') || $errors->has('customer_phone') || $errors->has('customer_email'))
+        @if($errors->has('customer_name') || $errors->has('customer_phone') || $errors->has('customer_email') || session('open_login_popup'))
             openPopup();
         @endif
     })();

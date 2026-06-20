@@ -924,71 +924,451 @@
 
     @media (max-width: 767px){
         .lc-product-detail-page{
-            padding: 18px 0 30px;
+            padding: 12px 0 96px;
+            background: #f5f7fb;
         }
 
         .lc-container{
             width: min(100%, calc(100% - 20px));
         }
 
+        .lc-breadcrumb{
+            font-size: 11px;
+            gap: 5px;
+            margin-bottom: 10px;
+            flex-wrap: nowrap;
+            overflow-x: auto;
+            white-space: nowrap;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+        }
+
+        .lc-breadcrumb::-webkit-scrollbar{
+            display: none;
+        }
+
+        .lc-breadcrumb span:last-child{
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 160px;
+            white-space: nowrap;
+        }
+
+        .lc-product-hero{
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
         .lc-gallery-card,
         .lc-info-card,
         .lc-detail-card,
         .lc-related-card-wrap{
-            border-radius: 20px;
+            border-radius: 16px;
+            box-shadow: 0 6px 18px rgba(15, 23, 42, 0.05);
+        }
+
+        .lc-gallery-card{
+            padding: 10px;
+        }
+
+        .lc-main-image-wrap{
+            min-height: 0;
+            aspect-ratio: 1 / 1;
+            border-radius: 12px;
+        }
+
+        .lc-main-image{
+            max-height: none;
+        }
+
+        .lc-main-image-wrap.is-zooming .lc-main-image{
+            transform: none;
+        }
+
+        .lc-zoom-note{
+            display: none;
+        }
+
+        .lc-thumb-list{
+            margin-top: 8px;
+            gap: 7px;
+        }
+
+        .lc-thumb-item{
+            width: 50px;
+            height: 50px;
+            flex: 0 0 50px;
+            border-radius: 10px;
+            padding: 4px;
+        }
+
+        .lc-gallery-caption{
+            margin-top: 8px;
+            font-size: 11px;
+        }
+
+        .lc-info-card{
+            padding: 14px;
+        }
+
+        .lc-brand-row{
+            gap: 6px 8px;
+            margin-bottom: 8px;
+        }
+
+        .lc-brand-chip{
+            padding: 5px 10px;
+            font-size: 11px;
+            gap: 6px;
+            border-radius: 999px;
+        }
+
+        .lc-brand-chip img{
+            width: 18px;
+            height: 18px;
         }
 
         .lc-product-title{
-            font-size: 26px;
+            font-size: 16px;
+            line-height: 1.4;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        .lc-product-meta{
+            font-size: 11px;
+            gap: 4px 10px;
+            margin-bottom: 10px;
+        }
+
+        .lc-price-box{
+            gap: 6px 10px;
+            margin-bottom: 10px;
         }
 
         .lc-price-sale{
-            font-size: 34px;
+            font-size: 22px;
+        }
+
+        .lc-price-original{
+            font-size: 13px;
+        }
+
+        .lc-price-discount{
+            height: 22px;
+            padding: 0 8px;
+            font-size: 11px;
+            border-radius: 6px;
+        }
+
+        .lc-flash-sale-pill{
+            height: 22px;
+            padding: 0 8px;
+            font-size: 11px;
+            gap: 5px;
+        }
+
+        .lc-flash-sale-pill::before{
+            font-size: 12px;
+        }
+
+        .lc-price-note{
+            font-size: 11px;
+        }
+
+        .lc-short-desc{
+            font-size: 13px;
+            line-height: 1.6;
+            margin-bottom: 12px;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
         }
 
         .lc-info-grid{
-            grid-template-columns: 1fr;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 8px;
+            margin-bottom: 14px;
         }
 
+        .lc-info-item{
+            padding: 9px 10px;
+            border-radius: 12px;
+        }
+
+        .lc-info-item-label{
+            font-size: 10.5px;
+            margin-bottom: 3px;
+        }
+
+        .lc-info-item-value{
+            font-size: 13px;
+        }
+
+        .lc-quantity-row{
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+
+        .lc-quantity-label{
+            font-size: 13px;
+        }
+
+        .lc-quantity-box{
+            height: 38px;
+        }
+
+        .lc-qty-btn{
+            width: 38px;
+            height: 38px;
+            font-size: 18px;
+        }
+
+        .lc-qty-input{
+            width: 44px;
+            height: 38px;
+            font-size: 14px;
+        }
+
+        /* Thanh hành động dính cố định kiểu app mua sắm */
         .lc-action-row{
+            position: fixed;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 60;
+            grid-template-columns: 1fr 1.4fr;
+            gap: 8px;
+            margin-bottom: 0;
+            background: #fff;
+            padding: 10px 14px calc(10px + env(safe-area-inset-bottom, 0px));
+            box-shadow: 0 -8px 24px rgba(15, 23, 42, 0.10);
+        }
+
+        .lc-action-btn{
+            min-height: 44px;
+            font-size: 14px;
+            border-radius: 14px;
+        }
+
+        .lc-policy-list{
             grid-template-columns: 1fr;
+            gap: 8px;
+        }
+
+        .lc-policy-item{
+            font-size: 11.5px;
+            padding: 10px 12px;
+            border-radius: 12px;
+            line-height: 1.5;
+        }
+
+        .lc-detail-card{
+            padding: 14px;
+            margin-bottom: 14px;
+        }
+
+        .lc-detail-layout{
+            gap: 12px;
+        }
+
+        .lc-tab-nav{
+            gap: 6px;
+        }
+
+        .lc-tab-btn{
+            min-width: auto;
+            padding: 9px 14px;
+            font-size: 12.5px;
+            border-radius: 999px;
+            white-space: nowrap;
+        }
+
+        .lc-section-title{
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+
+        .lc-product-article{
+            font-size: 13px;
+            line-height: 1.7;
+        }
+
+        .lc-product-article img{
+            border-radius: 12px;
+            margin: 12px auto;
+        }
+
+        .lc-product-article h1,
+        .lc-product-article h2,
+        .lc-product-article h3,
+        .lc-product-article h4,
+        .lc-product-article h5,
+        .lc-product-article h6{
+            font-size: 15px;
+            margin: 16px 0 8px;
+        }
+
+        .lc-brand-panel{
+            gap: 12px;
+        }
+
+        .lc-brand-card{
+            padding: 12px;
+            border-radius: 16px;
+        }
+
+        .lc-brand-logo{
+            height: 120px;
+            border-radius: 12px;
+        }
+
+        .lc-brand-name{
+            font-size: 16px;
+            margin: 10px 0 6px;
+        }
+
+        .lc-brand-desc{
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .lc-brand-banner{
+            border-radius: 14px;
+            margin-bottom: 10px;
         }
 
         .lc-gallery-grid{
             grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 8px;
+        }
+
+        .lc-gallery-grid-item{
+            border-radius: 14px;
         }
 
         .lc-reviewer-card{
-            flex-direction: column;
+            flex-direction: row;
+            align-items: center;
+            padding: 12px;
+            border-radius: 16px;
+            gap: 10px;
+        }
+
+        .lc-reviewer-avatar{
+            width: 48px;
+            height: 48px;
+            flex: 0 0 48px;
+            border-width: 2px;
+        }
+
+        .lc-reviewer-name{
+            gap: 6px 8px;
+            margin-bottom: 6px;
         }
 
         .lc-reviewer-name h3{
-            font-size: 22px;
+            font-size: 13px;
+        }
+
+        .lc-reviewer-badge{
+            font-size: 10.5px;
+            padding: 4px 9px;
+        }
+
+        .lc-reviewer-text{
+            font-size: 12.5px;
+            line-height: 1.6;
+        }
+
+        .lc-related-card-wrap{
+            padding: 14px;
+        }
+
+        .lc-related-head{
+            margin-bottom: 12px;
         }
 
         .lc-related-head h2{
-            font-size: 26px;
+            font-size: 16px;
+        }
+
+        .lc-related-arrows{
+            display: none;
+        }
+
+        .lc-related-scroll{
+            gap: 10px;
         }
 
         .lc-related-item{
-            min-width: 260px;
-            max-width: 260px;
-            flex-basis: 260px;
+            min-width: 132px;
+            max-width: 132px;
+            flex-basis: 132px;
+            border-radius: 14px;
+        }
+
+        .lc-related-discount,
+        .lc-related-flash{
+            height: 20px;
+            padding: 0 7px;
+            font-size: 10px;
+            border-radius: 7px;
+            top: 8px;
+        }
+
+        .lc-related-discount{
+            right: 8px;
+        }
+
+        .lc-related-flash{
+            left: 8px;
+        }
+
+        .lc-related-thumb{
+            height: 110px;
+            padding: 10px;
+        }
+
+        .lc-related-body{
+            padding: 0 10px 10px;
+        }
+
+        .lc-related-brand{
+            font-size: 10px;
+            margin-bottom: 4px;
         }
 
         .lc-related-name{
-            font-size: 18px;
-            min-height: 78px;
+            font-size: 12px;
+            line-height: 1.35;
+            min-height: 48px;
+            margin-bottom: 6px;
         }
 
-        .lc-main-image-wrap{
-            min-height: 360px;
+        .lc-related-price{
+            gap: 4px 8px;
+            margin-bottom: 8px;
+        }
+
+        .lc-related-price-sale{
+            font-size: 13px;
+        }
+
+        .lc-related-price-original{
+            font-size: 10px;
+        }
+
+        .lc-related-btn{
+            font-size: 12px;
+            min-height: 32px;
         }
 
         .lc-cart-toast{
             left: 10px;
             right: 10px;
-            bottom: 16px;
+            bottom: 84px;
             min-width: auto;
             max-width: none;
         }

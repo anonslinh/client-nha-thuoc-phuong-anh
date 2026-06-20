@@ -18,6 +18,7 @@ yarn-error.log
 *.sql
 *.sql.gz
 work/
+server-*.log
 /auth.json
 /.fleet
 /.idea

@@ -1307,25 +1307,11 @@
         const clearPhoneBtn = document.getElementById('paBtnClearPhone');
         const phoneInput = document.getElementById('paInpPhone');
 
-        headerStatus?.addEventListener('click', paOpenPhoneModal);
-        changePhoneBtn?.addEventListener('click', paOpenPhoneModal);
+        // SĐT được khoá theo tài khoản đã đăng nhập OTP, không cho phép tự đổi sang số khác.
+        changePhoneBtn?.addEventListener('click', function () {
+            paShowToast('Số điện thoại được lấy từ tài khoản đã đăng nhập, không thể đổi tại đây.', 'ok');
+        });
         closePhoneBtn?.addEventListener('click', paClosePhoneModal);
-        submitPhoneBtn?.addEventListener('click', paSubmitPhone);
-
-        phoneInput?.addEventListener('keydown', function (event) {
-            if(event.key === 'Enter'){
-                event.preventDefault();
-                paSubmitPhone();
-            }
-        });
-
-        clearPhoneBtn?.addEventListener('click', function () {
-            paClearSavedPhone();
-            paClosePhoneModal();
-            paUpdateHeaderStatus(null);
-            paResetScreen();
-            paShowToast('Đã xóa số điện thoại đã lưu.', 'ok');
-        });
 
         document.querySelectorAll('.js-dev-feature').forEach((button) => {
             button.addEventListener('click', function () {
@@ -1335,39 +1321,19 @@
 
         paResetScreen();
 
-        const phoneFromUrl = paGetQueryParam('phone');
+        // Bảo mật: trang này chỉ truy cập được khi đã đăng nhập OTP (middleware website_customer.auth).
+        // SĐT luôn lấy từ tài khoản đã xác thực phía server (PA_INITIAL_PHONE), KHÔNG cho phép đổi
+        // sang SĐT khác qua URL/localStorage/nhập tay để tránh xem dữ liệu của người khác.
+        paClearPhoneParam();
+        paClearSavedPhone();
 
-        if(phoneFromUrl){
-            const phone = paNormalizePhone(phoneFromUrl);
+        const verifiedPhone = paNormalizePhone(PA_INITIAL_PHONE);
 
-            if(paIsValidPhone(phone)){
-                paSavePhone(phone);
-                paUpdateHeaderStatus(phone);
-                paLoadUserData(phone);
-                paClearPhoneParam();
-                return;
-            }
+        if(verifiedPhone && paIsValidPhone(verifiedPhone)){
+            paSavePhone(verifiedPhone);
+            paUpdateHeaderStatus(verifiedPhone);
+            paLoadUserData(verifiedPhone);
         }
-
-        const phoneFromSession = paNormalizePhone(PA_INITIAL_PHONE);
-
-        if(phoneFromSession && paIsValidPhone(phoneFromSession)){
-            paSavePhone(phoneFromSession);
-            paUpdateHeaderStatus(phoneFromSession);
-            paLoadUserData(phoneFromSession);
-            return;
-        }
-
-        const cachedPhone = paGetSavedPhone();
-
-        if(cachedPhone && paIsValidPhone(cachedPhone)){
-            paUpdateHeaderStatus(cachedPhone);
-            paLoadUserData(cachedPhone);
-            return;
-        }
-
-        paUpdateHeaderStatus(null);
-        paOpenPhoneModal();
     });
 </script>
 @endsection

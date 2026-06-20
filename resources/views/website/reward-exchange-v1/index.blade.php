@@ -1289,7 +1289,8 @@
                     <i class="ri-phone-line"></i>
                     Số điện thoại
                 </label>
-                <input type="tel" id="paCustomerPhone" class="pa-input" placeholder="Nhập số điện thoại">
+                {{-- Khoá theo tài khoản đã đăng nhập OTP, không cho sửa để tránh đổi quà bằng điểm của người khác --}}
+                <input type="tel" id="paCustomerPhone" class="pa-input" readonly disabled>
             </div>
 
             <button class="pa-submit-btn" id="paBtnSubmitRedeem">
@@ -2021,17 +2022,12 @@
     }
 
     document.addEventListener('DOMContentLoaded', function () {
-        document.getElementById('paHeaderStatus')?.addEventListener('click', paOpenPhoneModal);
-        document.getElementById('paChangePhoneBtn')?.addEventListener('click', paOpenPhoneModal);
-        document.getElementById('paBtnSubmitPhone')?.addEventListener('click', paSubmitPhone);
+        // SĐT được khoá theo tài khoản đã đăng nhập OTP, không cho phép tự đổi sang số khác.
+        document.getElementById('paChangePhoneBtn')?.addEventListener('click', function () {
+            paShowToast('Số điện thoại được lấy từ tài khoản đã đăng nhập, không thể đổi tại đây.', 'ok');
+        });
         document.getElementById('paBtnClosePhone')?.addEventListener('click', () => paCloseModal('paPhoneLoginModal'));
         document.getElementById('paClosePhoneX')?.addEventListener('click', () => paCloseModal('paPhoneLoginModal'));
-        document.getElementById('paBtnClearPhone')?.addEventListener('click', function () {
-            paClearSavedPhone();
-            paCloseModal('paPhoneLoginModal');
-            paResetScreen();
-            paShowToast('Đã xóa số điện thoại đã lưu.', 'ok');
-        });
 
         document.getElementById('paBtnSubmitRedeem')?.addEventListener('click', paSubmitRedeem);
         document.getElementById('paCloseRedeemX')?.addEventListener('click', () => paCloseModal('paRedeemModal'));
@@ -2066,39 +2062,19 @@
 
         paLoadGifts();
 
-        const phoneFromUrl = paGetQueryParam('phone');
+        // Bảo mật: trang này chỉ truy cập được khi đã đăng nhập OTP (middleware website_customer.auth).
+        // SĐT luôn lấy từ tài khoản đã xác thực phía server (PA_INITIAL_PHONE), KHÔNG cho phép đổi
+        // sang SĐT khác qua URL/localStorage/nhập tay để tránh xem/đổi điểm của người khác.
+        paClearPhoneParam();
+        paClearSavedPhone();
 
-        if(phoneFromUrl){
-            const phone = paNormalizePhone(phoneFromUrl);
+        const verifiedPhone = paNormalizePhone(PA_INITIAL_PHONE);
 
-            if(paIsValidPhone(phone)){
-                paSavePhone(phone);
-                paUpdateHeaderStatus(phone);
-                paLoadPoints(phone);
-                paClearPhoneParam();
-                return;
-            }
+        if(verifiedPhone && paIsValidPhone(verifiedPhone)){
+            paSavePhone(verifiedPhone);
+            paUpdateHeaderStatus(verifiedPhone);
+            paLoadPoints(verifiedPhone);
         }
-
-        const phoneFromSession = paNormalizePhone(PA_INITIAL_PHONE);
-
-        if(phoneFromSession && paIsValidPhone(phoneFromSession)){
-            paSavePhone(phoneFromSession);
-            paUpdateHeaderStatus(phoneFromSession);
-            paLoadPoints(phoneFromSession);
-            return;
-        }
-
-        const cachedPhone = paGetSavedPhone();
-
-        if(cachedPhone && paIsValidPhone(cachedPhone)){
-            paUpdateHeaderStatus(cachedPhone);
-            paLoadPoints(cachedPhone);
-            return;
-        }
-
-        paUpdateHeaderStatus(null);
-        paOpenPhoneModal();
     });
 </script>
 @endsection

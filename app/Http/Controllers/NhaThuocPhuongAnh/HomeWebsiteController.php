@@ -25,6 +25,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Schema;
 use App\Models\TrademarkV1;
+use App\Models\GeneralSettings;
 use Carbon\Carbon;
 
 class HomeWebsiteController extends Controller
@@ -81,6 +82,9 @@ class HomeWebsiteController extends Controller
                 return $item;
             });
         //dd("Website mở dữ liệu vào 10:00 AM - 30/3/2026. Rất mong quý khách hàng thông cảm và tiếp tục ủng hộ Nhà thuốc Phương Anh!");
+        $popupTestEnabled = GeneralSettings::where('code', 'popup_test_enabled')->value('value');
+        $popupTestEnabled = $popupTestEnabled === null ? true : ((int) $popupTestEnabled === 1);
+
         return view('website.home.index', compact(
             'headerSearchKeywords',
             'bannerHero',
@@ -97,7 +101,8 @@ class HomeWebsiteController extends Controller
             'banners',
             'listMainCategory',
             'healthCornerList',
-            'listSick'
+            'listSick',
+            'popupTestEnabled'
         ));
     }
 

@@ -653,7 +653,7 @@
 
         #homeBestSellerSection .lc-product-image-wrap{
             width: 100%;
-            height: 104px;
+            height: 78px;
             border-bottom: 1px solid #eef2f7;
             background: #f8fafc;
         }
@@ -661,19 +661,19 @@
         #homeBestSellerSection .lc-product-image-wrap img{
             width: 100%;
             height: 100%;
-            padding: 8px;
+            padding: 6px;
             object-fit: contain;
         }
 
         #homeBestSellerSection .lc-product-body{
-            padding: 10px;
+            padding: 8px;
         }
 
         #homeBestSellerSection .lc-product-name{
-            min-height: 38px;
-            margin: 0 0 8px;
-            font-size: 12.5px;
-            line-height: 1.45;
+            min-height: 30px;
+            margin: 0 0 5px;
+            font-size: 11.5px;
+            line-height: 1.3;
             font-weight: 750;
         }
 
@@ -683,12 +683,12 @@
         }
 
         #homeBestSellerSection .lc-product-price-row{
-            min-height: 48px;
-            gap: 3px;
+            min-height: 28px;
+            gap: 2px;
         }
 
         #homeBestSellerSection .lc-product-price-sale{
-            font-size: 14.5px;
+            font-size: 12.5px;
             line-height: 1.2;
             font-weight: 900;
             white-space: normal;
@@ -699,21 +699,19 @@
         }
 
         #homeBestSellerSection .lc-product-price-original{
-            font-size: 10.5px;
+            font-size: 10px;
             line-height: 1.2;
         }
 
         #homeBestSellerSection .lc-product-unit-pill{
-            min-height: 20px;
-            padding: 0 7px;
-            font-size: 10px;
+            display: none !important;
         }
 
         #homeBestSellerSection .lc-product-btn-buy{
-            min-height: 34px;
-            margin-top: 8px;
+            min-height: 28px;
+            margin-top: 6px;
             border-radius: 12px;
-            font-size: 11.5px;
+            font-size: 10.5px;
             gap: 5px;
             box-shadow: none;
         }
@@ -786,25 +784,25 @@
         }
 
         #homeBestSellerSection .lc-product-image-wrap{
-            height: 98px;
+            height: 74px;
         }
 
         #homeBestSellerSection .lc-product-body{
-            padding: 9px;
+            padding: 7px;
         }
 
         #homeBestSellerSection .lc-product-name{
-            font-size: 12px;
-            min-height: 36px;
+            font-size: 11px;
+            min-height: 29px;
         }
 
         #homeBestSellerSection .lc-product-price-sale{
-            font-size: 13.5px;
+            font-size: 12px;
         }
 
         #homeBestSellerSection .lc-product-btn-buy{
-            min-height: 32px;
-            font-size: 11px;
+            min-height: 28px;
+            font-size: 10.5px;
         }
     }
 </style>

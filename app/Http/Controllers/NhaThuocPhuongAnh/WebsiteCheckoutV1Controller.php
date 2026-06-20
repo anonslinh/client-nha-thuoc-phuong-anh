@@ -5,18 +5,22 @@ namespace App\Http\Controllers\NhaThuocPhuongAnh;
 use App\Http\Controllers\Controller;
 use App\Models\CartItemV1;
 use App\Models\CartV1;
+use App\Models\DiscountCodeV1;
 use App\Models\OrderItemV1;
 use App\Models\OrderStatusLogV1;
 use App\Models\OrderV1;
 use App\Models\ProductV1;
 use App\Services\ProductPriceV1Service;
+use App\Services\ShippingFeeV1Service;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class WebsiteCheckoutV1Controller extends Controller
 {
     protected int $cartCookieMinutes = 43200; // 30 ngày
+    protected string $discountSessionKey = 'checkout_discount_code';
 
     public function index(Request $request)
     {
@@ -59,11 +63,83 @@ class WebsiteCheckoutV1Controller extends Controller
             'address_detail' => '',
         ]);
 
+        $subtotalAmount = (float) $cart->subtotal_amount;
+
+        $shippingInfo = app(ShippingFeeV1Service::class)->calculate($subtotalAmount);
+
+        $autoDiscountAmount = $this->calculateAutoDiscount($cart);
+
+        $availableVouchers = DiscountCodeV1::query()
+            ->active()
+            ->where('type', DiscountCodeV1::TYPE_VOUCHER)
+            ->orderBy('min_order_amount')
+            ->get();
+
+        $appliedDiscount = $this->getAppliedDiscount($subtotalAmount);
+
         return view('website.checkout-v1.index', compact(
             'cart',
             'branches',
-            'guestCheckoutInfo'
+            'guestCheckoutInfo',
+            'shippingInfo',
+            'autoDiscountAmount',
+            'availableVouchers',
+            'appliedDiscount'
         ));
+    }
+
+    public function applyDiscountCode(Request $request)
+    {
+        $request->validate([
+            'code' => ['required', 'string', 'max:50'],
+        ]);
+
+        $cart = $this->getActiveCartByRequest($request);
+
+        if (!$cart) {
+            return response()->json(['status' => false, 'msg' => 'Không tìm thấy giỏ hàng.'], 400);
+        }
+
+        $cart = $this->loadCartForDisplay($cart->id);
+        $subtotalAmount = (float) $cart->subtotal_amount;
+
+        $code = strtoupper(trim($request->input('code')));
+
+        $discount = DiscountCodeV1::query()
+            ->active()
+            ->where('code', $code)
+            ->first();
+
+        if (!$discount) {
+            return response()->json(['status' => false, 'msg' => 'Mã giảm giá không tồn tại hoặc đã hết hạn.'], 200);
+        }
+
+        if ($subtotalAmount < (float) $discount->min_order_amount) {
+            return response()->json([
+                'status' => false,
+                'msg' => 'Đơn hàng cần tối thiểu ' . number_format($discount->min_order_amount, 0, ',', '.') . 'đ để áp dụng mã này.',
+            ], 200);
+        }
+
+        $discountAmount = $discount->calculateDiscount($subtotalAmount);
+
+        session([$this->discountSessionKey => $discount->code]);
+
+        return response()->json([
+            'status' => true,
+            'msg' => 'Áp dụng mã giảm giá thành công.',
+            'discount_code' => $discount->code,
+            'discount_title' => $discount->title,
+            'discount_amount' => $discountAmount,
+            'discount_amount_label' => number_format($discountAmount, 0, ',', '.') . 'đ',
+        ]);
+    }
+
+    public function removeDiscountCode(Request $request)
+    {
+        session()->forget($this->discountSessionKey);
+
+        return response()->json(['status' => true, 'msg' => 'Đã bỏ mã giảm giá.']);
     }
 
     public function store(Request $request)
@@ -153,13 +229,22 @@ class WebsiteCheckoutV1Controller extends Controller
             |--------------------------------------------------------------------------
             */
             $subtotalAmount = (float) $cart->subtotal_amount;
-            $discountAmount = 0;
-            $shippingFee = 0;
+            $autoDiscountAmount = $this->calculateAutoDiscount($cart);
+
+            $appliedDiscount = $this->getAppliedDiscount($subtotalAmount);
+            $discountAmount = $appliedDiscount['amount'] ?? 0;
+            $voucherCode = $appliedDiscount['code'] ?? null;
+            $idDiscountCode = $appliedDiscount['id'] ?? null;
+
+            $shippingInfo = app(ShippingFeeV1Service::class)->calculate($subtotalAmount);
+            $shippingFee = (float) $shippingInfo['fee'];
+
             $totalAmount = max(0, $subtotalAmount - $discountAmount + $shippingFee);
 
             $order = OrderV1::query()->create([
                 'order_code' => $this->generateOrderCode(),
                 'id_cart_v1' => $cart->id,
+                'id_website_customer_v1' => Auth::guard('website_customer')->id(),
                 'cart_token' => $cart->cart_token,
 
                 'customer_name' => $validated['customer_name'],
@@ -181,6 +266,9 @@ class WebsiteCheckoutV1Controller extends Controller
 
                 'subtotal_amount' => $subtotalAmount,
                 'discount_amount' => $discountAmount,
+                'voucher_code' => $voucherCode,
+                'id_discount_code_v1' => $idDiscountCode,
+                'auto_discount_amount' => $autoDiscountAmount,
                 'shipping_fee' => $shippingFee,
                 'total_amount' => $totalAmount,
 
@@ -219,6 +307,12 @@ class WebsiteCheckoutV1Controller extends Controller
                 'note' => 'Đơn hàng được tạo từ website.',
                 'changed_by' => null,
             ]);
+
+            if ($idDiscountCode) {
+                DiscountCodeV1::where('id', $idDiscountCode)->increment('used_count');
+            }
+
+            session()->forget($this->discountSessionKey);
 
             /*
             |--------------------------------------------------------------------------
@@ -365,7 +459,9 @@ class WebsiteCheckoutV1Controller extends Controller
             | 2. Giá sale thường
             | 3. Giá gốc
             */
-            $displayPrice = $this->resolveDisplayPrice($product);
+            $priceInfo = app(ProductPriceV1Service::class)->resolveForProduct($product);
+            $displayPrice = (float) ($priceInfo['display_price'] ?? 0);
+            $originalPrice = $priceInfo['original_price'] ?? null;
 
             $item->update([
                 'kiotviet_product_id' => $product->id_product_kiotviet ?: null,
@@ -373,6 +469,7 @@ class WebsiteCheckoutV1Controller extends Controller
                 'product_name_snapshot' => $product->name,
                 'product_image_snapshot' => $product->img_avatar,
                 'price_snapshot' => $displayPrice,
+                'original_price_snapshot' => $originalPrice,
                 'line_total' => $displayPrice * (int) $item->quantity,
             ]);
         }
@@ -428,6 +525,58 @@ class WebsiteCheckoutV1Controller extends Controller
         }
 
         return asset(ltrim($path, '/'));
+    }
+
+    /**
+     * Tổng số tiền đã được giảm tự động (flash sale / giá khuyến mãi) so với giá gốc.
+     * Khoản này CHỈ mang tính thông báo cho khách, KHÔNG trừ thêm vào tổng thanh toán
+     * vì subtotal_amount của giỏ hàng đã được tính theo giá đã giảm (price_snapshot).
+     */
+    protected function calculateAutoDiscount(CartV1 $cart): float
+    {
+        $total = 0;
+
+        foreach ($cart->items as $item) {
+            $original = (float) ($item->original_price_snapshot ?? 0);
+            $price = (float) $item->price_snapshot;
+
+            if ($original > $price) {
+                $total += ($original - $price) * (int) $item->quantity;
+            }
+        }
+
+        return $total;
+    }
+
+    /**
+     * Lấy mã giảm giá (voucher/coupon) đang được áp dụng trong session, nếu còn hợp lệ.
+     */
+    protected function getAppliedDiscount(float $subtotalAmount): ?array
+    {
+        $code = session($this->discountSessionKey);
+
+        if (!$code) {
+            return null;
+        }
+
+        $discount = DiscountCodeV1::query()
+            ->active()
+            ->where('code', $code)
+            ->first();
+
+        if (!$discount || $subtotalAmount < (float) $discount->min_order_amount) {
+            session()->forget($this->discountSessionKey);
+            return null;
+        }
+
+        $amount = $discount->calculateDiscount($subtotalAmount);
+
+        return [
+            'id' => $discount->id,
+            'code' => $discount->code,
+            'title' => $discount->title,
+            'amount' => $amount,
+        ];
     }
 
     protected function generateOrderCode(): string

@@ -56,6 +56,7 @@ use App\Http\Controllers\NhaThuocPhuongAnh\WebsiteProductV1Controller;
 use App\Http\Controllers\NhaThuocPhuongAnh\WebsiteCartV1Controller;
 use App\Http\Controllers\NhaThuocPhuongAnh\WebsiteCheckoutV1Controller;
 use App\Http\Controllers\NhaThuocPhuongAnh\WebsiteGuestCustomerController;
+use App\Http\Controllers\NhaThuocPhuongAnh\WebsiteAuthV1Controller;
 use App\Http\Controllers\NhaThuocPhuongAnh\SeasonDiseaseWebsiteController;
 use App\Http\Controllers\NhaThuocPhuongAnh\WebsiteMyOrderV1Controller;
 use App\Http\Controllers\NhaThuocPhuongAnh\WebsiteCategoryController;
@@ -107,6 +108,8 @@ Route::prefix('dat-hang')->name('website.checkout.')->group(function () {
     Route::get('/', [WebsiteCheckoutV1Controller::class, 'index'])->name('index');
     Route::post('/tao-don', [WebsiteCheckoutV1Controller::class, 'store'])->name('store');
     Route::get('/thanh-cong/{orderCode}', [WebsiteCheckoutV1Controller::class, 'success'])->name('success');
+    Route::post('/ap-dung-ma-giam-gia', [WebsiteCheckoutV1Controller::class, 'applyDiscountCode'])->name('apply-discount');
+    Route::post('/bo-ma-giam-gia', [WebsiteCheckoutV1Controller::class, 'removeDiscountCode'])->name('remove-discount');
 });
 
 // Lưu thông tin khách hàng khi đặt hàng không cần đăng nhập
@@ -114,6 +117,15 @@ Route::post('/khach-hang/luu-session', [WebsiteGuestCustomerController::class, '
     ->name('website.guest-customer.store');
 Route::post('/khach-hang/xoa-session', [WebsiteGuestCustomerController::class, 'clear'])
     ->name('website.guest-customer.clear');
+
+// Đăng nhập khách hàng bằng OTP (Zalo) - đăng nhập 1 lần, dùng vĩnh viễn tới khi đăng xuất
+Route::prefix('khach-hang')->name('website.auth.')->group(function () {
+    Route::post('gui-otp', [WebsiteAuthV1Controller::class, 'sendOtp'])->name('send-otp');
+    Route::post('xac-thuc-otp', [WebsiteAuthV1Controller::class, 'verifyOtp'])->name('verify-otp');
+    Route::post('cap-nhat-thong-tin', [WebsiteAuthV1Controller::class, 'updateProfile'])->name('update-profile');
+    Route::post('dang-xuat', [WebsiteAuthV1Controller::class, 'logout'])->name('logout');
+    Route::get('thong-tin', [WebsiteAuthV1Controller::class, 'me'])->name('me');
+});
 
 //Chi tiết bệnh theo mùa
 Route::get('/benh-theo-mua/{id}', [SeasonDiseaseWebsiteController::class, 'show'])
@@ -171,16 +183,19 @@ Route::prefix('can-mua-thuoc')->name('website.prescription_request_v1.')->group(
 Route::get('/tu-van-duoc-si', [WebsitePharmacistConsultV1Controller::class, 'index'])
     ->name('website.pharmacist_consult_v1.index');
 
-// Điểm thưởng
+// Điểm thưởng (yêu cầu đăng nhập OTP - tránh lộ dữ liệu khách khác qua số điện thoại tự nhập)
 Route::get('/tich-diem-doi-qua', [WebsiteLoyaltyPointV1Controller::class, 'index'])
+    ->middleware('website_customer.auth')
     ->name('website.loyalty_point_v1.index');
 
-// Đơn thuốc đã mua
+// Đơn thuốc đã mua (yêu cầu đăng nhập OTP)
 Route::get('/don-thuoc-da-mua', [WebsitePurchasedMedicineV1Controller::class, 'index'])
+    ->middleware('website_customer.auth')
     ->name('website.purchased_medicine_v1.index');
-    
-// Đổi quà
+
+// Đổi quà (yêu cầu đăng nhập OTP)
 Route::get('/doi-qua', [WebsiteRewardExchangeV1Controller::class, 'index'])
+    ->middleware('website_customer.auth')
     ->name('website.reward_exchange_v1.index');
 /*
 |--------------------------------------------------------------------------
@@ -205,6 +220,9 @@ use App\Http\Controllers\NhaThuocPhuongAnhAdmin\BannerV1Controller;
 use App\Http\Controllers\NhaThuocPhuongAnhAdmin\MainCategoryV1Controller;
 use App\Http\Controllers\NhaThuocPhuongAnhAdmin\OrderV1Controller;
 use App\Http\Controllers\NhaThuocPhuongAnhAdmin\PrescriptionRequestV1Controller;
+use App\Http\Controllers\NhaThuocPhuongAnhAdmin\PopupTestController;
+use App\Http\Controllers\NhaThuocPhuongAnhAdmin\ShippingFeeRuleV1Controller;
+use App\Http\Controllers\NhaThuocPhuongAnhAdmin\DiscountCodeV1Controller;
 
 Route::get('gINNtanfKE2buXB/login', [LoginController::class, 'login'])->name('login');
 Route::get('authentication-forgot-password', [LoginController::class, 'forgotPassword'])->name('authentication-forgot-password');
@@ -423,13 +441,35 @@ Route::middleware([CheckLogin::class])->group(function (){
             Route::get('show/{id}', [BannerV1Controller::class, 'show'])->name('show');
         });
 
+        //POPUP THU NGHIEM
+        Route::prefix('popup-test')->name('popup_test.')->group(function () {
+            Route::get('/', [PopupTestController::class, 'index'])->name('index');
+            Route::post('update', [PopupTestController::class, 'update'])->name('update');
+        });
+
         //ORDER
         Route::prefix('admin/catalog-v1/order-v1')->name('admin.order_v1.')->group(function () {
             Route::get('/', [OrderV1Controller::class, 'index'])->name('index');
             Route::get('/{id}', [OrderV1Controller::class, 'show'])->name('show');
             Route::post('/{id}/update', [OrderV1Controller::class, 'update'])->name('update');
         });
-        
+
+        //PHI VAN CHUYEN
+        Route::prefix('shipping-fee')->name('shipping_fee.')->group(function () {
+            Route::get('/', [ShippingFeeRuleV1Controller::class, 'index'])->name('index');
+            Route::post('store', [ShippingFeeRuleV1Controller::class, 'store'])->name('store');
+            Route::post('update/{id}', [ShippingFeeRuleV1Controller::class, 'update'])->name('update');
+            Route::get('delete/{id}', [ShippingFeeRuleV1Controller::class, 'destroy'])->name('destroy');
+        });
+
+        //VOUCHER & MA GIAM GIA
+        Route::prefix('discount-code')->name('discount_code.')->group(function () {
+            Route::get('/', [DiscountCodeV1Controller::class, 'index'])->name('index');
+            Route::post('store', [DiscountCodeV1Controller::class, 'store'])->name('store');
+            Route::post('update/{id}', [DiscountCodeV1Controller::class, 'update'])->name('update');
+            Route::get('delete/{id}', [DiscountCodeV1Controller::class, 'destroy'])->name('destroy');
+        });
+
         //prescription request
         Route::prefix('admin/catalog-v1/prescription-request-v1')->name('prescription_request_v1.')->group(function () {
             Route::get('/', [PrescriptionRequestV1Controller::class, 'index'])->name('index');

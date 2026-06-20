@@ -23,6 +23,10 @@
         position:relative;
         overflow:hidden;
         box-shadow:0 18px 40px rgba(37,99,235,.18);
+        display:grid;
+        grid-template-columns:minmax(0,1fr) 430px;
+        gap:28px;
+        align-items:center;
     }
 
     .pa-rx-hero::after{
@@ -50,7 +54,7 @@
     .pa-rx-hero-content{
         position:relative;
         z-index:2;
-        max-width:850px;
+        max-width:780px;
     }
 
     .pa-rx-hero-badge{
@@ -112,6 +116,79 @@
     .pa-rx-hero-tags i{
         font-size:17px;
         line-height:1;
+    }
+
+    .pa-rx-hero-visual{
+        position:relative;
+        z-index:2;
+        border-radius:26px;
+        overflow:hidden;
+        background:rgba(255,255,255,.16);
+        border:1px solid rgba(255,255,255,.22);
+        box-shadow:0 24px 52px rgba(15,23,42,.22);
+    }
+
+    .pa-rx-hero-visual img{
+        display:block;
+        width:100%;
+        aspect-ratio:16 / 11;
+        object-fit:cover;
+    }
+
+    .pa-rx-flow{
+        display:grid;
+        grid-template-columns:repeat(3,minmax(0,1fr));
+        gap:14px;
+        margin:-4px 0 24px;
+    }
+
+    .pa-rx-flow-item{
+        background:#fff;
+        border:1px solid #e2e8f0;
+        border-radius:22px;
+        padding:18px;
+        box-shadow:0 12px 30px rgba(15,23,42,.05);
+        display:grid;
+        grid-template-columns:48px minmax(0,1fr);
+        gap:14px;
+        align-items:start;
+    }
+
+    .pa-rx-flow-num{
+        width:48px;
+        height:48px;
+        border-radius:16px;
+        background:#eaf7f3;
+        color:#0f8f65;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        font-size:20px;
+        font-weight:900;
+    }
+
+    .pa-rx-flow-item:nth-child(2) .pa-rx-flow-num{
+        background:#eff6ff;
+        color:#2563eb;
+    }
+
+    .pa-rx-flow-item:nth-child(3) .pa-rx-flow-num{
+        background:#fff7ed;
+        color:#ea580c;
+    }
+
+    .pa-rx-flow-item h3{
+        margin:0 0 6px;
+        color:#0f172a;
+        font-size:16px;
+        font-weight:900;
+    }
+
+    .pa-rx-flow-item p{
+        margin:0;
+        color:#64748b;
+        font-size:13px;
+        line-height:1.65;
     }
 
     .pa-rx-layout{
@@ -336,6 +413,34 @@
         line-height:1.6;
     }
 
+    .pa-photo-guide{
+        margin-top:14px;
+        display:grid;
+        grid-template-columns:repeat(3,minmax(0,1fr));
+        gap:10px;
+    }
+
+    .pa-photo-guide span{
+        min-height:40px;
+        border-radius:14px;
+        background:#fff;
+        border:1px solid #e2e8f0;
+        color:#334155;
+        font-size:12px;
+        font-weight:800;
+        display:flex;
+        align-items:center;
+        gap:7px;
+        padding:8px 10px;
+        line-height:1.35;
+    }
+
+    .pa-photo-guide i{
+        color:#0f8f65;
+        font-size:17px;
+        flex:0 0 auto;
+    }
+
     .pa-preview-wrap{
         display:none;
         margin-top:14px;
@@ -437,6 +542,67 @@
         gap:16px;
         position:sticky;
         top:18px;
+    }
+
+    .pa-guide-card{
+        background:#fff;
+        border-radius:24px;
+        padding:20px;
+        border:1px solid #edf2f7;
+        box-shadow:0 14px 35px rgba(15,23,42,.06);
+    }
+
+    .pa-guide-card img{
+        width:100%;
+        border-radius:20px;
+        display:block;
+        border:1px solid #e2e8f0;
+        margin-bottom:16px;
+    }
+
+    .pa-guide-card h3{
+        margin:0 0 12px;
+        color:#0f172a;
+        font-size:20px;
+        font-weight:900;
+        display:flex;
+        align-items:center;
+        gap:8px;
+    }
+
+    .pa-guide-card h3 i{
+        color:#0f8f65;
+        font-size:22px;
+    }
+
+    .pa-guide-list{
+        display:grid;
+        gap:10px;
+        margin:0;
+        padding:0;
+        list-style:none;
+    }
+
+    .pa-guide-list li{
+        display:grid;
+        grid-template-columns:28px minmax(0,1fr);
+        gap:10px;
+        align-items:start;
+        color:#334155;
+        font-size:14px;
+        line-height:1.6;
+    }
+
+    .pa-guide-list i{
+        width:28px;
+        height:28px;
+        border-radius:10px;
+        background:#ecfdf5;
+        color:#16a34a;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        font-size:16px;
     }
 
     .pa-contact-item{
@@ -851,6 +1017,18 @@
     }
 
     @media(max-width:1100px){
+        .pa-rx-hero{
+            grid-template-columns:1fr;
+        }
+
+        .pa-rx-hero-visual{
+            max-width:620px;
+        }
+
+        .pa-rx-flow{
+            grid-template-columns:1fr;
+        }
+
         .pa-rx-layout{
             grid-template-columns:1fr;
         }
@@ -880,6 +1058,7 @@
         }
 
         .pa-rx-form-grid,
+        .pa-photo-guide,
         .pa-contact-box{
             grid-template-columns:1fr;
         }
@@ -931,6 +1110,40 @@
                     <span><i class="ri-shield-check-line"></i> Bảo mật thông tin khách hàng</span>
                     <span><i class="ri-chat-smile-2-line"></i> Hỗ trợ qua Zalo OA</span>
                     <span><i class="ri-nurse-line"></i> Tư vấn bởi dược sĩ</span>
+                </div>
+            </div>
+
+            <div class="pa-rx-hero-visual">
+                <img
+                    src="{{ asset('phuonganh/img/prescription-guide-v2.png') }}"
+                    alt="Minh họa quy trình gửi đơn thuốc và nhận tư vấn từ dược sĩ"
+                    loading="eager"
+                >
+            </div>
+        </div>
+
+        <div class="pa-rx-flow" aria-label="Quy trình gửi yêu cầu mua thuốc">
+            <div class="pa-rx-flow-item">
+                <div class="pa-rx-flow-num">1</div>
+                <div>
+                    <h3>Gửi ảnh hoặc nội dung đơn</h3>
+                    <p>Chụp rõ đơn thuốc, nhập thêm tên thuốc, số lượng và ghi chú nếu cần tư vấn thay thế.</p>
+                </div>
+            </div>
+
+            <div class="pa-rx-flow-item">
+                <div class="pa-rx-flow-num">2</div>
+                <div>
+                    <h3>Dược sĩ kiểm tra</h3>
+                    <p>Đội ngũ dược sĩ đối chiếu thông tin, kiểm tra thuốc kê đơn và liên hệ lại khi cần xác nhận.</p>
+                </div>
+            </div>
+
+            <div class="pa-rx-flow-item">
+                <div class="pa-rx-flow-num">3</div>
+                <div>
+                    <h3>Nhận tư vấn và mua thuốc</h3>
+                    <p>Bạn được báo tình trạng thuốc, hướng dẫn sử dụng phù hợp và chọn nhận tại nhà thuốc hoặc giao hàng.</p>
                 </div>
             </div>
         </div>
@@ -1033,6 +1246,12 @@
                                     </div>
                                 </label>
 
+                                <div class="pa-photo-guide">
+                                    <span><i class="ri-focus-3-line"></i> Chụp đủ 4 góc đơn thuốc</span>
+                                    <span><i class="ri-sun-line"></i> Ảnh đủ sáng, không bị lóa</span>
+                                    <span><i class="ri-eye-line"></i> Tên thuốc và liều dùng đọc rõ</span>
+                                </div>
+
                                 <div class="pa-preview-wrap" id="paPreviewWrap">
                                     <img src="" alt="Ảnh đơn thuốc" class="pa-preview-image" id="paPreviewImage">
 
@@ -1082,6 +1301,34 @@
             </div>
 
             <aside class="pa-contact-box">
+                <div class="pa-guide-card">
+                    <img
+                        src="{{ asset('phuonganh/img/prescription-guide-v2.png') }}"
+                        alt="Hướng dẫn gửi đơn thuốc cho Nhà thuốc Phương Anh"
+                        loading="lazy"
+                    >
+
+                    <h3>
+                        <i class="ri-compass-3-line"></i>
+                        Gửi đơn sao cho dược sĩ xử lý nhanh
+                    </h3>
+
+                    <ul class="pa-guide-list">
+                        <li>
+                            <i class="ri-checkbox-circle-line"></i>
+                            <span>Điền đúng số điện thoại để dược sĩ gọi xác nhận khi đơn cần tư vấn thêm.</span>
+                        </li>
+                        <li>
+                            <i class="ri-checkbox-circle-line"></i>
+                            <span>Ghi rõ nhu cầu: mua đúng đơn, cần thuốc tương đương, hoặc muốn giao trong ngày.</span>
+                        </li>
+                        <li>
+                            <i class="ri-checkbox-circle-line"></i>
+                            <span>Với thuốc kê đơn, chuẩn bị ảnh đơn còn rõ ngày kê và thông tin bác sĩ nếu có.</span>
+                        </li>
+                    </ul>
+                </div>
+
                 <div class="pa-contact-item">
                     <div class="pa-contact-icon">
                         <i class="ri-phone-line"></i>

@@ -667,17 +667,19 @@
         }
 
         .pa-season-v2__products-wrap{
-            padding: 18px;
-            border-radius: 22px;
+            padding: 12px;
+            border-radius: 18px;
         }
 
         .pa-season-v2__products-head{
             align-items: flex-start;
             flex-direction: column;
+            gap: 8px;
+            margin-bottom: 10px;
         }
 
         .pa-season-v2__products-head h3{
-            font-size: 24px;
+            font-size: 20px;
         }
 
         .pa-season-v2__nav{
@@ -685,18 +687,48 @@
         }
 
         .pa-season-v2__product{
-            width: 220px;
-            min-width: 220px;
-            max-width: 220px;
+            width: 152px;
+            min-width: 152px;
+            max-width: 152px;
+            border-radius: 16px;
+        }
+
+        .pa-season-v2__product-image{
+            height: 82px;
+            aspect-ratio: auto;
+            padding: 7px;
+        }
+
+        .pa-season-v2__product-body{
+            padding: 8px;
         }
 
         .pa-season-v2__product-name{
-            min-height: 68px;
-            font-size: 15px;
+            min-height: 32px;
+            margin-bottom: 6px;
+            font-size: 11.5px;
+            line-height: 1.35;
+            -webkit-line-clamp: 2;
         }
 
         .pa-season-v2__product-price-sale{
-            font-size: 20px;
+            font-size: 13px;
+        }
+
+        .pa-season-v2__product-price-sale span,
+        .pa-season-v2__product-price-origin {
+            display: none;
+        }
+
+        .pa-season-v2__product-price{
+            margin-bottom: 6px;
+        }
+
+        .pa-season-v2__product-btn{
+            height: 28px;
+            min-height: 28px;
+            font-size: 10.5px;
+            box-shadow: none;
         }
 
         .pa-season-v2__banner{
