@@ -1434,8 +1434,9 @@
 
         .pa-mobile-header-actions{
             position: absolute !important;
-            top: 0 !important;
+            top: 50% !important;
             right: 0 !important;
+            transform: translateY(-50%) !important;
             width: 126px;
             min-width: 126px;
             display: inline-flex;
