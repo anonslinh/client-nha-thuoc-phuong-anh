@@ -50,6 +50,10 @@
         }
 
         /* ============= HEADER ============= */
+        /* Chỉ áp dụng cho desktop (>=768px). Mobile dùng toàn bộ CSS header
+           trong resources/views/website/home/header-menu.blade.php để tránh
+           2 bộ CSS cùng định nghĩa .lc-header* xung đột nhau trên mobile. */
+        @media (min-width: 768px) {
         .lc-header {
             position: relative;
             z-index: 50;
@@ -440,6 +444,7 @@
                 font-size: 14px;
             }
         }
+        } /* end @media (min-width: 768px) cho HEADER */
 
         /* ============= BANNER HERO BELOW HEADER ============= */
         .lc-banner {
