@@ -1419,7 +1419,7 @@
         }
 
         .lc-header-main{
-            grid-template-columns: minmax(0, 1fr) !important;
+            grid-template-columns: minmax(0, 1fr) auto !important;
             position: relative !important;
         }
 
@@ -1433,12 +1433,11 @@
         }
 
         .pa-mobile-header-actions{
-            position: absolute !important;
-            top: 50% !important;
-            right: 0 !important;
-            transform: translateY(-50%) !important;
-            width: 126px;
-            min-width: 126px;
+            grid-column: 2 !important;
+            grid-row: 1 !important;
+            position: static !important;
+            width: auto;
+            min-width: 0;
             display: inline-flex;
             align-items: center;
             justify-content: flex-end;
@@ -1721,10 +1720,6 @@
         .lc-search-bar{
             width: 100% !important;
             max-width: 100% !important;
-        }
-
-        .pa-mobile-header-actions{
-            right: 0 !important;
         }
     }
 </style>
