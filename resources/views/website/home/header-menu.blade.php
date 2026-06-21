@@ -1279,12 +1279,12 @@
         }
 
         .lc-header .lc-container{
-            width: calc(100vw - 20px) !important;
-            max-width: calc(100vw - 20px) !important;
-            margin-left: auto !important;
-            margin-right: auto !important;
-            padding-left: 0 !important;
-            padding-right: 0 !important;
+            width: 100% !important;
+            max-width: 100% !important;
+            margin-left: 0 !important;
+            margin-right: 0 !important;
+            padding-left: 10px !important;
+            padding-right: 10px !important;
         }
 
         .lc-header-top{
@@ -1493,8 +1493,10 @@
         }
 
         .lc-search-input{
+            width: 100%;
             height: 100%;
             min-width: 0;
+            border: none;
             font-size: 13px !important;
             line-height: 1.2;
             padding-right: 4px !important;
@@ -1713,13 +1715,6 @@
     }
 
     @media (max-width: 767px){
-        .lc-header .lc-container{
-            width: calc(100vw - 16px) !important;
-            max-width: calc(100vw - 16px) !important;
-            margin-left: 8px !important;
-            margin-right: 8px !important;
-        }
-
         .lc-header-main,
         .lc-search-wrap,
         .lc-search-bar{
