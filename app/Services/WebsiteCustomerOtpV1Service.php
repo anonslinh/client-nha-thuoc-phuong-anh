@@ -38,11 +38,11 @@ class WebsiteCustomerOtpV1Service
         $trackingId = 'NTPA' . now()->format('ymdHis') . rand(100, 999);
 
         try {
-            $response = Http::withHeaders([
-                'Content-Type' => 'application/json',
-                'Accept' => 'application/json',
-                'X-API-KEY' => config('services.outtech_otp.api_key'),
-            ])
+            $response = Http::asForm()
+                ->withHeaders([
+                    'Accept' => 'application/json',
+                    'X-API-KEY' => config('services.outtech_otp.api_key'),
+                ])
                 ->withOptions(['verify' => !app()->environment('local')])
                 ->timeout(15)
                 ->post(config('services.outtech_otp.url'), [
