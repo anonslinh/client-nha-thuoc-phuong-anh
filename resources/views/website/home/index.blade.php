@@ -1522,12 +1522,9 @@ document.addEventListener('DOMContentLoaded', function () {
             <i class="ri-flask-line" aria-hidden="true"></i>
         </div>
 
-        <h3 class="pa-beta-popup-title" id="paBetaPopupTitle">Website đang trong giai đoạn thử nghiệm</h3>
+        <h3 class="pa-beta-popup-title" id="paBetaPopupTitle">{{ $popupTestTitle ?? 'Website đang trong giai đoạn thử nghiệm' }}</h3>
 
-        <p class="pa-beta-popup-desc">
-            Nhà thuốc Phương Anh đang trong quá trình hoàn thiện website. Một số chức năng có thể chưa hoạt động hoàn hảo.
-            Rất mong nhận được góp ý của bạn để chúng tôi cải thiện trải nghiệm tốt hơn!
-        </p>
+        <p class="pa-beta-popup-desc">{{ $popupTestDescription ?? 'Nhà thuốc Phương Anh đang trong quá trình hoàn thiện website. Một số chức năng có thể chưa hoạt động hoàn hảo. Rất mong nhận được góp ý của bạn để chúng tôi cải thiện trải nghiệm tốt hơn!' }}</p>
 
         <div class="pa-beta-popup-actions">
             <a href="https://zalo.me/4374437222076872555" target="_blank" rel="noopener" class="pa-beta-popup-btn pa-beta-popup-btn-outline">
@@ -1539,9 +1536,11 @@ document.addEventListener('DOMContentLoaded', function () {
                 Đã hiểu, tiếp tục
             </button>
 
-            <button type="button" class="pa-beta-popup-btn pa-beta-popup-btn-text" id="paBetaPopupNeverShow">
-                Không hiển thị lại
-            </button>
+            @unless($popupTestAlwaysShow ?? true)
+                <button type="button" class="pa-beta-popup-btn pa-beta-popup-btn-text" id="paBetaPopupNeverShow">
+                    Không hiển thị lại
+                </button>
+            @endunless
         </div>
     </div>
 </div>
@@ -1683,12 +1682,19 @@ document.addEventListener('DOMContentLoaded', function () {
 <script>
     (function () {
         var STORAGE_KEY = 'paBetaPopupNeverShow';
+        var ALWAYS_SHOW = {{ ($popupTestAlwaysShow ?? true) ? 'true' : 'false' }};
 
         var isMobileUserAgent = /Android|iPhone|iPad|iPod|Mobile|Windows Phone/i.test(navigator.userAgent || '');
         var isNarrowViewport = window.matchMedia('(max-width: 767px)').matches;
         var isMobile = isMobileUserAgent && isNarrowViewport;
 
-        if (!isMobile || localStorage.getItem(STORAGE_KEY)) {
+        if (!isMobile) {
+            return;
+        }
+
+        // Khi "luôn hiển thị lại" TẮT thì tôn trọng lựa chọn "Không hiển thị lại" của khách.
+        // Khi BẬT thì bỏ qua, luôn hiện lại mỗi lần truy cập.
+        if (!ALWAYS_SHOW && localStorage.getItem(STORAGE_KEY)) {
             return;
         }
 
@@ -1714,7 +1720,9 @@ document.addEventListener('DOMContentLoaded', function () {
         closeBtn.addEventListener('click', closePopup);
         backdrop.addEventListener('click', closePopup);
         okBtn.addEventListener('click', closePopup);
-        neverShowBtn.addEventListener('click', neverShowAgain);
+        if (neverShowBtn) {
+            neverShowBtn.addEventListener('click', neverShowAgain);
+        }
     })();
 </script>
 @endif

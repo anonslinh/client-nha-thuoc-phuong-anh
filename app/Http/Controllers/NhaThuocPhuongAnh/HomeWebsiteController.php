@@ -85,6 +85,14 @@ class HomeWebsiteController extends Controller
         $popupTestEnabled = GeneralSettings::where('code', 'popup_test_enabled')->value('value');
         $popupTestEnabled = $popupTestEnabled === null ? true : ((int) $popupTestEnabled === 1);
 
+        $popupTestAlwaysShow = GeneralSettings::where('code', 'popup_test_always_show')->value('value');
+        $popupTestAlwaysShow = $popupTestAlwaysShow === null ? true : ((int) $popupTestAlwaysShow === 1);
+
+        $popupTestTitle = GeneralSettings::where('code', 'popup_test_title')->value('value')
+            ?: 'Website đang trong giai đoạn thử nghiệm';
+        $popupTestDescription = GeneralSettings::where('code', 'popup_test_description')->value('value')
+            ?: 'Nhà thuốc Phương Anh đang trong quá trình hoàn thiện website. Một số chức năng có thể chưa hoạt động hoàn hảo. Rất mong nhận được góp ý của bạn để chúng tôi cải thiện trải nghiệm tốt hơn!';
+
         return view('website.home.index', compact(
             'headerSearchKeywords',
             'bannerHero',
@@ -102,7 +110,10 @@ class HomeWebsiteController extends Controller
             'listMainCategory',
             'healthCornerList',
             'listSick',
-            'popupTestEnabled'
+            'popupTestEnabled',
+            'popupTestAlwaysShow',
+            'popupTestTitle',
+            'popupTestDescription'
         ));
     }
 

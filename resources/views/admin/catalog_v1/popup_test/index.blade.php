@@ -6,39 +6,62 @@
 
         @if(session('success')) <div class="alert alert-success mt-3 mb-0">{{ session('success') }}</div> @endif
         @if(session('error')) <div class="alert alert-danger mt-3 mb-0">{{ session('error') }}</div> @endif
+        @if($errors->any())
+            <div class="alert alert-danger mt-3 mb-0">
+                @foreach($errors->all() as $e) <div>{{ $e }}</div> @endforeach
+            </div>
+        @endif
     </div>
 
     <div class="card">
         <div class="card-body">
             <p class="text-muted">
                 Popup này hiển thị trên <strong>trang chủ phiên bản mobile</strong>, thông báo cho khách hàng biết
-                website đang trong giai đoạn thử nghiệm và mời khách góp ý qua Zalo. Khách có thể bấm
-                "Không hiển thị lại" để ẩn vĩnh viễn trên trình duyệt của họ; nếu không bấm, popup sẽ hiện lại
-                ở mỗi lần truy cập / tải lại trang chủ.
+                website đang trong giai đoạn thử nghiệm và mời khách góp ý qua Zalo.
             </p>
-
-            <div class="d-flex align-items-center gap-3 mt-3">
-                <span class="fw-semibold">Trạng thái hiện tại:</span>
-
-                @if($enabled == 1)
-                    <span class="badge bg-success">Đang bật</span>
-                @else
-                    <span class="badge bg-secondary">Đang tắt</span>
-                @endif
-            </div>
 
             <form action="{{ route('catalog_v1.popup_test.update') }}" method="post" class="mt-3">
                 @csrf
 
-                @if($enabled == 1)
-                    <button type="submit" class="btn btn-danger">
-                        <i class="ti ti-toggle-left me-1"></i> Tắt popup thử nghiệm
-                    </button>
-                @else
-                    <button type="submit" class="btn btn-success">
-                        <i class="ti ti-toggle-right me-1"></i> Bật popup thử nghiệm
-                    </button>
-                @endif
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Tiêu đề popup</label>
+                    <input type="text" name="title" class="form-control" value="{{ old('title', $title) }}"
+                           placeholder="VD: Website đang trong giai đoạn thử nghiệm" required>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label fw-semibold">Nội dung mô tả</label>
+                    <textarea name="description" class="form-control" rows="4" required
+                              placeholder="Nội dung hiển thị bên dưới tiêu đề...">{{ old('description', $description) }}</textarea>
+                </div>
+
+                <hr>
+
+                <div class="form-check form-switch mb-2">
+                    <input class="form-check-input" type="checkbox" role="switch" id="enabledSwitch"
+                           name="enabled" value="1" {{ old('enabled', $enabled) ? 'checked' : '' }}>
+                    <label class="form-check-label" for="enabledSwitch">
+                        <strong>Bật popup thử nghiệm</strong>
+                        <div class="text-muted small">Tắt thì popup sẽ không hiển thị trên trang chủ.</div>
+                    </label>
+                </div>
+
+                <div class="form-check form-switch mb-3">
+                    <input class="form-check-input" type="checkbox" role="switch" id="alwaysShowSwitch"
+                           name="always_show" value="1" {{ old('always_show', $alwaysShow) ? 'checked' : '' }}>
+                    <label class="form-check-label" for="alwaysShowSwitch">
+                        <strong>Luôn hiển thị lại</strong>
+                        <div class="text-muted small">
+                            <u>Bật</u>: popup hiện lại ở <strong>mỗi lần</strong> khách truy cập/tải lại trang chủ
+                            (ẩn nút "Không hiển thị lại").<br>
+                            <u>Tắt</u>: hiện nút "Không hiển thị lại" — khách bấm thì sẽ không thấy popup ở các lần sau.
+                        </div>
+                    </label>
+                </div>
+
+                <button type="submit" class="btn btn-primary">
+                    <i class="ti ti-device-floppy me-1"></i> Lưu cấu hình
+                </button>
             </form>
         </div>
     </div>
