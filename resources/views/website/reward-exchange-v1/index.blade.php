@@ -1502,7 +1502,12 @@
         const el = document.getElementById('paPointsValue');
         if(el) el.textContent = paFormatPoints(PA_APP.balance);
 
-        paReevaluateButtons();
+        // Có điểm mới -> render lại để sắp xếp quà đổi được lên đầu theo số điểm hiện tại.
+        if(PA_APP.gifts && PA_APP.gifts.length){
+            paRenderGifts();
+        }else{
+            paReevaluateButtons();
+        }
     }
 
     function paResetScreen(){
@@ -1660,6 +1665,28 @@
         });
     }
 
+    // Sắp xếp (chỉ phía client): ưu tiên quà mà với số điểm hiện tại của user có thể đổi được.
+    // Thứ tự: 1) Đổi được (đủ điểm + còn hàng) → 2) Còn hàng nhưng chưa đủ điểm → 3) Hết quà.
+    // Trong nhóm đổi được: điểm cao lên trước (quà giá trị nhất user có thể nhận).
+    // Trong nhóm chưa đủ điểm: điểm thấp lên trước (gần đạt được nhất).
+    function paSortGiftsByRedeemable(gifts){
+        const balance = Number(PA_APP.balance) || 0;
+
+        return gifts.slice().sort((a, b) => {
+            const aPts = Number(a.points) || 0;
+            const bPts = Number(b.points) || 0;
+            const aInStock = (Number(a.total_qty) || 0) > 0;
+            const bInStock = (Number(b.total_qty) || 0) > 0;
+            const aRedeem = aInStock && balance >= aPts;
+            const bRedeem = bInStock && balance >= bPts;
+
+            if(aRedeem !== bRedeem) return aRedeem ? -1 : 1;     // đổi được lên đầu
+            if(aInStock !== bInStock) return aInStock ? -1 : 1;  // hết quà xuống cuối
+            if(aRedeem) return bPts - aPts;                      // nhóm đổi được: điểm cao trước
+            return aPts - bPts;                                  // nhóm chưa đủ: gần đạt trước
+        });
+    }
+
     function paRenderGifts(){
         const grid = document.getElementById('paRewardsGrid');
 
@@ -1675,7 +1702,7 @@
             return;
         }
 
-        grid.innerHTML = PA_APP.gifts.map((gift) => {
+        grid.innerHTML = paSortGiftsByRedeemable(PA_APP.gifts).map((gift) => {
             const id = gift.id;
             const name = gift.name || 'Quà tặng';
             const image = gift.image_url || '';
@@ -1728,6 +1755,7 @@
         });
 
         paReevaluateButtons();
+        paFilterGifts(); // giữ lại từ khoá tìm kiếm hiện tại sau khi render/sắp xếp lại
     }
 
     function paRenderBranchesForGift(giftId){
